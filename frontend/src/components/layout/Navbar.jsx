@@ -122,7 +122,10 @@ export const Navbar = () => {
 
             {/* Resume Download Button */}
             <a
-              href="/api/profile/resume"
+              href={import.meta.env.VITE_API_URL 
+                ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api/profile/resume` 
+                : '/api/profile/resume'
+              }
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-primary to-secondary rounded-xl hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
@@ -175,7 +178,10 @@ export const Navbar = () => {
 
               {/* Resume Download — Mobile */}
               <a
-                href="/api/profile/resume"
+                href={import.meta.env.VITE_API_URL 
+                  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api/profile/resume` 
+                  : '/api/profile/resume'
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 mt-2 py-3 px-4 text-sm font-semibold text-primary dark:text-primary-light rounded-xl hover:bg-primary/5 transition-colors"
