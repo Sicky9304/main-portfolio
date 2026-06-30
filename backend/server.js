@@ -96,7 +96,7 @@ const start = async () => {
   app.listen(PORT, () => {
     console.log(`\n🚀 Server running on port ${PORT}`);
     console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
-    console.log(`🌐 CORS origin: ${process.env.CORS_ORIGIN || 'http://localhost:5173'}\n`);
+    console.log(`🌐 CORS origin: ${process.env.CORS_ORIGIN || 'https://main-portfolio-sand-iota.vercel.app/'}\n`);
   });
 };
 

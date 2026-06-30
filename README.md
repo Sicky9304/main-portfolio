@@ -2,6 +2,10 @@
 
 A premium, interactive personal developer portfolio featuring a glassmorphism design system, theme-aware holographic particle video backdrops, dynamic binary PDF resume database streaming, and a secure passcode-guarded administrative CRUD dashboard with drag-and-drop Cloudinary uploading.
 
+### 🌐 Live Deployments
+* **🔗 Frontend (Vercel)**: [https://main-portfolio-sand-iota.vercel.app/](https://main-portfolio-sand-iota.vercel.app/)
+* **🔗 Backend API (Render)**: [https://main-portfolio-24pg.onrender.com/](https://main-portfolio-24pg.onrender.com/)
+
 ---
 
 ## 🎨 Key Features & Visual Mechanics
