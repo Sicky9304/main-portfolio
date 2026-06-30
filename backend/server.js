@@ -18,8 +18,26 @@ const PORT = process.env.PORT || 5000;
 
 // ─── Middleware ───────────────────────────────────
 app.use(helmet());
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'https://main-portfolio-sand-iota.vercel.app',
+  'https://main-portfolio-24pg.onrender.com'
+];
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (
+      allowedOrigins.includes(origin) || 
+      origin.endsWith('.vercel.app') ||
+      origin.startsWith('http://localhost:')
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   credentials: true,
 }));
@@ -50,7 +68,7 @@ const contactLimiter = rateLimit({
 
 // ─── Routes ───────────────────────────────────────
 app.get('/', (req, res) => {
-  res.send("Api is working...");
+  res.json({ success: true, message: 'Server is running', timestamp: new Date().toISOString() });
 });
 
 app.get('/api/health', (req, res) => {
