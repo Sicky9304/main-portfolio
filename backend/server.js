@@ -13,7 +13,6 @@ import profileRoutes from './routes/profile.js';
 import serviceRoutes from './routes/services.js';
 import testimonialRoutes from './routes/testimonials.js';
 import uploadRoutes from './routes/upload.js';
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -50,6 +49,10 @@ const contactLimiter = rateLimit({
 });
 
 // ─── Routes ───────────────────────────────────────
+app.get('/', (req, res) => {
+  res.send("Api is working...");
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Server is running', timestamp: new Date().toISOString() });
 });
