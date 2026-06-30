@@ -36,7 +36,8 @@ function AppContent() {
     return () => window.removeEventListener('popstate', handleLocationChange);
   }, []);
 
-  if (currentPath === '/sicky-admin') {
+  const cleanPath = currentPath.replace(/\/$/, '');
+  if (cleanPath === '/sicky-admin') {
     return <AdminDashboard />;
   }
 
