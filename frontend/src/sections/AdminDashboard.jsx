@@ -61,14 +61,14 @@ export const AdminDashboard = () => {
     }
   }, []);
 
-  // 2. Fetch Dashboard data
   useEffect(() => {
     if (isAuthenticated) {
       const loadData = async () => {
         try {
           const projs = await fetchProjects();
+          const validProjs = Array.isArray(projs) ? projs : [];
           // Sort by order
-          setProjects(projs.sort((a, b) => a.order - b.order));
+          setProjects(validProjs.sort((a, b) => (a.order || 0) - (b.order || 0)));
           
           const prof = await fetchProfile();
           setProfile(prof);

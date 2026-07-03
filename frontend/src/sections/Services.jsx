@@ -55,7 +55,8 @@ const FALLBACK_SERVICES = [
 ];
 
 export const Services = () => {
-  const { data: services } = useApi(fetchServices, FALLBACK_SERVICES);
+  const { data: servicesData } = useApi(fetchServices, FALLBACK_SERVICES);
+  const services = Array.isArray(servicesData) && servicesData.length > 0 ? servicesData : FALLBACK_SERVICES;
 
   return (
     <section id="services" className="section-padding relative">

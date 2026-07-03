@@ -122,15 +122,19 @@ export const Testimonials = () => {
 
                   <div className="flex items-center gap-4">
 
-                    {/* <span className="text-4xl">
-                      {testimonial?.avatar || "🙂"}
-                    </span> */}
-
-                    <img
-                      src={testimonial?.avatar}
-                      alt={testimonial?.name}
-                      className="w-14 h-14 rounded-full object-cover border-2 border-primary"
-                    />
+                    {testimonial?.avatar && (testimonial.avatar.startsWith("http") || testimonial.avatar.startsWith("/")) ? (
+                      <img
+                        src={testimonial.avatar}
+                        alt={testimonial.name}
+                        className="w-14 h-14 rounded-full object-cover border-2 border-primary"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-full bg-primary/10 dark:bg-primary/5 flex items-center justify-center border-2 border-primary">
+                        <span className="text-3xl">
+                          {testimonial?.avatar || "🙂"}
+                        </span>
+                      </div>
+                    )}
 
                     <div>
 

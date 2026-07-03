@@ -29,6 +29,10 @@ app.use(cors({
  origin(origin,cb){
    if(!origin) return cb(null,true);
    if(allowed.includes(origin)) return cb(null,true);
+   // Allow any localhost port in development mode
+   if(process.env.NODE_ENV==='development' && /^http:\/\/localhost:\d+$/.test(origin)){
+     return cb(null,true);
+   }
    cb(new Error('Not allowed by CORS'));
  },
  credentials:true,
@@ -39,7 +43,7 @@ app.use(express.json({limit:'10mb'}));
 
 const apiLimiter=rateLimit({
  windowMs:15*60*1000,
- max:100,
+ max:process.env.NODE_ENV==='development' ? 10000 : 100,
  standardHeaders:true,
  legacyHeaders:false
 });

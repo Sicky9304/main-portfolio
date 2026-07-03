@@ -1,9 +1,11 @@
 // Production API Service
-const API_BASE = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, "")}/api`
-  : "/api";
+const API_BASE = import.meta.env.DEV
+  ? "/api"
+  : (import.meta.env.VITE_API_URL
+      ? `${import.meta.env.VITE_API_URL.replace(/\/$/, "")}/api`
+      : "/api");
 
-const DEFAULT_TIMEOUT = 15000;
+const DEFAULT_TIMEOUT = 60000;
 
 export class ApiError extends Error {
   constructor(message, status = 500, details = null) {

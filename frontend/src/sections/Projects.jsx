@@ -115,7 +115,8 @@ const FALLBACK_PROJECTS = [
 ];
 
 export const Projects = () => {
-  const { data: projects } = useApi(fetchProjects, FALLBACK_PROJECTS);
+  const { data: projectsData, error } = useApi(fetchProjects, FALLBACK_PROJECTS);
+  const projects = Array.isArray(projectsData) && projectsData.length > 0 ? projectsData : FALLBACK_PROJECTS;
   const [selectedProject, setSelectedProject] = useState(null);
 
   // Close modal on Escape key
@@ -141,6 +142,12 @@ export const Projects = () => {
           title="Work That Speaks"
           description="Each project is a unique piece of development, crafted to solve real-world problems."
         />
+
+        {error && (
+          <p className="text-center text-sm text-yellow-600 dark:text-yellow-400 mb-8">
+            Backend data unavailable. Showing fallback projects.
+          </p>
+        )}
 
         {/* Project Showcase */}
         <div className="space-y-20">
@@ -255,7 +262,7 @@ export const Projects = () => {
 
                     {/* Tech Stack Pills */}
                     <div className="flex flex-wrap gap-2">
-                      {project.tech.map((t) => (
+                      {(project.tech || []).map((t) => (
                         <span key={t} className="px-3 py-1.5 rounded-xl text-xs font-semibold glass text-slate-600 dark:text-slate-300">
                           {t}
                         </span>
@@ -335,12 +342,12 @@ export const Projects = () => {
                   </p>
                 </div>
 
-                <div>
+                 <div>
                   <div className="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-white mb-3">
                     <Layers size={14} className="text-primary" /> Key Features
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {selectedProject.features.map((f) => (
+                    {(selectedProject.features || []).map((f) => (
                       <div key={f} className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-sm text-slate-700 dark:text-slate-300">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
                         {f}
@@ -350,7 +357,7 @@ export const Projects = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {selectedProject.tech.map((t) => (
+                  {(selectedProject.tech || []).map((t) => (
                     <span key={t} className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-primary/5 dark:bg-primary/10 text-primary dark:text-primary-light">
                       {t}
                     </span>
