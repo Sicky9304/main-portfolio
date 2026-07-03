@@ -5,12 +5,14 @@ import {
   Edit3, ExternalLink, Link2, Sparkles, RefreshCw, X, CheckCircle 
 } from 'lucide-react';
 import { Github } from '../components/ui/BrandIcons';
+import { useTheme } from '../context/ThemeContext';
 import { 
   createProject, updateProject, deleteProject, 
   updateProfile, uploadImage, fetchProjects, fetchProfile 
 } from '../api/index.js';
 
 export const AdminDashboard = () => {
+  const { theme } = useTheme();
   const [passcode, setPasscode] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -58,13 +60,9 @@ export const AdminDashboard = () => {
     const htmlEl = document.documentElement;
     const bodyEl = document.body;
     
-    // Save original styles/classes
+    // Save original styles
     const originalHtmlBg = htmlEl.style.backgroundColor;
     const originalBodyBg = bodyEl.style.backgroundColor;
-    
-    // Force dark background to prevent white space scroll on mobile
-    htmlEl.style.backgroundColor = '#030712'; // Obsidian surface-dark
-    bodyEl.style.backgroundColor = '#030712';
     
     // Remove Lenis scroll constraints on admin route
     htmlEl.classList.remove('lenis'); 
@@ -74,6 +72,16 @@ export const AdminDashboard = () => {
       bodyEl.style.backgroundColor = originalBodyBg;
     };
   }, []);
+
+  // Sync background color with theme context to prevent white margin scroll issues
+  useEffect(() => {
+    const htmlEl = document.documentElement;
+    const bodyEl = document.body;
+    const bg = theme === 'dark' ? '#030712' : '#F8FAFC';
+    
+    htmlEl.style.backgroundColor = bg;
+    bodyEl.style.backgroundColor = bg;
+  }, [theme]);
 
   useEffect(() => {
     const savedCode = localStorage.getItem('adminPasscode');
@@ -128,6 +136,36 @@ export const AdminDashboard = () => {
     setIsAuthenticated(false);
     setPasscode('');
   };
+
+  // 2. Automatic logout on inactivity (2 minutes)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const INACTIVITY_TIMEOUT = 2 * 60 * 1000; // 2 minutes
+    let timeoutId;
+
+    const resetTimer = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        handleLogout();
+        alert("Session expired due to inactivity. You have been logged out.");
+      }, INACTIVITY_TIMEOUT);
+    };
+
+    // Events that register user activity
+    const events = ['mousemove', 'keypress', 'click', 'scroll', 'touchstart'];
+
+    // Initialize the timer
+    resetTimer();
+
+    // Set event listeners to reset timer on user activity
+    events.forEach(evt => window.addEventListener(evt, resetTimer));
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      events.forEach(evt => window.removeEventListener(evt, resetTimer));
+    };
+  }, [isAuthenticated]);
 
   // 3. Resume base64 converters
   const handleResumeSelect = (e) => {
@@ -318,7 +356,7 @@ export const AdminDashboard = () => {
   // RENDER: Passcode Prompt Screen
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#030712] flex flex-col items-center justify-center text-white px-4 relative overflow-hidden">
+      <div className="min-h-screen bg-surface-light dark:bg-surface-dark flex flex-col items-center justify-center text-slate-800 dark:text-white px-4 relative overflow-hidden transition-colors duration-300">
         {/* Ambient background glow elements */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-1/4 left-1/3 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
@@ -327,7 +365,7 @@ export const AdminDashboard = () => {
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.4 }}
-          className="w-full max-w-md glass border border-slate-800/80 rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6 relative z-10"
+          className="w-full max-w-md glass border border-slate-200 dark:border-slate-800/80 rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6 relative z-10"
         >
           <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-primary border border-primary/20 shadow-lg shadow-primary/5">
             <Lock size={28} className="text-primary animate-pulse" />
@@ -337,12 +375,12 @@ export const AdminDashboard = () => {
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-heading">
               Admin Portal
             </h2>
-            <p className="text-xs text-slate-400">Authorized Access Only • Secure Session Mode</p>
+            <p className="text-xs text-slate-555 dark:text-slate-400">Authorized Access Only • Secure Session Mode</p>
           </div>
 
           <form onSubmit={handleLoginSubmit} className="space-y-4 text-left">
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5 pl-1">
+              <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 pl-1">
                 Passcode
               </label>
               <input
@@ -351,11 +389,11 @@ export const AdminDashboard = () => {
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
                 disabled={loading}
-                className="w-full px-5 py-3.5 rounded-xl bg-slate-950/80 border border-slate-800 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 text-center text-lg tracking-wider focus:outline-none transition-all duration-300"
+                className="w-full px-5 py-3.5 rounded-xl bg-white/60 dark:bg-slate-950/80 border border-slate-250 dark:border-slate-800 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 text-center text-lg tracking-wider text-slate-800 dark:text-white focus:outline-none transition-all duration-300 shadow-sm dark:shadow-none"
               />
             </div>
             {errorMsg && (
-              <p className="text-xs font-semibold text-red-400 text-center bg-red-950/20 py-2 rounded-lg border border-red-900/30">
+              <p className="text-xs font-semibold text-red-500 dark:text-red-400 text-center bg-red-500/10 dark:bg-red-950/20 py-2 rounded-lg border border-red-200 dark:border-red-900/30">
                 ⚠️ {errorMsg}
               </p>
             )}
@@ -376,7 +414,7 @@ export const AdminDashboard = () => {
 
           <button 
             onClick={navigateToHome}
-            className="text-xs text-slate-500 hover:text-slate-350 flex items-center gap-1 mx-auto cursor-pointer transition-colors"
+            className="text-xs text-slate-500 dark:text-slate-450 hover:text-slate-700 dark:hover:text-slate-350 flex items-center gap-1 mx-auto cursor-pointer transition-colors"
           >
             <ArrowLeft size={12} /> Go back to website
           </button>
@@ -387,22 +425,22 @@ export const AdminDashboard = () => {
 
   // RENDER: Admin Main Panel Dashboard
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 sm:p-6 md:p-12 relative">
+    <div className="min-h-screen bg-surface-light dark:bg-surface-dark text-slate-800 dark:text-slate-100 p-4 sm:p-6 md:p-12 relative transition-colors duration-300 w-full overflow-x-hidden">
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-900">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-200 dark:border-slate-900">
           <div>
             <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent flex items-center gap-2 font-heading">
               <Sparkles className="text-primary animate-spin-slow w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 flex-shrink-0" /> Administrative Dashboard
             </h1>
-            <p className="text-xs sm:text-sm text-slate-400 font-mono mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1.5 leading-relaxed">
-              <span className="flex items-center gap-1 text-emerald-400 font-semibold bg-emerald-950/20 px-2 py-0.5 rounded-md border border-emerald-900/30">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-mono mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1.5 leading-relaxed">
+              <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-500/10 dark:bg-emerald-950/20 px-2 py-0.5 rounded-md border border-emerald-500/20 dark:border-emerald-900/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-555 dark:bg-emerald-400 animate-pulse"></span>
                 Authorized Session Active
               </span>
-              <span className="text-slate-700 hidden xs:inline">•</span>
-              <span className="bg-slate-900/50 text-slate-400 px-2 py-0.5 rounded-md border border-slate-800">
+              <span className="text-slate-300 dark:text-slate-700 hidden xs:inline">•</span>
+              <span className="bg-slate-100 dark:bg-slate-900/50 text-slate-650 dark:text-slate-400 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-800">
                 Secure Storage Mode
               </span>
             </p>
@@ -410,13 +448,13 @@ export const AdminDashboard = () => {
           <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
             <button 
               onClick={navigateToHome}
-              className="flex-1 sm:flex-initial justify-center px-3 py-2 rounded-xl border border-slate-800 text-xs sm:text-sm font-semibold hover:border-primary/50 hover:text-primary transition-all duration-300 flex items-center gap-1.5 cursor-pointer bg-slate-900/40 backdrop-blur-sm shadow-md hover:shadow-primary/5"
+              className="flex-1 sm:flex-initial justify-center px-3 py-2 rounded-xl border border-slate-250 dark:border-slate-800 text-xs sm:text-sm font-semibold hover:border-primary/50 hover:text-primary transition-all duration-300 flex items-center gap-1.5 cursor-pointer bg-white/60 dark:bg-slate-900/40 backdrop-blur-sm shadow-sm dark:shadow-md hover:shadow-primary/5 text-slate-700 dark:text-slate-200"
             >
               <ExternalLink size={13} /> Go to Site
             </button>
             <button 
               onClick={handleLogout}
-              className="flex-1 sm:flex-initial justify-center px-3 py-2 rounded-xl bg-red-950/20 border border-red-900/30 text-red-400 text-xs sm:text-sm font-semibold hover:bg-red-900/20 hover:border-red-500/30 transition-all duration-300 cursor-pointer text-center flex items-center gap-1.5"
+              className="flex-1 sm:flex-initial justify-center px-3 py-2 rounded-xl bg-red-500/10 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 text-red-650 dark:text-red-400 text-xs sm:text-sm font-semibold hover:bg-red-555 hover:border-red-500/30 dark:hover:bg-red-900/20 transition-all duration-300 cursor-pointer text-center flex items-center gap-1.5"
             >
               <Lock size={13} /> Lock Panel
             </button>
@@ -426,18 +464,18 @@ export const AdminDashboard = () => {
         {/* Resume and Actions Grid */}
         <div className="grid md:grid-cols-3 gap-6">
           {/* Resume Upload Module */}
-          <div className="glass border border-slate-800/80 rounded-3xl p-5 sm:p-6 md:col-span-1 space-y-4 shadow-xl hover:shadow-primary/5 transition-all duration-300 relative group">
-            <div className="flex items-center gap-2 text-sm font-bold text-slate-300 font-heading">
+          <div className="glass border border-slate-250 dark:border-slate-800/80 rounded-3xl p-5 sm:p-6 md:col-span-1 space-y-4 shadow-lg dark:shadow-xl hover:shadow-primary/5 transition-all duration-300 relative group text-slate-700 dark:text-slate-300">
+            <div className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-300 font-heading">
               <FileText size={16} className="text-primary" /> Dynamic PDF Resume
             </div>
             
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
               Upload your updated PDF resume. The PDF will be stored as binary base64 directly in the database.
             </p>
 
             <div 
               onClick={() => fileInputRef.current?.click()}
-              className="h-32 border-2 border-dashed border-slate-800 hover:border-primary/55 hover:bg-slate-950/40 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-300 group/drop"
+              className="h-32 border-2 border-dashed border-slate-300 dark:border-slate-800 hover:border-primary/55 hover:bg-slate-100/50 dark:hover:bg-slate-950/40 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-300 group/drop"
             >
               <input 
                 type="file" 
@@ -446,16 +484,16 @@ export const AdminDashboard = () => {
                 accept="application/pdf"
                 className="hidden" 
               />
-              <div className="w-9 h-9 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-center text-slate-400 group-hover/drop:text-primary group-hover/drop:border-primary/30 transition-colors">
+              <div className="w-9 h-9 rounded-xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-555 dark:text-slate-400 group-hover/drop:text-primary group-hover/drop:border-primary/30 transition-colors shadow-sm dark:shadow-none">
                 <Upload size={18} />
               </div>
-              <span className="text-xs text-slate-400 font-medium px-4 text-center truncate w-full">
+              <span className="text-xs text-slate-600 dark:text-slate-400 font-medium px-4 text-center truncate w-full">
                 {resumeFile ? (resumeFile.name.length > 22 ? resumeFile.name.substring(0, 19) + '...' : resumeFile.name) : 'Select Resume PDF'}
               </span>
             </div>
 
             {resumeError && (
-              <p className="text-xs text-red-400 font-semibold bg-red-950/15 p-2 rounded-lg border border-red-900/20 text-center">
+              <p className="text-xs text-red-555 dark:text-red-400 font-semibold bg-red-500/10 dark:bg-red-950/15 p-2 rounded-lg border border-red-200 dark:border-red-900/20 text-center">
                 ⚠️ {resumeError}
               </p>
             )}
@@ -477,13 +515,13 @@ export const AdminDashboard = () => {
             )}
 
             {resumeStatus === 'success' && (
-              <p className="text-xs text-emerald-400 font-semibold flex items-center justify-center gap-1.5 bg-emerald-950/20 p-2.5 rounded-xl border border-emerald-900/20">
+              <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center justify-center gap-1.5 bg-emerald-500/10 dark:bg-emerald-950/20 p-2.5 rounded-xl border border-emerald-250 dark:border-emerald-900/20">
                 ✔️ Resume uploaded successfully!
               </p>
             )}
 
             {profile?.resumeBase64 && (
-              <div className="pt-3 flex items-center justify-between border-t border-slate-900">
+              <div className="pt-3 flex items-center justify-between border-t border-slate-200 dark:border-slate-900">
                 <span className="text-xs text-slate-500 font-mono">Current PDF Available</span>
                 <a 
                   href="/api/profile/resume" 
@@ -498,35 +536,35 @@ export const AdminDashboard = () => {
           </div>
 
           {/* Quick Stats & Configs */}
-          <div className="glass border border-slate-800/80 rounded-3xl p-5 sm:p-6 md:col-span-2 flex flex-col justify-between shadow-xl hover:shadow-secondary/5 transition-all duration-300">
+          <div className="glass border border-slate-250 dark:border-slate-800/80 rounded-3xl p-5 sm:p-6 md:col-span-2 flex flex-col justify-between shadow-lg dark:shadow-xl hover:shadow-secondary/5 transition-all duration-300">
             <div className="space-y-2">
-              <div className="text-sm font-bold text-slate-300 flex items-center gap-2 font-heading">
+              <div className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 font-heading">
                 <Sparkles size={16} className="text-secondary" /> Portfolio Summary
               </div>
-              <p className="text-xs text-slate-400">Overview of configured resources.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Overview of configured resources.</p>
               
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4">
-                <div className="p-4 rounded-2xl bg-slate-950/40 border border-slate-850 hover:border-slate-800/80 transition-all duration-300 group/stat">
-                  <span className="text-2xl sm:text-3xl font-black text-white bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent group-hover/stat:text-primary transition-colors">{projects.length}</span>
-                  <span className="block text-[10px] text-slate-400 uppercase tracking-widest mt-1.5 font-medium">Projects</span>
+                <div className="p-4 rounded-2xl bg-white/40 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-850 hover:border-slate-300 dark:hover:border-slate-800/80 transition-all duration-300 group/stat shadow-sm dark:shadow-none">
+                  <span className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white bg-gradient-to-r from-slate-800 dark:from-white to-slate-500 dark:to-slate-400 bg-clip-text text-transparent group-hover/stat:text-primary transition-colors">{projects.length}</span>
+                  <span className="block text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1.5 font-medium">Projects</span>
                 </div>
-                <div className="p-4 rounded-2xl bg-slate-950/40 border border-slate-850 hover:border-slate-800/80 transition-all duration-300 group/stat">
-                  <span className="text-2xl sm:text-3xl font-black text-white bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent group-hover/stat:text-secondary transition-colors">
+                <div className="p-4 rounded-2xl bg-white/40 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-850 hover:border-slate-300 dark:hover:border-slate-800/80 transition-all duration-300 group/stat shadow-sm dark:shadow-none">
+                  <span className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white bg-gradient-to-r from-slate-800 dark:from-white to-slate-500 dark:to-slate-400 bg-clip-text text-transparent group-hover/stat:text-secondary transition-colors">
                     {projects.filter(p => p.thumbnail).length}
                   </span>
-                  <span className="block text-[10px] text-slate-400 uppercase tracking-widest mt-1.5 font-medium">With Image</span>
+                  <span className="block text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1.5 font-medium">With Image</span>
                 </div>
-                <div className="p-4 rounded-2xl bg-slate-950/40 border border-slate-850 hover:border-slate-800/80 transition-all duration-300 col-span-2 sm:col-span-1 flex flex-col justify-center items-center text-center">
-                  <span className="text-xs font-mono text-emerald-400 font-bold flex items-center gap-1 bg-emerald-950/20 px-2 py-0.5 rounded border border-emerald-900/30">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <div className="p-4 rounded-2xl bg-white/40 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-850 hover:border-slate-300 dark:hover:border-slate-800/80 transition-all duration-300 col-span-2 sm:col-span-1 flex flex-col justify-center items-center text-center shadow-sm dark:shadow-none">
+                  <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1 bg-emerald-500/10 dark:bg-emerald-950/20 px-2 py-0.5 rounded border border-emerald-250 dark:border-emerald-900/30 animate-pulse">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-555 dark:bg-emerald-400 animate-pulse"></span>
                     Sync Active
                   </span>
-                  <span className="block text-[10px] text-slate-400 uppercase tracking-widest mt-2 font-medium font-sans">Database Status</span>
+                  <span className="block text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-2 font-medium font-sans">Database Status</span>
                 </div>
               </div>
             </div>
             
-            <div className="pt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-slate-900 mt-6">
+            <div className="pt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-slate-200 dark:border-slate-900 mt-6">
               <span className="text-[11px] text-slate-500 font-mono flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary/80"></span>
                 MongoDB + Cloudinary REST Services
@@ -786,7 +824,7 @@ export const AdminDashboard = () => {
                         setProjectForm(prev => ({ ...prev, thumbnail: e.target.value }));
                         setImagePreview(e.target.value);
                       }}
-                      className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-xs text-white"
+                      className="w-full px-4 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-primary focus:outline-none text-xs text-slate-800 dark:text-white"
                       placeholder="Or enter custom image URL directly"
                     />
                   </div>
@@ -796,11 +834,11 @@ export const AdminDashboard = () => {
                 </form>
 
                 {/* Form Footer - Sticky */}
-                <div className="p-4 sm:p-5 bg-slate-950/80 backdrop-blur-md border-t border-slate-850 flex justify-end gap-3 flex-shrink-0">
+                <div className="p-4 sm:p-5 bg-slate-50/95 dark:bg-slate-950/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-850 flex justify-end gap-3 flex-shrink-0">
                   <button 
                     type="button"
                     onClick={() => setShowForm(false)}
-                    className="px-4 py-2.5 rounded-xl border border-slate-800 hover:border-slate-700 text-xs font-semibold text-slate-350 transition-all cursor-pointer flex items-center justify-center"
+                    className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-900/60 text-xs font-semibold text-slate-600 dark:text-slate-350 transition-all cursor-pointer flex items-center justify-center"
                   >
                     Cancel
                   </button>
@@ -820,7 +858,7 @@ export const AdminDashboard = () => {
         {/* Projects Listing */}
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-base sm:text-lg font-bold text-slate-300 flex items-center gap-2 font-heading">
+            <h2 className="text-base sm:text-lg font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 font-heading">
               📂 Manage Projects ({projects.length})
             </h2>
             <button 
@@ -835,10 +873,10 @@ export const AdminDashboard = () => {
             {projects.map((proj) => (
               <div 
                 key={proj.slug}
-                className="p-4 sm:p-5 rounded-2xl glass border border-slate-850 hover:border-slate-800 transition-all duration-300 flex flex-col xs:flex-row gap-3 xs:gap-4 items-start xs:items-center justify-between shadow-lg hover:shadow-primary/5"
+                className="p-4 sm:p-5 rounded-2xl glass border border-slate-200 dark:border-slate-850 hover:border-slate-300 dark:hover:border-slate-800 transition-all duration-300 flex flex-col xs:flex-row gap-3 xs:gap-4 items-start xs:items-center justify-between shadow-sm dark:shadow-lg hover:shadow-primary/5"
               >
                 <div className="flex gap-3 sm:gap-4 items-start xs:items-center overflow-hidden min-w-0 flex-1 w-full">
-                  <div className="w-12 h-10 xs:w-16 xs:h-12 rounded-xl bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center flex-shrink-0 shadow-inner">
+                  <div className="w-12 h-10 xs:w-16 xs:h-12 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 overflow-hidden flex items-center justify-center flex-shrink-0 shadow-inner">
                     {proj.thumbnail ? (
                       <img src={proj.thumbnail} alt={proj.title} className="w-full h-full object-cover" />
                     ) : (
@@ -846,7 +884,7 @@ export const AdminDashboard = () => {
                     )}
                   </div>
                   <div className="overflow-hidden min-w-0 flex-1 space-y-1">
-                    <h3 className="font-bold text-sm text-white font-heading truncate flex items-center gap-1.5">
+                    <h3 className="font-bold text-sm text-slate-800 dark:text-white font-heading truncate flex items-center gap-1.5">
                       {proj.title}
                       {proj.featured && (
                         <span className="text-[9px] bg-primary/20 text-primary border border-primary/25 px-1.5 py-0.5 rounded font-sans font-semibold flex-shrink-0">
@@ -860,7 +898,7 @@ export const AdminDashboard = () => {
                     {proj.tech && proj.tech.length > 0 && (
                       <div className="flex flex-wrap gap-1 pt-0.5">
                         {proj.tech.slice(0, 3).map((t, idx) => (
-                          <span key={idx} className="text-[9px] px-1.5 py-0.5 rounded bg-slate-950/60 border border-slate-900 text-slate-400 font-mono">
+                          <span key={idx} className="text-[9px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-900 text-slate-600 dark:text-slate-400 font-mono">
                             {t}
                           </span>
                         ))}
@@ -871,29 +909,29 @@ export const AdminDashboard = () => {
                     )}
 
                     <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-slate-950 text-slate-400 font-mono">Order: {proj.order}</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-650 dark:text-slate-400 font-mono">Order: {proj.order}</span>
                       <span className={`text-[9px] px-1.5 py-0.5 rounded border font-mono ${
                         proj.status === 'Completed' 
-                          ? 'bg-emerald-950/15 border-emerald-900/30 text-emerald-400' 
+                          ? 'bg-emerald-500/10 dark:bg-emerald-950/15 border-emerald-200 dark:border-emerald-900/30 text-emerald-600 dark:text-emerald-400' 
                           : proj.status === 'In Progress'
-                            ? 'bg-amber-950/15 border-amber-900/30 text-amber-400'
-                            : 'bg-indigo-950/15 border-indigo-900/30 text-indigo-400'
+                            ? 'bg-amber-500/10 dark:bg-amber-950/15 border-amber-200 dark:border-amber-900/30 text-amber-600 dark:text-amber-400'
+                            : 'bg-indigo-500/10 dark:bg-indigo-950/15 border-indigo-200 dark:border-indigo-900/30 text-indigo-650 dark:text-indigo-400'
                       }`}>{proj.status}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex gap-2 w-full xs:w-auto justify-end pt-3 xs:pt-0 border-t xs:border-t-0 border-slate-800/60 mt-2 xs:mt-0 flex-shrink-0">
+                <div className="flex gap-2 w-full xs:w-auto justify-end pt-3 xs:pt-0 border-t xs:border-t-0 border-slate-200 dark:border-slate-800/60 mt-2 xs:mt-0 flex-shrink-0">
                   <button 
                     onClick={() => openEditForm(proj)}
-                    className="p-2 rounded-xl bg-slate-950 border border-slate-800 hover:border-primary/40 hover:text-primary transition-all duration-300 cursor-pointer shadow-md hover:shadow-primary/5"
+                    className="p-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-primary/40 hover:text-primary text-slate-600 dark:text-slate-400 transition-all duration-300 cursor-pointer shadow-sm dark:shadow-md hover:shadow-primary/5"
                     title="Edit Project"
                   >
                     <Edit3 size={14} />
                   </button>
                   <button 
                     onClick={() => handleDeleteProject(proj.slug)}
-                    className="p-2 rounded-xl bg-red-950/10 border border-red-900/30 text-red-400 hover:bg-red-950/30 hover:border-red-500/40 hover:text-red-300 transition-all duration-300 cursor-pointer shadow-md"
+                    className="p-2 rounded-xl bg-red-500/5 dark:bg-red-950/10 border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-500/10 hover:border-red-500/30 dark:hover:bg-red-900/20 transition-all duration-300 cursor-pointer shadow-sm dark:shadow-md"
                     title="Delete Project"
                   >
                     <Trash2 size={14} />
