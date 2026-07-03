@@ -7,7 +7,7 @@
   <!-- Analytics & Tracking -->
   <!-- Google Analytics 4 (GA4) -->
   <script>
-    (function() {
+    (function () {
       const gaId = "%VITE_GA_MEASUREMENT_ID%";
       if (gaId && gaId !== "%" + "VITE_GA_MEASUREMENT_ID" + "%" && gaId !== "") {
         const script = document.createElement('script');
@@ -16,7 +16,7 @@
         document.head.appendChild(script);
 
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+        function gtag() { dataLayer.push(arguments); }
         window.gtag = gtag;
         gtag('js', new Date());
         gtag('config', gaId);
@@ -26,20 +26,20 @@
 
   <!-- Microsoft Clarity -->
   <script>
-    (function() {
+    (function () {
       const clarityId = "%VITE_CLARITY_PROJECT_ID%";
       if (clarityId && clarityId !== "%" + "VITE_CLARITY_PROJECT_ID" + "%" && clarityId !== "") {
-        (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window,document,"clarity","script",clarityId);
+        (function (c, l, a, r, i, t, y) {
+          c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+          t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+          y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+        })(window, document, "clarity", "script", clarityId);
       }
     })();
   </script>
 
   <!-- Bing Webmaster Tools -->
-  <script>
+  <!-- <script>
     (function() {
       const bingId = "%VITE_BING_VERIFICATION_ID%";
       if (bingId && bingId !== "%" + "VITE_BING_VERIFICATION_ID" + "%" && bingId !== "") {
@@ -49,7 +49,7 @@
         document.head.appendChild(meta);
       }
     })();
-  </script>
+  </script> -->
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -60,8 +60,7 @@
   <!-- Primary SEO -->
   <title>Sicky Kumar | Full Stack MERN Developer | React, Node.js Portfolio</title>
 
-  <meta name="title"
-    content="Sicky Kumar | Full Stack MERN Developer | React, Node.js Portfolio" />
+  <meta name="title" content="Sicky Kumar | Full Stack MERN Developer | React, Node.js Portfolio" />
 
   <meta name="description"
     content="Sicky Kumar is a Full Stack MERN Developer specializing in React.js, Node.js, Express.js, MongoDB, JavaScript, TypeScript, APIs, UI/UX, and scalable web applications." />
@@ -73,8 +72,7 @@
   <meta name="theme-color" content="#0F172A" />
 
   <!-- SEO Keywords -->
-  <meta name="keywords"
-    content="
+  <meta name="keywords" content="
     Sicky Kumar,
     Sicky Kumar Portfolio,
     Full Stack Developer,
@@ -113,8 +111,7 @@
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
-  <meta property="og:title"
-    content="Sicky Kumar | Full Stack MERN Developer" />
+  <meta property="og:title" content="Sicky Kumar | Full Stack MERN Developer" />
   <meta property="og:description"
     content="Explore my Full Stack MERN portfolio featuring React, Node.js, Express, MongoDB, modern UI/UX, and production-ready web applications." />
   <meta property="og:image" content="https://www.sickykumar.in/og-image.png" />
@@ -124,12 +121,9 @@
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title"
-    content="Sicky Kumar | Full Stack MERN Developer" />
-  <meta name="twitter:description"
-    content="Modern React.js, Node.js and MERN Stack Portfolio by Sicky Kumar." />
-  <meta name="twitter:image"
-    content="https://www.sickykumar.in/og-image.png" />
+  <meta name="twitter:title" content="Sicky Kumar | Full Stack MERN Developer" />
+  <meta name="twitter:description" content="Modern React.js, Node.js and MERN Stack Portfolio by Sicky Kumar." />
+  <meta name="twitter:image" content="https://www.sickykumar.in/og-image.png" />
 
   <!-- Performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -141,25 +135,16 @@
   <link rel="dns-prefetch" href="//api.fontshare.com">
 
   <!-- Fonts loaded asynchronously to prevent render-blocking -->
-  <link
-    rel="preload"
-    as="style"
+  <link rel="preload" as="style"
     href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800,900&f[]=general-sans@400,500,600,700&display=swap" />
-  <link
-    rel="stylesheet"
+  <link rel="stylesheet"
     href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800,900&f[]=general-sans@400,500,600,700&display=swap"
-    media="print"
-    onload="this.media='all'" />
+    media="print" onload="this.media='all'" />
 
-  <link
-    rel="preload"
-    as="style"
+  <link rel="preload" as="style"
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-    media="print"
-    onload="this.media='all'" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    media="print" onload="this.media='all'" />
 
   <!-- Structured Data -->
   <script type="application/ld+json">
