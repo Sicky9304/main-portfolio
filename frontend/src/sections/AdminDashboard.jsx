@@ -301,7 +301,7 @@ export const AdminDashboard = () => {
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="w-full max-w-md bg-slate-900 border border-slate-800/80 rounded-3xl p-8 shadow-2xl text-center space-y-6"
+          className="w-full max-w-md bg-slate-900 border border-slate-800/80 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6"
         >
           <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary animate-pulse">
             <Lock size={32} />
@@ -345,27 +345,27 @@ export const AdminDashboard = () => {
 
   // RENDER: Admin Main Panel Dashboard
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-12 relative">
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 sm:p-6 md:p-12 relative">
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-900">
           <div>
-            <h1 className="text-3xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent flex items-center gap-2">
-              <Sparkles size={28} className="text-primary animate-spin-slow" /> Administrative Dashboard
+            <h1 className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent flex items-center gap-2">
+              <Sparkles className="text-primary animate-spin-slow w-6 h-6 sm:w-7 sm:h-7" /> Administrative Dashboard
             </h1>
             <p className="text-sm text-slate-500 font-mono mt-1">Authorized Session Active • Secure Storage Mode</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 w-full sm:w-auto">
             <button 
               onClick={navigateToHome}
-              className="px-4 py-2.5 rounded-xl border border-slate-800 text-sm font-semibold hover:border-slate-700 transition-colors flex items-center gap-2 cursor-pointer bg-slate-900/50"
+              className="flex-1 sm:flex-initial justify-center px-4 py-2.5 rounded-xl border border-slate-800 text-sm font-semibold hover:border-slate-700 transition-colors flex items-center gap-2 cursor-pointer bg-slate-900/50"
             >
               <ExternalLink size={14} /> Go to Site
             </button>
             <button 
               onClick={handleLogout}
-              className="px-4 py-2.5 rounded-xl bg-red-950/40 border border-red-900/40 text-red-400 text-sm font-semibold hover:bg-red-950/60 transition-colors cursor-pointer"
+              className="flex-1 sm:flex-initial justify-center px-4 py-2.5 rounded-xl bg-red-950/40 border border-red-900/40 text-red-400 text-sm font-semibold hover:bg-red-950/60 transition-colors cursor-pointer text-center"
             >
               Lock Panel
             </button>
@@ -375,7 +375,7 @@ export const AdminDashboard = () => {
         {/* Resume and Actions Grid */}
         <div className="grid md:grid-cols-3 gap-6">
           {/* Resume Upload Module */}
-          <div className="bg-slate-900/50 border border-slate-900 rounded-3xl p-6 md:col-span-1 space-y-4">
+          <div className="bg-slate-900/50 border border-slate-900 rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:col-span-1 space-y-4">
             <div className="flex items-center gap-2 text-sm font-bold text-slate-300">
               <FileText size={16} className="text-primary" /> Dynamic PDF Resume
             </div>
@@ -441,7 +441,7 @@ export const AdminDashboard = () => {
           </div>
 
           {/* Quick Stats & Configs */}
-          <div className="bg-slate-900/50 border border-slate-900 rounded-3xl p-6 md:col-span-2 flex flex-col justify-between">
+          <div className="bg-slate-900/50 border border-slate-900 rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:col-span-2 flex flex-col justify-between">
             <div className="space-y-2">
               <div className="text-sm font-bold text-slate-300 flex items-center gap-2">
                 <Sparkles size={16} className="text-accent" /> Portfolio Summary
@@ -459,18 +459,18 @@ export const AdminDashboard = () => {
                   </span>
                   <span className="block text-[10px] text-slate-500 uppercase tracking-widest mt-1">With Image</span>
                 </div>
-                <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-900/60 text-center">
+                <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-900/60 text-center col-span-2 sm:col-span-1">
                   <span className="text-xs font-mono text-emerald-400">Database Sync</span>
                   <span className="block text-[10px] text-slate-500 uppercase tracking-widest mt-2">Active</span>
                 </div>
               </div>
             </div>
             
-            <div className="pt-4 flex justify-between items-center border-t border-slate-950 mt-4">
+            <div className="pt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-slate-950 mt-4">
               <span className="text-xs text-slate-500 font-mono">MongoDB + Cloudinary REST Services</span>
               <button 
                 onClick={openCreateForm}
-                className="px-4 py-2 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary-dark transition-colors cursor-pointer flex items-center gap-1.5"
+                className="w-full sm:w-auto justify-center px-4 py-2 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary-dark transition-colors cursor-pointer flex items-center gap-1.5"
               >
                 <Plus size={14} /> Add New Project
               </button>
@@ -481,15 +481,15 @@ export const AdminDashboard = () => {
         {/* Project Form Modal Overlay */}
         <AnimatePresence>
           {showForm && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
               <motion.div
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden max-h-[90vh] overflow-y-auto"
+                className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl overflow-hidden max-h-[92vh] overflow-y-auto"
               >
                 {/* Header */}
-                <div className="p-6 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
+                <div className="p-4 sm:p-6 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
                   <h3 className="font-bold text-lg">
                     {isEditing ? `Edit Project: ${isEditing.title}` : 'Add New Project'}
                   </h3>
@@ -502,7 +502,7 @@ export const AdminDashboard = () => {
                 </div>
 
                 {/* Form Body */}
-                <form onSubmit={handleProjectSubmit} className="p-6 space-y-5">
+                <form onSubmit={handleProjectSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5">
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-slate-400 mb-1.5">Project Title</label>
@@ -661,7 +661,7 @@ export const AdminDashboard = () => {
                         <option value="Planned">Planned</option>
                       </select>
                     </div>
-                    <div className="flex items-center gap-2 pt-6">
+                    <div className="flex items-center gap-2 sm:pt-6">
                       <input 
                         type="checkbox"
                         id="featured"
@@ -679,8 +679,8 @@ export const AdminDashboard = () => {
                       Thumbnail Image (Drag & Drop to Upload to Cloudinary)
                     </label>
 
-                    <div className="grid grid-cols-4 gap-4 items-center">
-                      <div className="col-span-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-center">
+                      <div className="sm:col-span-3">
                         <div 
                           onDragEnter={handleDrag}
                           onDragOver={handleDrag}
@@ -704,7 +704,7 @@ export const AdminDashboard = () => {
                           </span>
                         </div>
                       </div>
-                      <div className="col-span-1 h-24 rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center relative">
+                      <div className="sm:col-span-1 h-24 rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center relative w-full">
                         {imagePreview ? (
                           <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                         ) : (
@@ -766,20 +766,20 @@ export const AdminDashboard = () => {
             {projects.map((proj) => (
               <div 
                 key={proj.slug}
-                className="p-5 rounded-2xl bg-slate-900/40 border border-slate-900 hover:border-slate-800 transition-colors flex gap-4 items-center justify-between"
+                className="p-4 sm:p-5 rounded-2xl bg-slate-900/40 border border-slate-900 hover:border-slate-800 transition-colors flex gap-3 sm:gap-4 items-center justify-between"
               >
-                <div className="flex gap-4 items-center overflow-hidden">
-                  <div className="w-16 h-12 rounded-xl bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center flex-shrink-0">
+                <div className="flex gap-3 sm:gap-4 items-center overflow-hidden min-w-0 flex-1">
+                  <div className="w-12 h-10 sm:w-16 sm:h-12 rounded-xl bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center flex-shrink-0">
                     {proj.thumbnail ? (
                       <img src={proj.thumbnail} alt={proj.title} className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-xl">{proj.emoji || '🚀'}</span>
+                      <span className="text-lg sm:text-xl">{proj.emoji || '🚀'}</span>
                     )}
                   </div>
-                  <div className="overflow-hidden">
+                  <div className="overflow-hidden min-w-0 flex-1">
                     <h3 className="font-bold text-sm truncate">{proj.title}</h3>
                     <p className="text-xs text-slate-500 font-mono truncate">/{proj.slug}</p>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex flex-wrap items-center gap-1.5 mt-1">
                       <span className="text-[9px] px-1.5 py-0.5 rounded bg-slate-950 text-slate-400 font-mono">Order: {proj.order}</span>
                       <span className={`text-[9px] px-1.5 py-0.5 rounded font-mono ${
                         proj.status === 'Completed' ? 'bg-emerald-950/20 text-emerald-400' : 'bg-amber-950/20 text-amber-400'
@@ -788,7 +788,7 @@ export const AdminDashboard = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-1.5 flex-shrink-0 ml-2">
                   <button 
                     onClick={() => openEditForm(proj)}
                     className="p-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-850 hover:border-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer"
