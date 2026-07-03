@@ -40,3 +40,42 @@ export const Linkedin = ({ size = 24, className = '', ...props }) => (
     <circle cx="4" cy="4" r="2" />
   </svg>
 );
+
+export const Whatsapp = ({ size = 24, className = '', ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={`lucide lucide-whatsapp ${className}`}
+    {...props}
+  >
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+    <path d="M14 8.5c-.3-.2-.8-.6-1-.7-.3-.1-.5 0-.7.3l-.4.5c-.2.2-.4.2-.7 0a6 6 0 0 1-1.7-1.7c-.2-.3-.2-.5 0-.7l.5-.4c.3-.2.4-.4.3-.7a5 5 0 0 0-.7-1c-.2-.3-.5-.3-.7 0a2 2 0 0 0-.6.8c-.2.7 0 1.6.5 2.5a8 8 0 0 0 3.3 3.3c.9.5 1.8.7 2.5.5a2 2 0 0 0 .8-.6c.3-.2.3-.5 0-.7z" />
+  </svg>
+);
+
+export const Telegram = ({ size = 24, className = '', ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={`lucide lucide-telegram ${className}`}
+    {...props}
+  >
+    <path d="m22 2-19 9 7 3 3 8 9-20Z" />
+    <path d="M22 2L10 14" />
+  </svg>
+);
+

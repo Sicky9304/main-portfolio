@@ -7,6 +7,8 @@
 - [GitHub](https://github.com/Sicky9304) - GitHub projects and open source contributions.
 - [LinkedIn](https://www.linkedin.com/in/sicky-kumar-39a3a21a3/) - Professional network profile.
 - [LeetCode](https://leetcode.com/u/Sicky9304) - Coding profile and problem-solving activity.
+- [WhatsApp](https://wa.me/919304490856) - Contact via WhatsApp (+91 9304490856).
+- [Telegram](https://t.me/+919304490856) - Contact via Telegram (+91 9304490856).
 
 ## Technical Skills
 - **Languages**: JavaScript, TypeScript, HTML, CSS

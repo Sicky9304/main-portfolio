@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { MapPin, Sparkles, ArrowDown, Code2 } from 'lucide-react';
-import { Github, Linkedin } from '../components/ui/BrandIcons';
+import { Github, Linkedin, Whatsapp, Telegram } from '../components/ui/BrandIcons';
 import { useTheme } from '../context/ThemeContext';
 import { MagneticButton } from '../components/ui/MagneticButton';
 import { useApi } from '../hooks/useApi';
@@ -19,6 +19,8 @@ const SOCIAL_ICON_MAP = {
   GitHub: Github,
   LinkedIn: Linkedin,
   LeetCode: Code2,
+  WhatsApp: Whatsapp,
+  Telegram: Telegram,
 };
 
 export const Hero = () => {
@@ -32,11 +34,28 @@ export const Hero = () => {
     'Building scalable SaaS products and modern web experiences with React, Node.js, and cutting-edge technologies.';
   const location = profile?.location || 'West Bengal, India';
   const available = profile?.available ?? true;
-  const socialLinks = profile?.socialLinks || [
+  
+  let rawSocialLinks = profile?.socialLinks || [
     { platform: 'GitHub', url: 'https://github.com/Sicky9304', handle: '@Sicky9304' },
     { platform: 'LinkedIn', url: 'https://linkedin.com/in/sickykumar', handle: '/in/sickykumar' },
     { platform: 'LeetCode', url: 'https://leetcode.com/u/Sicky9304', handle: '@Sicky9304' },
   ];
+
+  // Ensure WhatsApp and Telegram are always appended if not present
+  if (!rawSocialLinks.some((s) => s.platform === 'WhatsApp')) {
+    rawSocialLinks = [
+      ...rawSocialLinks,
+      { platform: 'WhatsApp', url: 'https://wa.me/919304490856', handle: 'WhatsApp' },
+    ];
+  }
+  if (!rawSocialLinks.some((s) => s.platform === 'Telegram')) {
+    rawSocialLinks = [
+      ...rawSocialLinks,
+      { platform: 'Telegram', url: 'https://t.me/+919304490856', handle: 'Telegram' },
+    ];
+  }
+
+  const socialLinks = rawSocialLinks;
 
   const [roleIndex, setRoleIndex] = useState(0);
   const [displayText, setDisplayText] = useState('');
