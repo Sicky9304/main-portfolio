@@ -160,43 +160,35 @@ export const Hero = () => {
     visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
   };
 
+  {/* Background Looping Holographic Particle Video (Only in Dark Mode, high visibility) */}
+  const videoSrc =
+    theme === 'dark'
+      ? "/hologram_night.mp4"
+      : "/hologram_day.mp4";
+
+  const videoClass =
+    theme === "dark"
+      ? "absolute inset-0 w-full h-full object-cover pointer-events-none z-0 mix-blend-screen opacity-55 transition-opacity duration-500"
+      : "absolute inset-0 w-full h-full object-cover pointer-events-none z-0 mix-blend-multiply opacity-30 invert hue-rotate-180 saturate-200 blur-[2px] transition-opacity duration-500";
+
   return (
     <section
       id="hero"
       className="relative min-h-screen flex items-center overflow-hidden aurora grid-bg"
     >
       {/* Background Looping Holographic Particle Video (Only in Dark Mode, high visibility) */}
-      {theme === 'dark' && (
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0 mix-blend-screen opacity-[0.55] transition-opacity duration-500"
-        >
-          <source
-            src="/hologram_bg.mp4"
-            type="video/mp4"
-          />
-        </video>
-      )}
-
-      {/* Background Looping Day Holographic Video (Only in Light Mode, styled to match theme colors and prevent text conflict) */}
-      {theme === 'light' && (
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0 mix-blend-multiply opacity-[0.30] invert hue-rotate-180 saturate-200 blur-[2px] transition-opacity duration-500"
-        >
-
-          <source
-            src="/hologram_day.mp4"
-            type="video/mp4"
-          />
-        </video>
-      )}
+      <video
+        key={theme}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        disablePictureInPicture
+        className={videoClass}
+      >
+        <source src={videoSrc} type="video/mp4" />
+      </video>
 
 
       {/* Floating Blobs */}
@@ -355,7 +347,7 @@ export const Hero = () => {
             >
               {/* Profile Image with Zoom and 3D Cursor Pull */}
               <motion.img
-                src={theme === 'dark' ? '/profile_night.png' : '/profile_day.png'}
+                src={theme === 'dark' ? '/profile_night.webp' : '/profile_day.webp'}
                 alt={name}
                 className="w-full h-full object-cover object-center"
                 style={{

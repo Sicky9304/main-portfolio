@@ -1,4 +1,14 @@
+# robots.txt
+# https://www.sickykumar.in
+
 User-agent: *
 Allow: /
 
-Sitemap: https://sickykumar.dev/sitemap.xml
+# Prevent indexing of admin panel
+Disallow: /sicky-admin
+
+# Sitemap location
+Sitemap: https://www.sickykumar.in/sitemap.xml
+
+# Preferred host
+Host: https://www.sickykumar.in
