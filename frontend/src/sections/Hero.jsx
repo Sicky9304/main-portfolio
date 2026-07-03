@@ -176,19 +176,21 @@ export const Hero = () => {
       id="hero"
       className="relative min-h-screen flex items-center overflow-hidden aurora grid-bg"
     >
-      {/* Background Looping Holographic Particle Video (Only in Dark Mode, high visibility) */}
-      <video
-        key={theme}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        disablePictureInPicture
-        className={videoClass}
-      >
-        <source src={videoSrc} type="video/mp4" />
-      </video>
+      {/* Background Looping Holographic Particle Video (Disabled on mobile for performance) */}
+      {!isMobileScreen && (
+        <video
+          key={theme}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          disablePictureInPicture
+          className={videoClass}
+        >
+          <source src={videoSrc} type="video/mp4" />
+        </video>
+      )}
 
 
       {/* Floating Blobs */}
@@ -349,6 +351,7 @@ export const Hero = () => {
               <motion.img
                 src={theme === 'dark' ? '/profile_night.webp' : '/profile_day.webp'}
                 alt={name}
+                fetchpriority="high"
                 className="w-full h-full object-cover object-center"
                 style={{
                   x: imageX,

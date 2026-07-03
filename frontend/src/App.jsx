@@ -8,9 +8,11 @@ import { CursorGlow } from './components/ui/CursorGlow';
 import { ScrollProgress } from './components/ui/ScrollProgress';
 
 import { Hero } from './sections/Hero';
-import { AdminDashboard } from './sections/AdminDashboard';
 
-// Lazy load below-the-fold sections to reduce initial bundle size
+// Lazy load below-the-fold sections and admin dashboard to reduce initial bundle size
+const AdminDashboard = lazy(() =>
+  import('./sections/AdminDashboard').then((m) => ({ default: m.AdminDashboard }))
+);
 const About = lazy(() =>
   import('./sections/About').then((m) => ({ default: m.About }))
 );
@@ -43,11 +45,11 @@ function AppContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
 
-  // Show loading screen only on initial page load
+  // Show loading screen only on initial page load (reduced for performance)
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2000);
+    }, 800);
 
     return () => clearTimeout(timer);
   }, []);
@@ -68,7 +70,11 @@ function AppContent() {
 
   // Render admin dashboard separately
   if (cleanPath === '/sicky-admin') {
-    return <AdminDashboard />;
+    return (
+      <Suspense fallback={null}>
+        <AdminDashboard />
+      </Suspense>
+    );
   }
 
   return (

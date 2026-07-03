@@ -160,6 +160,7 @@ export const Projects = () => {
                       <img
                         src={project.thumbnail}
                         alt={project.title}
+                        loading="lazy"
                         className="absolute inset-0 w-full h-full object-cover object-top border border-slate-200 dark:border-slate-800 transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
