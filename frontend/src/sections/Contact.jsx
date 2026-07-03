@@ -147,6 +147,7 @@ export const Contact = () => {
                   {/* Name */}
                   <div className="relative">
                     <label
+                      htmlFor="contact-name"
                       className={`absolute left-4 transition-all duration-300 pointer-events-none ${focusedField === 'name' || formData.name
                           ? 'top-1 text-[10px] font-bold text-primary'
                           : 'top-4 text-sm text-slate-400'
@@ -155,6 +156,7 @@ export const Contact = () => {
                       Your Name
                     </label>
                     <input
+                      id="contact-name"
                       type="text"
                       name="name"
                       value={formData.name}
@@ -169,6 +171,7 @@ export const Contact = () => {
                   {/* Email */}
                   <div className="relative">
                     <label
+                      htmlFor="contact-email"
                       className={`absolute left-4 transition-all duration-300 pointer-events-none ${focusedField === 'email' || formData.email
                           ? 'top-1 text-[10px] font-bold text-primary'
                           : 'top-4 text-sm text-slate-400'
@@ -177,6 +180,7 @@ export const Contact = () => {
                       Email Address
                     </label>
                     <input
+                      id="contact-email"
                       type="email"
                       name="email"
                       value={formData.email}
@@ -191,6 +195,7 @@ export const Contact = () => {
                   {/* Message */}
                   <div className="relative">
                     <label
+                      htmlFor="contact-message"
                       className={`absolute left-4 transition-all duration-300 pointer-events-none ${focusedField === 'message' || formData.message
                           ? 'top-1 text-[10px] font-bold text-primary'
                           : 'top-4 text-sm text-slate-400'
@@ -199,6 +204,7 @@ export const Contact = () => {
                       Your Message
                     </label>
                     <textarea
+                      id="contact-message"
                       name="message"
                       rows="4"
                       value={formData.message}

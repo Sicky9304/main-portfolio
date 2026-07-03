@@ -1,0 +1,16 @@
+# Sicky Kumar | Full Stack MERN Developer
+
+> Portfolio and profile of Sicky Kumar, a Full Stack MERN Developer specializing in React.js, Node.js, Express.js, MongoDB, JavaScript, TypeScript, APIs, UI/UX, and scalable web applications.
+
+## Contact & Social Links
+- [Website](https://www.sickykumar.in/) - Official portfolio website.
+- [GitHub](https://github.com/Sicky9304) - GitHub projects and open source contributions.
+- [LinkedIn](https://www.linkedin.com/in/sicky-kumar-39a3a21a3/) - Professional network profile.
+- [LeetCode](https://leetcode.com/u/Sicky9304) - Coding profile and problem-solving activity.
+
+## Technical Skills
+- **Languages**: JavaScript, TypeScript, HTML, CSS
+- **Frontend Development**: React.js, Vite, Tailwind CSS, GSAP, Framer Motion, Responsive Design
+- **Backend Development**: Node.js, Express.js, REST APIs, Firebase
+- **Databases**: MongoDB
+- **Developer Tools**: Git, GitHub, Vercel, npm
