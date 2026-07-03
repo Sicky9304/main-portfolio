@@ -53,7 +53,28 @@ export const AdminDashboard = () => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imagePreview, setImagePreview] = useState('');
 
-  // 1. Initial Authentication Check
+  // 1. Initial Authentication Check & Body styling overrides
+  useEffect(() => {
+    const htmlEl = document.documentElement;
+    const bodyEl = document.body;
+    
+    // Save original styles/classes
+    const originalHtmlBg = htmlEl.style.backgroundColor;
+    const originalBodyBg = bodyEl.style.backgroundColor;
+    
+    // Force dark background to prevent white space scroll on mobile
+    htmlEl.style.backgroundColor = '#030712'; // Obsidian surface-dark
+    bodyEl.style.backgroundColor = '#030712';
+    
+    // Remove Lenis scroll constraints on admin route
+    htmlEl.classList.remove('lenis'); 
+    
+    return () => {
+      htmlEl.style.backgroundColor = originalHtmlBg;
+      bodyEl.style.backgroundColor = originalBodyBg;
+    };
+  }, []);
+
   useEffect(() => {
     const savedCode = localStorage.getItem('adminPasscode');
     if (savedCode) {
@@ -297,44 +318,65 @@ export const AdminDashboard = () => {
   // RENDER: Passcode Prompt Screen
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white px-4">
+      <div className="min-h-screen bg-[#030712] flex flex-col items-center justify-center text-white px-4 relative overflow-hidden">
+        {/* Ambient background glow elements */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-1/4 left-1/3 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
+
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="w-full max-w-md bg-slate-900 border border-slate-800/80 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6"
+          transition={{ duration: 0.4 }}
+          className="w-full max-w-md glass border border-slate-800/80 rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6 relative z-10"
         >
-          <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary animate-pulse">
-            <Lock size={32} />
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-primary border border-primary/20 shadow-lg shadow-primary/5">
+            <Lock size={28} className="text-primary animate-pulse" />
           </div>
           
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold tracking-tight">Sicky Admin Panel</h2>
-            <p className="text-sm text-slate-400">Unlock to update portfolio projects and resume</p>
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-heading">
+              Admin Portal
+            </h2>
+            <p className="text-xs text-slate-400">Authorized Access Only • Secure Session Mode</p>
           </div>
 
-          <form onSubmit={handleLoginSubmit} className="space-y-4">
-            <input
-              type="password"
-              placeholder="Enter Admin Passcode"
-              value={passcode}
-              onChange={(e) => setPasscode(e.target.value)}
-              disabled={loading}
-              className="w-full px-5 py-3.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary text-center text-lg tracking-wider focus:outline-none transition-colors"
-            />
-            {errorMsg && <p className="text-xs font-semibold text-red-400">{errorMsg}</p>}
+          <form onSubmit={handleLoginSubmit} className="space-y-4 text-left">
+            <div>
+              <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5 pl-1">
+                Passcode
+              </label>
+              <input
+                type="password"
+                placeholder="••••••••••••"
+                value={passcode}
+                onChange={(e) => setPasscode(e.target.value)}
+                disabled={loading}
+                className="w-full px-5 py-3.5 rounded-xl bg-slate-950/80 border border-slate-800 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 text-center text-lg tracking-wider focus:outline-none transition-all duration-300"
+              />
+            </div>
+            {errorMsg && (
+              <p className="text-xs font-semibold text-red-400 text-center bg-red-950/20 py-2 rounded-lg border border-red-900/30">
+                ⚠️ {errorMsg}
+              </p>
+            )}
             
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary-dark font-semibold text-white transition-all cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark font-semibold text-white transition-all shadow-lg shadow-primary/10 hover:shadow-primary/25 cursor-pointer flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0"
             >
-              {loading ? <RefreshCw className="animate-spin" size={18} /> : 'Verify Access'}
+              {loading ? <RefreshCw className="animate-spin" size={18} /> : (
+                <>
+                  <span>Verify Passcode</span>
+                  <Sparkles size={16} />
+                </>
+              )}
             </button>
           </form>
 
           <button 
             onClick={navigateToHome}
-            className="text-xs text-slate-500 hover:text-slate-400 flex items-center gap-1 mx-auto cursor-pointer"
+            className="text-xs text-slate-500 hover:text-slate-350 flex items-center gap-1 mx-auto cursor-pointer transition-colors"
           >
             <ArrowLeft size={12} /> Go back to website
           </button>
@@ -351,23 +393,32 @@ export const AdminDashboard = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-900">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent flex items-center gap-2">
-              <Sparkles className="text-primary animate-spin-slow w-6 h-6 sm:w-7 sm:h-7" /> Administrative Dashboard
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent flex items-center gap-2 font-heading">
+              <Sparkles className="text-primary animate-spin-slow w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 flex-shrink-0" /> Administrative Dashboard
             </h1>
-            <p className="text-sm text-slate-500 font-mono mt-1">Authorized Session Active • Secure Storage Mode</p>
+            <p className="text-xs sm:text-sm text-slate-400 font-mono mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1.5 leading-relaxed">
+              <span className="flex items-center gap-1 text-emerald-400 font-semibold bg-emerald-950/20 px-2 py-0.5 rounded-md border border-emerald-900/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                Authorized Session Active
+              </span>
+              <span className="text-slate-700 hidden xs:inline">•</span>
+              <span className="bg-slate-900/50 text-slate-400 px-2 py-0.5 rounded-md border border-slate-800">
+                Secure Storage Mode
+              </span>
+            </p>
           </div>
-          <div className="flex gap-3 w-full sm:w-auto">
+          <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
             <button 
               onClick={navigateToHome}
-              className="flex-1 sm:flex-initial justify-center px-4 py-2.5 rounded-xl border border-slate-800 text-sm font-semibold hover:border-slate-700 transition-colors flex items-center gap-2 cursor-pointer bg-slate-900/50"
+              className="flex-1 sm:flex-initial justify-center px-3 py-2 rounded-xl border border-slate-800 text-xs sm:text-sm font-semibold hover:border-primary/50 hover:text-primary transition-all duration-300 flex items-center gap-1.5 cursor-pointer bg-slate-900/40 backdrop-blur-sm shadow-md hover:shadow-primary/5"
             >
-              <ExternalLink size={14} /> Go to Site
+              <ExternalLink size={13} /> Go to Site
             </button>
             <button 
               onClick={handleLogout}
-              className="flex-1 sm:flex-initial justify-center px-4 py-2.5 rounded-xl bg-red-950/40 border border-red-900/40 text-red-400 text-sm font-semibold hover:bg-red-950/60 transition-colors cursor-pointer text-center"
+              className="flex-1 sm:flex-initial justify-center px-3 py-2 rounded-xl bg-red-950/20 border border-red-900/30 text-red-400 text-xs sm:text-sm font-semibold hover:bg-red-900/20 hover:border-red-500/30 transition-all duration-300 cursor-pointer text-center flex items-center gap-1.5"
             >
-              Lock Panel
+              <Lock size={13} /> Lock Panel
             </button>
           </div>
         </div>
@@ -375,18 +426,18 @@ export const AdminDashboard = () => {
         {/* Resume and Actions Grid */}
         <div className="grid md:grid-cols-3 gap-6">
           {/* Resume Upload Module */}
-          <div className="bg-slate-900/50 border border-slate-900 rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:col-span-1 space-y-4">
-            <div className="flex items-center gap-2 text-sm font-bold text-slate-300">
+          <div className="glass border border-slate-800/80 rounded-3xl p-5 sm:p-6 md:col-span-1 space-y-4 shadow-xl hover:shadow-primary/5 transition-all duration-300 relative group">
+            <div className="flex items-center gap-2 text-sm font-bold text-slate-300 font-heading">
               <FileText size={16} className="text-primary" /> Dynamic PDF Resume
             </div>
             
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-slate-400 leading-relaxed">
               Upload your updated PDF resume. The PDF will be stored as binary base64 directly in the database.
             </p>
 
             <div 
               onClick={() => fileInputRef.current?.click()}
-              className="h-32 border-2 border-dashed border-slate-800 hover:border-primary/40 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors hover:bg-slate-900/40"
+              className="h-32 border-2 border-dashed border-slate-800 hover:border-primary/55 hover:bg-slate-950/40 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-300 group/drop"
             >
               <input 
                 type="file" 
@@ -395,19 +446,25 @@ export const AdminDashboard = () => {
                 accept="application/pdf"
                 className="hidden" 
               />
-              <Upload size={24} className="text-slate-600 group-hover:text-primary" />
-              <span className="text-xs text-slate-400 font-medium">
-                {resumeFile ? resumeFile.name : 'Select Resume PDF'}
+              <div className="w-9 h-9 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-center text-slate-400 group-hover/drop:text-primary group-hover/drop:border-primary/30 transition-colors">
+                <Upload size={18} />
+              </div>
+              <span className="text-xs text-slate-400 font-medium px-4 text-center truncate w-full">
+                {resumeFile ? (resumeFile.name.length > 22 ? resumeFile.name.substring(0, 19) + '...' : resumeFile.name) : 'Select Resume PDF'}
               </span>
             </div>
 
-            {resumeError && <p className="text-xs text-red-400 font-semibold">{resumeError}</p>}
+            {resumeError && (
+              <p className="text-xs text-red-400 font-semibold bg-red-950/15 p-2 rounded-lg border border-red-900/20 text-center">
+                ⚠️ {resumeError}
+              </p>
+            )}
             
             {resumeFile && (
               <button 
                 onClick={handleUploadResume}
                 disabled={resumeStatus === 'uploading'}
-                className="w-full py-2.5 rounded-xl bg-primary text-white font-semibold text-xs hover:bg-primary-dark transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold text-xs hover:shadow-lg hover:shadow-primary/10 transition-all cursor-pointer flex items-center justify-center gap-1.5"
               >
                 {resumeStatus === 'uploading' ? (
                   <RefreshCw className="animate-spin" size={14} />
@@ -420,19 +477,19 @@ export const AdminDashboard = () => {
             )}
 
             {resumeStatus === 'success' && (
-              <p className="text-xs text-emerald-400 font-semibold flex items-center gap-1 bg-emerald-950/20 p-2 rounded-lg border border-emerald-900/20">
+              <p className="text-xs text-emerald-400 font-semibold flex items-center justify-center gap-1.5 bg-emerald-950/20 p-2.5 rounded-xl border border-emerald-900/20">
                 ✔️ Resume uploaded successfully!
               </p>
             )}
 
             {profile?.resumeBase64 && (
-              <div className="pt-2 flex items-center justify-between border-t border-slate-950">
+              <div className="pt-3 flex items-center justify-between border-t border-slate-900">
                 <span className="text-xs text-slate-500 font-mono">Current PDF Available</span>
                 <a 
                   href="/api/profile/resume" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="text-xs text-primary hover:underline flex items-center gap-1"
+                  className="text-xs text-primary hover:text-primary-light hover:underline flex items-center gap-1 transition-colors"
                 >
                   View Current <Link2 size={10} />
                 </a>
@@ -441,36 +498,42 @@ export const AdminDashboard = () => {
           </div>
 
           {/* Quick Stats & Configs */}
-          <div className="bg-slate-900/50 border border-slate-900 rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:col-span-2 flex flex-col justify-between">
+          <div className="glass border border-slate-800/80 rounded-3xl p-5 sm:p-6 md:col-span-2 flex flex-col justify-between shadow-xl hover:shadow-secondary/5 transition-all duration-300">
             <div className="space-y-2">
-              <div className="text-sm font-bold text-slate-300 flex items-center gap-2">
-                <Sparkles size={16} className="text-accent" /> Portfolio Summary
+              <div className="text-sm font-bold text-slate-300 flex items-center gap-2 font-heading">
+                <Sparkles size={16} className="text-secondary" /> Portfolio Summary
               </div>
-              <p className="text-xs text-slate-500">Overview of configured resources.</p>
+              <p className="text-xs text-slate-400">Overview of configured resources.</p>
               
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4">
-                <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-900/60 text-center">
-                  <span className="text-2xl font-black text-white">{projects.length}</span>
-                  <span className="block text-[10px] text-slate-500 uppercase tracking-widest mt-1">Projects</span>
+                <div className="p-4 rounded-2xl bg-slate-950/40 border border-slate-850 hover:border-slate-800/80 transition-all duration-300 group/stat">
+                  <span className="text-2xl sm:text-3xl font-black text-white bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent group-hover/stat:text-primary transition-colors">{projects.length}</span>
+                  <span className="block text-[10px] text-slate-400 uppercase tracking-widest mt-1.5 font-medium">Projects</span>
                 </div>
-                <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-900/60 text-center">
-                  <span className="text-2xl font-black text-white">
+                <div className="p-4 rounded-2xl bg-slate-950/40 border border-slate-850 hover:border-slate-800/80 transition-all duration-300 group/stat">
+                  <span className="text-2xl sm:text-3xl font-black text-white bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent group-hover/stat:text-secondary transition-colors">
                     {projects.filter(p => p.thumbnail).length}
                   </span>
-                  <span className="block text-[10px] text-slate-500 uppercase tracking-widest mt-1">With Image</span>
+                  <span className="block text-[10px] text-slate-400 uppercase tracking-widest mt-1.5 font-medium">With Image</span>
                 </div>
-                <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-900/60 text-center col-span-2 sm:col-span-1">
-                  <span className="text-xs font-mono text-emerald-400">Database Sync</span>
-                  <span className="block text-[10px] text-slate-500 uppercase tracking-widest mt-2">Active</span>
+                <div className="p-4 rounded-2xl bg-slate-950/40 border border-slate-850 hover:border-slate-800/80 transition-all duration-300 col-span-2 sm:col-span-1 flex flex-col justify-center items-center text-center">
+                  <span className="text-xs font-mono text-emerald-400 font-bold flex items-center gap-1 bg-emerald-950/20 px-2 py-0.5 rounded border border-emerald-900/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Sync Active
+                  </span>
+                  <span className="block text-[10px] text-slate-400 uppercase tracking-widest mt-2 font-medium font-sans">Database Status</span>
                 </div>
               </div>
             </div>
             
-            <div className="pt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-slate-950 mt-4">
-              <span className="text-xs text-slate-500 font-mono">MongoDB + Cloudinary REST Services</span>
+            <div className="pt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-slate-900 mt-6">
+              <span className="text-[11px] text-slate-500 font-mono flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary/80"></span>
+                MongoDB + Cloudinary REST Services
+              </span>
               <button 
                 onClick={openCreateForm}
-                className="w-full sm:w-auto justify-center px-4 py-2 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary-dark transition-colors cursor-pointer flex items-center gap-1.5"
+                className="w-full sm:w-auto justify-center px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark text-white text-xs font-semibold hover:shadow-lg hover:shadow-primary/10 transition-all cursor-pointer flex items-center gap-1.5 active:translate-y-0.5"
               >
                 <Plus size={14} /> Add New Project
               </button>
@@ -481,166 +544,167 @@ export const AdminDashboard = () => {
         {/* Project Form Modal Overlay */}
         <AnimatePresence>
           {showForm && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm">
               <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
+                initial={{ scale: 0.96, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl overflow-hidden max-h-[92vh] overflow-y-auto"
+                exit={{ scale: 0.96, opacity: 0 }}
+                className="w-full max-w-2xl glass border border-slate-800 rounded-3xl overflow-hidden max-h-[90vh] flex flex-col shadow-2xl relative"
               >
                 {/* Header */}
-                <div className="p-4 sm:p-6 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
-                  <h3 className="font-bold text-lg">
+                <div className="p-4 sm:p-5 bg-slate-950/80 backdrop-blur-md border-b border-slate-850 flex justify-between items-center flex-shrink-0">
+                  <h3 className="font-bold text-base sm:text-lg font-heading text-white">
                     {isEditing ? `Edit Project: ${isEditing.title}` : 'Add New Project'}
                   </h3>
                   <button 
+                    type="button"
                     onClick={() => setShowForm(false)}
-                    className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                    className="p-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer flex items-center justify-center active:scale-95"
                   >
-                    <X size={18} />
+                    <X size={16} />
                   </button>
                 </div>
 
                 {/* Form Body */}
-                <form onSubmit={handleProjectSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5">
-                  <div className="grid sm:grid-cols-2 gap-4">
+                <form onSubmit={handleProjectSubmit} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-5 custom-scrollbar text-left">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-1.5">Project Title</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-1.5 pl-0.5">Project Title</label>
                       <input 
                         type="text" 
                         required
                         value={projectForm.title}
                         onChange={(e) => setProjectForm(prev => ({ ...prev, title: e.target.value }))}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-sm"
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 focus:outline-none text-sm text-white transition-all duration-300"
                         placeholder="e.g. AgriConnect"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-1.5">Project Slug (URL Path)</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-1.5 pl-0.5">Project Slug (URL Path)</label>
                       <input 
                         type="text" 
                         required
                         value={projectForm.slug}
                         onChange={(e) => setProjectForm(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') }))}
                         disabled={!!isEditing}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-sm disabled:opacity-50"
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 focus:outline-none text-sm text-white transition-all duration-300 disabled:opacity-40"
                         placeholder="e.g. agriconnect"
                       />
                     </div>
                   </div>
 
-                  <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-1.5">Tagline</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-1.5 pl-0.5">Tagline</label>
                       <input 
                         type="text" 
                         required
                         value={projectForm.tagline}
                         onChange={(e) => setProjectForm(prev => ({ ...prev, tagline: e.target.value }))}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-sm"
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 focus:outline-none text-sm text-white transition-all duration-300"
                         placeholder="Connecting farmers to markets"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-xs font-semibold text-slate-400 mb-1.5">Emoji</label>
+                        <label className="block text-xs font-semibold text-slate-400 mb-1.5 pl-0.5 text-center">Emoji</label>
                         <input 
                           type="text" 
                           value={projectForm.emoji}
                           onChange={(e) => setProjectForm(prev => ({ ...prev, emoji: e.target.value }))}
-                          className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-sm text-center"
+                          className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 focus:outline-none text-sm text-center text-white transition-all duration-300"
                           placeholder="🌱"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-slate-400 mb-1.5">Display Order</label>
+                        <label className="block text-xs font-semibold text-slate-400 mb-1.5 pl-0.5 text-center">Display Order</label>
                         <input 
                           type="number" 
                           value={projectForm.order}
                           onChange={(e) => setProjectForm(prev => ({ ...prev, order: parseInt(e.target.value) || 0 }))}
-                          className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-sm text-center"
+                          className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 focus:outline-none text-sm text-center text-white transition-all duration-300"
                         />
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5">Description</label>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1.5 pl-0.5">Description</label>
                     <textarea 
                       required
                       rows={3}
                       value={projectForm.description}
                       onChange={(e) => setProjectForm(prev => ({ ...prev, description: e.target.value }))}
-                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-sm"
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 focus:outline-none text-sm text-white transition-all duration-300"
                       placeholder="Detail what the project does..."
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5">The Problem Solved (Case Study)</label>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1.5 pl-0.5">The Problem Solved (Case Study)</label>
                     <textarea 
                       rows={2}
                       value={projectForm.problem}
                       onChange={(e) => setProjectForm(prev => ({ ...prev, problem: e.target.value }))}
-                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-sm"
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 focus:outline-none text-sm text-white transition-all duration-300"
                       placeholder="What issue does this solve?"
                     />
                   </div>
 
-                  <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-1.5">Tech Stack (comma separated)</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-1.5 pl-0.5">Tech Stack (comma separated)</label>
                       <input 
                         type="text" 
                         required
                         value={projectForm.tech}
                         onChange={(e) => setProjectForm(prev => ({ ...prev, tech: e.target.value }))}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-sm"
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 focus:outline-none text-sm text-white transition-all duration-300"
                         placeholder="React.js, Node.js, Express.js, PostgreSQL"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-1.5">Key Features (comma separated)</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-1.5 pl-0.5">Key Features (comma separated)</label>
                       <input 
                         type="text" 
                         value={projectForm.features}
                         onChange={(e) => setProjectForm(prev => ({ ...prev, features: e.target.value }))}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-sm"
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 focus:outline-none text-sm text-white transition-all duration-300"
                         placeholder="Marketplace, Soil Readings, Admin advice feed"
                       />
                     </div>
                   </div>
 
-                  <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-1.5">GitHub Repository Link</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-1.5 pl-0.5">GitHub Repository Link</label>
                       <input 
                         type="url" 
                         value={projectForm.github}
                         onChange={(e) => setProjectForm(prev => ({ ...prev, github: e.target.value }))}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-sm"
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 focus:outline-none text-sm text-white transition-all duration-300"
                         placeholder="https://github.com/..."
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-1.5">Live Demo Link</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-1.5 pl-0.5">Live Demo Link</label>
                       <input 
                         type="url" 
                         value={projectForm.demo}
                         onChange={(e) => setProjectForm(prev => ({ ...prev, demo: e.target.value }))}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-sm"
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 focus:outline-none text-sm text-white transition-all duration-300"
                         placeholder="https://..."
                       />
                     </div>
                   </div>
 
-                  <div className="grid sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-1.5">Background Gradient</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-1.5 pl-0.5">Background Gradient</label>
                       <select 
                         value={projectForm.color}
                         onChange={(e) => setProjectForm(prev => ({ ...prev, color: e.target.value }))}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-sm"
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-sm text-slate-300 cursor-pointer"
                       >
                         <option value="from-primary to-secondary">Cyan to Purple</option>
                         <option value="from-emerald-500 to-accent">Emerald to Cyan</option>
@@ -650,33 +714,33 @@ export const AdminDashboard = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-400 mb-1.5">Development Status</label>
+                      <label className="block text-xs font-semibold text-slate-400 mb-1.5 pl-0.5">Development Status</label>
                       <select 
                         value={projectForm.status}
                         onChange={(e) => setProjectForm(prev => ({ ...prev, status: e.target.value }))}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-sm"
+                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-sm text-slate-300 cursor-pointer"
                       >
                         <option value="Completed">Completed</option>
                         <option value="In Progress">In Progress</option>
                         <option value="Planned">Planned</option>
                       </select>
                     </div>
-                    <div className="flex items-center gap-2 sm:pt-6">
+                    <div className="flex items-center gap-2 pt-2 sm:pt-6 pl-1">
                       <input 
                         type="checkbox"
                         id="featured"
                         checked={projectForm.featured}
                         onChange={(e) => setProjectForm(prev => ({ ...prev, featured: e.target.checked }))}
-                        className="w-4 h-4 rounded bg-slate-950 border-slate-800 text-primary focus:ring-primary"
+                        className="w-4 h-4 rounded bg-slate-950 border-slate-800 text-primary focus:ring-primary/20 focus:ring-2 cursor-pointer"
                       />
-                      <label htmlFor="featured" className="text-xs font-semibold text-slate-400 cursor-pointer">Featured Project</label>
+                      <label htmlFor="featured" className="text-xs font-semibold text-slate-400 cursor-pointer select-none">Featured Project</label>
                     </div>
                   </div>
 
                   {/* Cloudinary Thumbnail Drag & Drop Uploader */}
                   <div className="space-y-2">
-                    <label className="block text-xs font-semibold text-slate-400">
-                      Thumbnail Image (Drag & Drop to Upload to Cloudinary)
+                    <label className="block text-xs font-semibold text-slate-400 pl-0.5">
+                      Thumbnail Image (Upload to Cloudinary)
                     </label>
 
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-center">
@@ -687,7 +751,7 @@ export const AdminDashboard = () => {
                           onDragLeave={handleDrag}
                           onDrop={handleDrop}
                           onClick={() => document.getElementById('imageFileRef').click()}
-                          className={`h-24 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors bg-slate-950/60 ${
+                          className={`h-24 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-all duration-300 bg-slate-950/40 hover:bg-slate-950/60 ${
                             dragActive ? 'border-primary bg-primary/5' : 'border-slate-800 hover:border-primary/30'
                           }`}
                         >
@@ -698,17 +762,19 @@ export const AdminDashboard = () => {
                             accept="image/*"
                             className="hidden" 
                           />
-                          <Upload size={18} className={`${uploadingImage ? 'animate-bounce' : ''} text-slate-500`} />
-                          <span className="text-xs text-slate-400 font-medium">
+                          <div className="w-8 h-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                            <Upload size={14} className={uploadingImage ? 'animate-bounce' : ''} />
+                          </div>
+                          <span className="text-xs text-slate-400 font-medium text-center px-4 truncate w-full">
                             {uploadingImage ? 'Uploading to Cloudinary...' : 'Drop image here or click to browse'}
                           </span>
                         </div>
                       </div>
-                      <div className="sm:col-span-1 h-24 rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center relative w-full">
+                      <div className="sm:col-span-1 h-24 rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center relative w-full shadow-inner">
                         {imagePreview ? (
                           <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                         ) : (
-                          <span className="text-[10px] text-slate-600 font-mono text-center px-2">No Image</span>
+                          <span className="text-[10px] text-slate-500 font-mono text-center px-2">No Image</span>
                         )}
                       </div>
                     </div>
@@ -720,29 +786,32 @@ export const AdminDashboard = () => {
                         setProjectForm(prev => ({ ...prev, thumbnail: e.target.value }));
                         setImagePreview(e.target.value);
                       }}
-                      className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-xs"
+                      className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary focus:outline-none text-xs text-white"
                       placeholder="Or enter custom image URL directly"
                     />
                   </div>
 
-                  {/* Form Footer */}
-                  <div className="pt-4 border-t border-slate-800 flex justify-end gap-3">
-                    <button 
-                      type="button"
-                      onClick={() => setShowForm(false)}
-                      className="px-4 py-2 rounded-xl border border-slate-800 hover:border-slate-700 text-xs font-semibold transition-colors cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      type="submit"
-                      disabled={loading || uploadingImage}
-                      className="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-dark font-semibold text-xs text-white transition-all cursor-pointer flex items-center gap-1.5"
-                    >
-                      {loading ? <RefreshCw className="animate-spin" size={14} /> : 'Save Project'}
-                    </button>
-                  </div>
+                  {/* Fixed bottom padding to ensure content is fully scrollable */}
+                  <div className="h-2"></div>
                 </form>
+
+                {/* Form Footer - Sticky */}
+                <div className="p-4 sm:p-5 bg-slate-950/80 backdrop-blur-md border-t border-slate-850 flex justify-end gap-3 flex-shrink-0">
+                  <button 
+                    type="button"
+                    onClick={() => setShowForm(false)}
+                    className="px-4 py-2.5 rounded-xl border border-slate-800 hover:border-slate-700 text-xs font-semibold text-slate-350 transition-all cursor-pointer flex items-center justify-center"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit"
+                    disabled={loading || uploadingImage}
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark font-semibold text-xs text-white transition-all cursor-pointer flex items-center gap-1.5 active:translate-y-0.5"
+                  >
+                    {loading ? <RefreshCw className="animate-spin" size={14} /> : 'Save Project'}
+                  </button>
+                </div>
               </motion.div>
             </div>
           )}
@@ -751,12 +820,12 @@ export const AdminDashboard = () => {
         {/* Projects Listing */}
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-bold text-slate-300 flex items-center gap-2">
+            <h2 className="text-base sm:text-lg font-bold text-slate-300 flex items-center gap-2 font-heading">
               📂 Manage Projects ({projects.length})
             </h2>
             <button 
               onClick={openCreateForm}
-              className="px-3.5 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1"
+              className="px-3 py-1.5 rounded-xl bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 text-xs font-semibold transition-all duration-300 cursor-pointer flex items-center gap-1 hover:-translate-y-0.5 active:translate-y-0"
             >
               <Plus size={12} /> Add Project
             </button>
@@ -766,39 +835,65 @@ export const AdminDashboard = () => {
             {projects.map((proj) => (
               <div 
                 key={proj.slug}
-                className="p-4 sm:p-5 rounded-2xl bg-slate-900/40 border border-slate-900 hover:border-slate-800 transition-colors flex gap-3 sm:gap-4 items-center justify-between"
+                className="p-4 sm:p-5 rounded-2xl glass border border-slate-850 hover:border-slate-800 transition-all duration-300 flex flex-col xs:flex-row gap-3 xs:gap-4 items-start xs:items-center justify-between shadow-lg hover:shadow-primary/5"
               >
-                <div className="flex gap-3 sm:gap-4 items-center overflow-hidden min-w-0 flex-1">
-                  <div className="w-12 h-10 sm:w-16 sm:h-12 rounded-xl bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center flex-shrink-0">
+                <div className="flex gap-3 sm:gap-4 items-start xs:items-center overflow-hidden min-w-0 flex-1 w-full">
+                  <div className="w-12 h-10 xs:w-16 xs:h-12 rounded-xl bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center flex-shrink-0 shadow-inner">
                     {proj.thumbnail ? (
                       <img src={proj.thumbnail} alt={proj.title} className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-lg sm:text-xl">{proj.emoji || '🚀'}</span>
+                      <span className="text-lg xs:text-xl">{proj.emoji || '🚀'}</span>
                     )}
                   </div>
-                  <div className="overflow-hidden min-w-0 flex-1">
-                    <h3 className="font-bold text-sm truncate">{proj.title}</h3>
+                  <div className="overflow-hidden min-w-0 flex-1 space-y-1">
+                    <h3 className="font-bold text-sm text-white font-heading truncate flex items-center gap-1.5">
+                      {proj.title}
+                      {proj.featured && (
+                        <span className="text-[9px] bg-primary/20 text-primary border border-primary/25 px-1.5 py-0.5 rounded font-sans font-semibold flex-shrink-0">
+                          Featured
+                        </span>
+                      )}
+                    </h3>
                     <p className="text-xs text-slate-500 font-mono truncate">/{proj.slug}</p>
-                    <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                    
+                    {/* Tech tags preview on dashboard */}
+                    {proj.tech && proj.tech.length > 0 && (
+                      <div className="flex flex-wrap gap-1 pt-0.5">
+                        {proj.tech.slice(0, 3).map((t, idx) => (
+                          <span key={idx} className="text-[9px] px-1.5 py-0.5 rounded bg-slate-950/60 border border-slate-900 text-slate-400 font-mono">
+                            {t}
+                          </span>
+                        ))}
+                        {proj.tech.length > 3 && (
+                          <span className="text-[9px] px-1 py-0.5 text-slate-500 font-mono">+{proj.tech.length - 3}</span>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
                       <span className="text-[9px] px-1.5 py-0.5 rounded bg-slate-950 text-slate-400 font-mono">Order: {proj.order}</span>
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded font-mono ${
-                        proj.status === 'Completed' ? 'bg-emerald-950/20 text-emerald-400' : 'bg-amber-950/20 text-amber-400'
+                      <span className={`text-[9px] px-1.5 py-0.5 rounded border font-mono ${
+                        proj.status === 'Completed' 
+                          ? 'bg-emerald-950/15 border-emerald-900/30 text-emerald-400' 
+                          : proj.status === 'In Progress'
+                            ? 'bg-amber-950/15 border-amber-900/30 text-amber-400'
+                            : 'bg-indigo-950/15 border-indigo-900/30 text-indigo-400'
                       }`}>{proj.status}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex gap-1.5 flex-shrink-0 ml-2">
+                <div className="flex gap-2 w-full xs:w-auto justify-end pt-3 xs:pt-0 border-t xs:border-t-0 border-slate-800/60 mt-2 xs:mt-0 flex-shrink-0">
                   <button 
                     onClick={() => openEditForm(proj)}
-                    className="p-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-850 hover:border-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                    className="p-2 rounded-xl bg-slate-950 border border-slate-800 hover:border-primary/40 hover:text-primary transition-all duration-300 cursor-pointer shadow-md hover:shadow-primary/5"
                     title="Edit Project"
                   >
                     <Edit3 size={14} />
                   </button>
                   <button 
                     onClick={() => handleDeleteProject(proj.slug)}
-                    className="p-2 rounded-lg bg-red-950/20 hover:bg-red-950/40 border border-red-900/30 text-red-400 transition-colors cursor-pointer"
+                    className="p-2 rounded-xl bg-red-950/10 border border-red-900/30 text-red-400 hover:bg-red-950/30 hover:border-red-500/40 hover:text-red-300 transition-all duration-300 cursor-pointer shadow-md"
                     title="Delete Project"
                   >
                     <Trash2 size={14} />
