@@ -63,7 +63,7 @@ export const About = () => {
 
   return (
     <section id="about" className="section-padding relative">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-6">
         <SectionHeading
           label="About Me"
           title="Passionate Developer & Continuous Learner"

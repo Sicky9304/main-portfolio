@@ -63,7 +63,7 @@ export const TiltCard = ({ children, className = '' }) => {
         scale: hovered ? 1.025 : 1.0,
       }}
       transition={{ duration: 0.4, ease: [0.25, 1, 0.5, 1] }}
-      className={`relative group rounded-[32px] overflow-hidden aspect-[16/10] shadow-lg transition-shadow duration-500 cursor-pointer ${
+      className={`relative group rounded-[32px] overflow-hidden shadow-lg transition-shadow duration-500 cursor-pointer ${
         hovered ? 'shadow-primary/10 dark:shadow-primary/5 shadow-2xl' : 'shadow-black/5'
       } ${className}`}
     >

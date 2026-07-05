@@ -24,5 +24,5 @@ async function start(){
    process.exit(1);
  }
 }
-
+// Trigger server watch reload to load new env variables
 start();

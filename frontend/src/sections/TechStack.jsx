@@ -85,7 +85,7 @@ export const TechStack = () => {
 
   return (
     <section id="skills" className="section-padding relative">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-6">
         <SectionHeading
           label="Tech Stack"
           title="Technologies I Work With"

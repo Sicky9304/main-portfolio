@@ -5,6 +5,7 @@ import Project from '../models/Project.js';
 import Service from '../models/Service.js';
 import Testimonial from '../models/Testimonial.js';
 import Profile from '../models/Profile.js';
+import Blog from '../blog/Blog.js';
 
 // ─── Seed Data ────────────────────────────────────
 
@@ -26,14 +27,14 @@ const PROJECTS = [
       'Neon dropshadow glowing Lucide accents',
     ],
     tech: ['React.js', 'Node.js', 'Express.js', 'MongoDB', 'Cloudinary', 'Framer Motion'],
-    github: 'https://github.com/Sicky9304/Portfolio_With_AI.git',
-    demo: 'https://portfolio-with-ai-seven.vercel.app/',
+    github: 'https://github.com/Sicky9304/main-portfolio.git',
+    demo: 'https://sickykumar.in',
     color: 'from-primary to-accent',
     emoji: '🔮',
     status: 'Completed',
     order: 0,
     featured: true,
-    thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600&auto=format&fit=crop',
+    thumbnail: '/images/blogs/3d_portfolio.webp',
   },
   {
     title: 'AI E-Learning Platform',
@@ -58,7 +59,7 @@ const PROJECTS = [
     status: 'Completed',
     order: 1,
     featured: true,
-    thumbnail: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop',
+    thumbnail: '/images/blogs/e_learning.webp',
   },
   {
     title: 'AgriConnect',
@@ -83,7 +84,7 @@ const PROJECTS = [
     status: 'Completed',
     order: 2,
     featured: true,
-    thumbnail: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=600&auto=format&fit=crop',
+    thumbnail: '/images/blogs/agri_connect.webp',
   },
   {
     title: 'Portfolio with AI',
@@ -108,7 +109,7 @@ const PROJECTS = [
     status: 'Completed',
     order: 3,
     featured: true,
-    thumbnail: '',
+    thumbnail: '/images/blogs/portfolio_ai.webp',
   },
   {
     title: 'News Portal App',
@@ -133,7 +134,7 @@ const PROJECTS = [
     status: 'Completed',
     order: 4,
     featured: true,
-    thumbnail: '',
+    thumbnail: '/images/blogs/news_portal.webp',
   },
   {
     title: 'Pokémon Explorer',
@@ -158,7 +159,7 @@ const PROJECTS = [
     status: 'Completed',
     order: 5,
     featured: true,
-    thumbnail: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=600&auto=format&fit=crop',
+    thumbnail: '/images/blogs/pokemon_search.webp',
   },
 ];
 
@@ -237,6 +238,530 @@ const TESTIMONIALS = [
   },
 ];
 
+// Blogs section
+const BLOGS = [
+  {
+    title: 'The Complete MERN Stack Roadmap for Beginners (2026 Edition)',
+    slug: 'complete-mern-stack-roadmap-2026',
+    description: 'Learn the complete MERN Stack roadmap in 2026 with a step-by-step guide covering HTML, CSS, JavaScript, React, Node.js, Express.js, MongoDB, deployment, and real-world projects.',
+    content: `# The Complete MERN Stack Roadmap for Beginners (2026 Edition)
+
+The MERN Stack is one of the most popular technologies for building modern web applications. It allows developers to create fast, scalable, and full-stack applications using JavaScript from frontend to backend.
+
+In 2026, the MERN Stack continues to dominate full-stack development, enhanced by modern tools like Redux Toolkit, TanStack Query, Tailwind CSS, and AI API integrations. This guide outlines the ultimate roadmap to mastering the MERN stack from absolute scratch.
+
+MERN is an acronym for:
+* **MongoDB** – A document-based NoSQL Database
+* **Express.js** – A lightweight backend Framework for Node.js
+* **React.js** – A component-based Frontend UI Library
+* **Node.js** – A powerful JavaScript Runtime
+
+---
+
+## 12-Step Detailed Roadmap
+
+### Step 1: Learn HTML (The Skeleton)
+Before diving into databases and frameworks, you must master the building blocks of the web. Focus on:
+* [Semantic HTML](https://developer.mozilla.org/en-US/docs/Glossary/Semantics#html_semantics): Use tags like \`<header>\`, \`<nav>\`, \`<article>\`, and \`<footer>\` for accessibility and SEO.
+* **Forms & Validation:** Understand input types, form submissions, and client-side validation rules.
+* **Tables:** Organize tabular datasets cleanly.
+* **Portfolio Project:** Create your first basic webpage listing your skills and social links using pure HTML.
+
+*Example - Semantic HTML Structure:*
+\`\`\`html
+<header>
+  <h1>My Web Development Portfolio</h1>
+</header>
+<main>
+  <section>
+    <h2>Skills</h2>
+    <p>HTML, CSS, JavaScript, and MERN.</p>
+  </section>
+</main>
+\`\`\`
+
+### Step 2: Learn CSS (The Presentation)
+Make your pages look stunning. Avoid using template builders and learn layout mechanics:
+* [Flexbox Guide](https://css-tricks.com/snippets/css/a-guide-to-flexbox/): Aligning items along columns or rows.
+* [CSS Grid Guide](https://css-tricks.com/snippets/css/complete-guide-grid/): Creating complex grid layouts.
+* **Responsive Design:** Using media queries to adapt to mobile layouts down to 300px.
+* [Tailwind CSS Documentation](https://tailwindcss.com/docs): A utility-first CSS framework that speeds up responsive styling.
+
+### Step 3: Master JavaScript (The Engine)
+JavaScript drives the logic of the entire MERN stack. Master:
+* **ES6+ Syntax:** Destructuring, arrow functions, template literals, and modules.
+* **Async/Await & Promises:** Crucial for fetching API data without freezing the browser interface.
+* **DOM Manipulation:** Selecting elements, updating styling, and handling click events.
+* [Fetch API MDN](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API): Consuming backend resources.
+
+*Example - Async Fetch Function:*
+\`\`\`javascript
+async function fetchUserData(userId) {
+  try {
+    const response = await fetch(\`/api/users/\${userId}\`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to load user data:", error);
+  }
+}
+\`\`\`
+
+### Step 4: Learn Git & GitHub (The Safety Net)
+Version control is mandatory for professional engineering.
+* [Git Documentation](https://git-scm.com/doc): Learn \`git init\`, \`git add\`, \`git commit\`, \`git branch\`, and \`git push\`.
+* **Collaborative Flow:** Create repositories, manage pull requests, and resolve merge conflicts.
+
+### Step 5: Learn React (The Frontend)
+React allows you to build modular, component-based user interfaces.
+* [React Docs](https://react.dev): Components, JSX, Props, and state management.
+* **Hooks:** Master \`useState\`, \`useEffect\`, \`useContext\`, and custom hooks.
+* [React Router Web](https://reactrouter.com): Use React Router to build Single Page Applications (SPAs).
+* [Redux Toolkit Quickstart](https://redux-toolkit.js.org/introduction/quick-start) & [TanStack Query Docs](https://tanstack.com/query/latest/docs/framework/react/overview): Manage client state with Redux Toolkit and server state with TanStack Query.
+
+### Step 6: Learn Node.js & Express.js (The Control Room)
+Write server-side code using the same JavaScript language.
+* **REST APIs:** Design endpoint structures (\`GET\`, \`POST\`, \`PUT\`, \`DELETE\`).
+* [Express.js Guide](https://expressjs.com/en/guide/routing.html): Handle logging, parsing headers, CORS, and request validations.
+
+*Example - Express Server:*
+\`\`\`javascript
+import express from 'express';
+const app = express();
+app.use(express.json());
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'active', server: 'Node.js' });
+});
+
+app.listen(5000, () => console.log('Server running on port 5000'));
+\`\`\`
+
+### Step 7: Learn MongoDB & Mongoose (The Vault)
+Store data in flexible JSON-like documents.
+* **CRUD Operations:** Learn how to create, read, update, and delete entries.
+* [MongoDB Aggregation](https://www.mongodb.com/docs/manual/aggregation/): Group and filter collections dynamically.
+* [Mongoose Docs](https://mongoosejs.com/docs/): Structure relations using Mongoose schemas.
+
+### Step 8: Backend Authentication (The Shield)
+Secure your administration dashboards and user directories.
+* [JWT Introduction](https://jwt.io/introduction): Issuing tokens for secure client requests.
+* **Cookies:** Store authentication tokens in secure, HttpOnly cookies to prevent XSS attacks.
+* **Password Hashing:** Always store credentials securely using bcrypt.
+
+### Step 9: File Upload (The Media Library)
+Handle uploads like profile photos or project mockups.
+* [Multer on GitHub](https://github.com/expressjs/multer): Parse multi-part form data in your Express server.
+* [Cloudinary Node API](https://cloudinary.com/documentation/node_integration): Stream files directly to cloud storage and retrieve fast CDN links.
+
+### Step 10: Full Stack Deployment (Going Live)
+A project doesn't exist until it is deployed.
+* [Vercel Deployment](https://vercel.com/docs): Deploy React applications to Vercel.
+* [Render Hosting](https://render.com/docs): Deploy Express servers to Render.
+* [MongoDB Atlas Quickstart](https://www.mongodb.com/docs/atlas/getting-started/): Connect your app with MongoDB Atlas.
+
+### Step 11: Build Real-World Projects
+Stop watching tutorials and start building:
+1. **LMS (Learning Management System):** Course uploads, enrollment database, and progress tracks.
+2. **Developer Portfolio:** Interactive showcase (like this portfolio!).
+3. **AI Chatbot:** A live chat dashboard powered by LLM endpoints.
+4. **Music Player:** Stream files with customized audio controls.
+5. **E-commerce:** Fully integrated shopping cart, product catalog, and payment portals.
+
+### Step 12: Learn AI Integration (The Edge)
+Modern developers in 2026 must leverage AI. Connect your MERN stack backend to LLMs like Google Gemini API to parse documents, draft automated responses, or organize tag categorization dynamically.
+
+---
+
+## Common Mistakes to Avoid
+* **Tutorial Hell:** Watching hours of videos without writing a single line of your own code.
+* **Skipping Basics:** Diving into React before mastering basic JavaScript functions and async loops.
+* **Framework Overload:** Trying to learn React, Vue, Angular, and Svelte at the same time. Focus on MERN.
+* **Ignoring Git:** Writing code without version checkpoints.
+* **Avoiding Deployment:** Keeping all work stored strictly on localhost.
+
+---
+
+## Recommended Timeline
+
+| Phase | Duration | Core Focus |
+|---|---|---|
+| **Month 1** | Weeks 1-4 | HTML, CSS, JavaScript Fundamentals |
+| **Month 2** | Weeks 5-8 | React, Routing, State Management |
+| **Month 3** | Weeks 9-12 | Node.js, Express APIs, Routing |
+| **Month 4** | Weeks 13-16 | MongoDB, Mongoose schemas, Authentication |
+| **Month 5** | Weeks 17-20 | Building Full Stack Projects (CRUD) |
+| **Month 6** | Weeks 21-24 | Deployment, Optimizations & Interview Prep |
+
+---
+
+## Final Thoughts
+Mastering the MERN Stack requires time, structure, and consistency. Start by writing small HTML sheets, progress to interactive React frontends, attach databases, and build real-world SaaS systems. Keep building, deploying, and refining your engineering skills!`,
+    category: 'Web Development',
+    readTime: '6 min read',
+    thumbnail: '/images/blogs/mern_roadmap.webp',
+    featured: true,
+    createdAt: new Date('2026-07-05'),
+    complexity: 'Beginner',
+    audioDuration: '6:30',
+    tldr: [
+      'The MERN Stack combines MongoDB, Express, React, and Node.js for modern full-stack development.',
+      'A structured 12-step path moves from layout layouts to backend APIs, authentication, and cloud deployment.',
+      'Avoiding tutorial hell and deploying real-world projects is key to becoming a professional developer in 2026.'
+    ],
+    order: 0,
+    status: 'Published',
+    tags: ['MERN', 'React', 'MongoDB', 'Node.js', 'Web Development']
+  },
+  {
+    title: 'Building an AI SaaS Platform with Next.js & Prisma',
+    slug: 'building-ai-saas-nextjs-prisma',
+    description: 'A professional architectural blueprint detailing how to structure, model, and deploy a secure AI SaaS platform using Next.js and Prisma.',
+    content: `# Building an AI SaaS Platform with Next.js & Prisma
+
+Artificial Intelligence is reshaping how we design Software-as-a-Service (SaaS) products. By combining next-generation LLM APIs with robust server routing, developers can construct applications that generate dynamic value in real-time. In this comprehensive guide, we will analyze the technical blueprint of a modern AI SaaS application, focusing on direct database connections, relational modeling, and performance metrics.
+
+![AI SaaS Application Architecture](/images/blogs/ai_saas.webp)
+
+---
+
+## Chapter 1: The Architectural Blueprint
+
+Building a production-ready SaaS product requires choosing components that provide rapid development cycles, secure data access, and high performance. Here is a breakdown of our architecture:
+
+1. **Frontend Rendering Framework:** Next.js (App Router) is chosen because of React Server Components (RSC) and built-in edge optimizations.
+2. **Database ORM:** Prisma acts as our type-safe query engine, connecting securely with PostgreSQL.
+3. **AI Integration Layer:** Connecting with Google Gemini and OpenAI LLM endpoints with structured JSON responses.
+4. **Security & Authentication:** NextAuth.js (supporting OAuth and Magic Links) secures admin routes.
+
+---
+
+## Chapter 2: Relational Schema Modeling with Prisma
+
+A relational schema is critical to tracking user credits, transactions, and generated history. Let us look at a proper database model structure:
+
+\`\`\`prisma
+model User {
+  id            String       @id @default(cuid())
+  name          String?
+  email         String?      @unique
+  credits       Int          @default(100)
+  generations   Generation[]
+  createdAt     DateTime     @default(now())
+}
+
+model Generation {
+  id        String   @id @default(cuid())
+  prompt    String
+  result    String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+\`\`\`
+
+Using relational schema structures with cascade deletes ensures that user accounts can be cleaned up without orphaned database documents.
+
+---
+
+## Chapter 3: Minimizing Token Overhead & Latency
+
+When building LLM-based tools, prompt latency and token consumption directly affect profit margins. To optimize your prompt engineering:
+
+- **Use Structured Output:** Force LLMs to return JSON using schemas to simplify parsing.
+- **Cache System Prompts:** Cache repeating system messages on the LLM provider side to speed up generations.
+- **Implement Server Actions:** Use Next.js Server Actions to securely query the DB without extra REST endpoints.`,
+    category: 'Web Development',
+    readTime: '15 min read',
+    thumbnail: '/images/blogs/ai_saas_cover.webp',
+    featured: true,
+    createdAt: new Date('2025-05-22'),
+    complexity: 'Advanced',
+    audioDuration: '15:22',
+    tldr: [
+      'Next.js 14 App Router and Prisma make a solid foundation for dynamic data applications.',
+      'Prisma Schema allows for quick migrations and clean relational tables.',
+      'Server Actions simplify the creation of API endpoints for database writes without separate controllers.'
+    ],
+    order: 1,
+    status: 'Published',
+    tags: ['Next.js', 'Prisma', 'AI', 'SaaS', 'Database']
+  },
+  {
+    title: 'Server Components in Next.js 14',
+    slug: 'server-components-nextjs-14',
+    description: 'A deep dive into React Server Components (RSC) and how they solve performance, styling, and bundle limitations.',
+    content: `# Server Components in Next.js 14
+
+React Server Components (RSC) represent a paradigm shift in how we build React applications. By shifting component rendering to the server, we can write fast, secure, and SEO-friendly applications. In this guide, we will break down the mechanics of RSC, the client-server boundary, and performance optimization.
+
+![React Server Components Split Diagram](/images/blogs/server_components.webp)
+
+---
+
+## Chapter 1: The Problem with Client-Side Rendering
+
+Before RSC, everything in a React app was compiled and sent to the browser. The browser then ran JavaScript to render the DOM. This resulted in:
+- **Large Bundle Sizes:** Library dependencies were sent to the browser, impacting page speed.
+- **Slower Initial Page Load:** Low-end mobile devices had to parse megabytes of client code before displaying content.
+- **Data Fetching Chains:** Fetching data inside nested components triggered waterfalls of requests.
+
+---
+
+## Chapter 2: The Server Component Solution
+
+With Next.js, components are **Server Components by default**. They render on the server, producing raw HTML. Here is why this changes everything:
+
+- **Zero Client-Side Bundle:** Code used for server components remains on the server.
+- **Direct Database Access:** Query databases directly from inside a component securely.
+- **Better Security:** Keep API keys, private tokens, and SQL commands safe on the server.
+
+\`\`\`javascript
+// This component queries the database directly on the server!
+import db from '@/lib/db';
+
+export default async function ProjectList() {
+  const projects = await db.project.findMany();
+  
+  return (
+    <div className="grid gap-4">
+      {projects.map(p => (
+        <div key={p.id} className="p-4 glass rounded-2xl">
+          <h3>{p.title}</h3>
+        </div>
+      ))}
+    </div>
+  );
+}
+\`\`\`
+
+---
+
+## Chapter 3: Setting Client-Server Boundaries
+
+While Server Components handle backend queries, Client Components (using the \`'use client'\` directive) are necessary when:
+1. Using React state hooks (\`useState\`, \`useEffect\`).
+2. Listening to browser events (clicks, scrolls).
+3. Utilizing browser-only APIs (like \`window\` or \`localStorage\`).`,
+    category: 'Web Development',
+    readTime: '10 min read',
+    thumbnail: '/images/blogs/server_components_cover.webp',
+    featured: false,
+    createdAt: new Date('2025-05-18'),
+    complexity: 'Intermediate',
+    audioDuration: '10:45',
+    tldr: [
+      'Server Components render on the server, resulting in zero client-side bundle size impact.',
+      'They allow direct database queries from inside components securely.',
+      'Client Components are still needed for interactive hooks and browser APIs.'
+    ],
+    order: 2,
+    status: 'Published',
+    tags: ['Next.js', 'React', 'Server Components']
+  },
+  {
+    title: 'Authentication in Next.js with NextAuth',
+    slug: 'authentication-nextjs-nextauth',
+    description: 'An advanced walkthrough for configuring NextAuth.js, protecting dynamic endpoints, and structuring secure middleware.',
+    content: `# Authentication in Next.js with NextAuth
+
+Securing applications is one of the most critical aspects of web development. NextAuth.js (Auth.js) is the standard authentication solution for Next.js applications, offering OAuth connection adapters, credentials management, and middleware guards.
+
+![NextAuth Security Portal mockups](/images/blogs/auth_portal.webp)
+
+---
+
+## Chapter 1: Setting up NextAuth Handler
+
+First, install the library:
+\`\`\`bash
+npm install next-auth
+\`\`\`
+
+Create an \`auth.js\` configuration file to define your authentication options and credentials:
+
+\`\`\`javascript
+import NextAuth from "next-auth";
+import GithubProvider from "next-auth/providers/github";
+
+export const authOptions = {
+  providers: [
+    GithubProvider({
+      clientId: process.env.GITHUB_ID,
+      clientSecret: process.env.GITHUB_SECRET,
+    }),
+  ],
+  pages: {
+    signIn: '/login',
+  }
+};
+
+export default NextAuth(authOptions);
+\`\`\`
+
+---
+
+## Chapter 2: Protecting Routes with Middleware
+
+You can secure pages using Next.js Middleware. Create a \`middleware.js\` file in your root folder:
+
+\`\`\`javascript
+export { default } from "next-auth/middleware";
+
+export const config = { 
+  matcher: ["/dashboard/:path*", "/admin/:path*"] 
+};
+\`\`\`
+
+Any request to \`/dashboard\` or \`/admin\` will automatically redirect to the login page if the session cookie is missing or expired.`,
+    category: 'Web Development',
+    readTime: '8 min read',
+    thumbnail: '/images/blogs/auth_portal_cover.webp',
+    featured: false,
+    createdAt: new Date('2025-05-19'),
+    complexity: 'Intermediate',
+    audioDuration: '8:15',
+    tldr: [
+      'NextAuth is the standard auth solution for Next.js supporting multiple OAuth providers.',
+      'We configure authentication options in auth.js API handlers.',
+      'Routes can be protected automatically using Next.js Middleware.'
+    ],
+    order: 3,
+    status: 'Published',
+    tags: ['Next.js', 'NextAuth', 'Authentication']
+  },
+  {
+    title: 'MongoDB Aggregation Made Easy',
+    slug: 'mongodb-aggregation-made-easy',
+    description: 'A developer guide to mastering aggregation pipelines, filtering matching documents, and generating reports.',
+    content: `# MongoDB Aggregation Made Easy
+
+The MongoDB Aggregation Framework is a pipeline-based tool to transform and summarize documents. In this guide, we will analyze the key stages of aggregation pipelines and how to structure complex reporting tools.
+
+![Database Pipeline Aggregation Infographic](/images/blogs/db_pipeline.webp)
+
+---
+
+## Chapter 1: The Assembly Line Concept
+
+Think of an aggregation pipeline like an assembly line:
+1. **Raw documents** enter the pipeline.
+2. Each stage (**$match**, **$group**, **$project**) filters, groups, or shapes the documents.
+3. Transformed, consolidated metrics exit the pipeline.
+
+---
+
+## Chapter 2: Essential Pipeline Stages
+
+### 1. $match (Filtering)
+Filters documents to pass only matching documents to the next stage.
+\`\`\`json
+{ "$match": { "status": "active" } }
+\`\`\`
+
+### 2. $group (Consolidating)
+Groups documents by a key and runs accumulator functions.
+\`\`\`json
+{ 
+  "$group": { 
+    "_id": "$category", 
+    "totalRevenue": { "$sum": "$price" } 
+  } 
+}
+\`\`\`
+
+### 3. $project (Reshaping)
+Selects or adds specific fields to pass to the next stage.
+\`\`\`json
+{ 
+  "$project": { 
+    "title": 1, 
+    "discountPrice": { "$multiply": ["$price", 0.9] } 
+  } 
+}
+\`\`\`
+
+---
+
+## Chapter 3: Indexing and Optimization
+
+To keep aggregations fast:
+- **Filter Early:** Place **$match** at the very beginning of the pipeline to leverage database indexes and reduce document counts immediately.
+- **Use $limit:** Limit results at the end to save network and memory overhead.`,
+    category: 'Backend',
+    readTime: '12 min read',
+    thumbnail: '/images/blogs/db_pipeline_cover.webp',
+    featured: false,
+    createdAt: new Date('2025-05-10'),
+    complexity: 'Advanced',
+    audioDuration: '12:30',
+    tldr: [
+      'Aggregation Framework is a pipeline-based tool to transform and summarize documents.',
+      '$match acts as a filter to process matching items.',
+      '$group aggregates records by a key using accumulator functions.'
+    ],
+    order: 4,
+    status: 'Published',
+    tags: ['MongoDB', 'Aggregation', 'Database']
+  },
+  {
+    title: 'Deploying MERN Apps on Render',
+    slug: 'deploying-mern-render',
+    description: 'A complete guide to deploy your app for free using Render.',
+    content: `# Deploying MERN Apps on Render
+
+Render is an excellent, developer-friendly alternative to Heroku for hosting full-stack applications. In this guide, we will set up automatic deployments for our MERN stack application.
+
+![MERN Render Deployment architecture](/images/blogs/deploy_mern.webp)
+
+---
+
+## Chapter 1: Repository Structure
+
+For easy deployment, organize your project in a single repository:
+- \`/backend\`: Express server code
+- \`/frontend\`: React Vite client code
+- \`package.json\` (in root): Defines scripts to install and run both.
+
+---
+
+## Chapter 2: Deploying Backend (Web Service)
+
+1. Create a new **Web Service** on Render.
+2. Link your GitHub repository.
+3. Configure the following build settings:
+   - **Environment:** Node
+   - **Build Command:** \`npm install\`
+   - **Start Command:** \`node backend/server.js\`
+4. Add environment variables in the **Env** tab (e.g. \`MONGODB_URI\`, \`PORT=10000\`).
+
+---
+
+## Chapter 3: Deploying Frontend (Static Site)
+
+1. Create a new **Static Site** on Render.
+2. Build Settings:
+   - **Build Command:** \`npm run build\` (runs vite build)
+   - **Publish Directory:** \`dist\` (or \`frontend/dist\`)
+3. Under **Redirects/Rewrites**, add a rewrite rule from \`/*\` to \`/index.html\` to support client-side routing.`,
+    category: 'Tools & DevOps',
+    readTime: '7 min read',
+    thumbnail: '/images/blogs/deploy_mern_cover.webp',
+    featured: false,
+    createdAt: new Date('2025-05-09'),
+    complexity: 'Beginner',
+    audioDuration: '7:05',
+    tldr: [
+      'MERN applications can be deployed in a single repository with nested backend/frontend folders.',
+      'Deploy backend as a Web Service and supply environment variables.',
+      'Deploy frontend as a Static Site with a rewrite rule to index.html for client routing.'
+    ],
+    order: 5,
+    status: 'Published',
+    tags: ['MERN', 'Deployment', 'DevOps']
+  }
+];
+
 // ─── Seed Function ────────────────────────────────
 
 const seed = async () => {
@@ -248,6 +773,11 @@ const seed = async () => {
     await Project.deleteMany({});
     await Project.insertMany(PROJECTS);
     console.log(`  ✅ Seeded ${PROJECTS.length} projects (fresh seed)`);
+
+    // Blogs
+    await Blog.deleteMany({});
+    await Blog.insertMany(BLOGS);
+    console.log(`  ✅ Seeded ${BLOGS.length} blog posts (fresh seed)`);
 
     // Services
     const existingServices = await Service.countDocuments();

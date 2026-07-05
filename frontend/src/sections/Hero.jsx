@@ -34,7 +34,7 @@ export const Hero = () => {
     'Building scalable SaaS products and modern web experiences with React, Node.js, and cutting-edge technologies.';
   const location = profile?.location || 'West Bengal, India';
   const available = profile?.available ?? true;
-  
+
   let rawSocialLinks = profile?.socialLinks || [
     { platform: 'GitHub', url: 'https://github.com/Sicky9304', handle: '@Sicky9304' },
     { platform: 'LinkedIn', url: 'https://linkedin.com/in/sickykumar', handle: '/in/sickykumar' },
@@ -170,7 +170,7 @@ export const Hero = () => {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.12, delayChildren: 2.0 },
+      transition: { staggerChildren: 0.12, delayChildren: 0.8 },
     },
   };
 
@@ -179,15 +179,15 @@ export const Hero = () => {
     visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
   };
 
-  {/* Background Looping Holographic Particle Video (Only in Dark Mode, high visibility) */}
+  {/* Background Looping Holographic Particle Video (Only in Dark Mode, high visibility) */ }
   const videoSrc =
-    theme === 'dark'
-      ? "/hologram_night.mp4"
+    theme === 'light'
+      ? "/hologram_day.mp4"
       : "/hologram_day.mp4";
 
   const videoClass =
     theme === "dark"
-      ? "absolute inset-0 w-full h-full object-cover pointer-events-none z-0 mix-blend-screen opacity-55 transition-opacity duration-500"
+      ? "absolute inset-0 w-full h-full object-cover pointer-events-none z-0 mix-blend-screen opacity-30 transition-opacity duration-500"
       : "absolute inset-0 w-full h-full object-cover pointer-events-none z-0 mix-blend-multiply opacity-30 invert hue-rotate-180 saturate-200 blur-[2px] transition-opacity duration-500";
 
   return (
@@ -217,18 +217,18 @@ export const Hero = () => {
       <div className="blob blob-accent w-[400px] h-[400px] bottom-20 right-0 opacity-50" />
       <div className="blob blob-pink w-[300px] h-[300px] top-1/2 left-1/2 opacity-30" />
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pt-32 pb-20 sm:pt-40 sm:pb-24 grid lg:grid-cols-2 gap-12 items-center">
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-6 pt-28 pb-16 sm:pt-24 sm:pb-16 grid lg:grid-cols-2 gap-12 items-center">
         {/* ===== LEFT SIDE: Text Content ===== */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="space-y-6"
+          className="space-y-4"
         >
           {/* Greeting */}
           <motion.div variants={itemVariants} className="flex items-center gap-3">
             <span className="text-3xl">👋</span>
-            <span className="text-lg font-medium text-slate-600 dark:text-slate-400" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <span className="text-base font-medium text-slate-600 dark:text-slate-400" style={{ fontFamily: 'Inter, sans-serif' }}>
               Hello, I am
             </span>
           </motion.div>
@@ -236,7 +236,7 @@ export const Hero = () => {
           {/* Name */}
           <motion.h1
             variants={itemVariants}
-            className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.05] tracking-tight"
+            className="text-4xl sm:text-5xl lg:text-6xl font-black leading-snug tracking-tight"
             style={{ fontFamily: 'Satoshi, sans-serif' }}
           >
             <span className="text-slate-900 dark:text-white">{firstName}</span>
@@ -246,7 +246,7 @@ export const Hero = () => {
 
           {/* Typing Role */}
           <motion.div variants={itemVariants} className="h-9 flex items-center">
-            <span className="text-xl sm:text-2xl font-semibold text-primary dark:text-primary-light" style={{ fontFamily: 'Satoshi, sans-serif' }}>
+            <span className="text-lg sm:text-xl font-semibold text-primary dark:text-primary-light" style={{ fontFamily: 'Satoshi, sans-serif' }}>
               {displayText}
             </span>
             <span className="inline-block w-0.5 h-7 bg-primary dark:bg-primary-light ml-1 animate-pulse" />
@@ -255,7 +255,7 @@ export const Hero = () => {
           {/* Description */}
           <motion.p
             variants={itemVariants}
-            className="max-w-lg text-base sm:text-lg text-slate-500 dark:text-slate-400 leading-relaxed"
+            className="max-w-lg text-sm sm:text-base text-slate-500 dark:text-slate-400 leading-relaxed"
           >
             {description}
           </motion.p>

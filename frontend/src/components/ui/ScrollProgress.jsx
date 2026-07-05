@@ -52,7 +52,7 @@ export const ScrollProgress = () => {
             whileHover={{ scale: 1.1, y: -2 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleScrollToTop}
-            className="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-full bg-white/90 dark:bg-slate-900/90 border border-slate-200/50 dark:border-slate-800/50 shadow-xl backdrop-blur-md flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-primary dark:hover:text-primary-light transition-colors group cursor-pointer focus:outline-none"
+            className="fixed bottom-6 right-20 z-40 w-11 h-11 rounded-full bg-white/90 dark:bg-slate-900/90 border border-slate-200/50 dark:border-slate-800/50 shadow-xl backdrop-blur-md flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-primary dark:hover:text-primary-light transition-colors group cursor-pointer focus:outline-none"
             aria-label="Scroll to top"
           >
             {/* SVG Radial Completion Circle */}

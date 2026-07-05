@@ -39,7 +39,7 @@ export const Contact = () => {
 
   return (
     <section id="contact" className="section-padding relative">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-6">
         <SectionHeading
           label="Contact"
           title="Let's Work Together"

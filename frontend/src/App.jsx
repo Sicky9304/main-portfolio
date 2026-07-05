@@ -6,6 +6,8 @@ import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { CursorGlow } from './components/ui/CursorGlow';
 import { ScrollProgress } from './components/ui/ScrollProgress';
+import { ThemeCustomizer } from './components/ui/ThemeCustomizer';
+import { GlobalAIAssistant } from './components/ai/GlobalAIAssistant';
 
 import { Hero } from './sections/Hero';
 
@@ -39,6 +41,13 @@ const Testimonials = lazy(() =>
 
 const Contact = lazy(() =>
   import('./sections/Contact').then((m) => ({ default: m.Contact }))
+);
+
+const BlogPage = lazy(() =>
+  import('./sections/blog/BlogPage').then((m) => ({ default: m.BlogPage }))
+);
+const BlogDetailsPage = lazy(() =>
+  import('./sections/blog/BlogDetailsPage').then((m) => ({ default: m.BlogDetailsPage }))
 );
 
 function AppContent() {
@@ -77,18 +86,24 @@ function AppContent() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-surface-light dark:bg-surface-dark transition-colors duration-500 noise-overlay overflow-x-hidden w-full relative">
-
-      {/* Global UI Effects */}
-      <CursorGlow />
-      <ScrollProgress />
-      <LoadingScreen isLoading={isLoading} />
-
-      <Navbar />
-
-      <main className="relative z-10">
-
+  // Determine page content
+  let mainContent;
+  if (cleanPath === '/blog') {
+    mainContent = (
+      <Suspense fallback={null}>
+        <BlogPage />
+      </Suspense>
+    );
+  } else if (cleanPath.startsWith('/blog/')) {
+    const slug = cleanPath.split('/blog/')[1];
+    mainContent = (
+      <Suspense fallback={null}>
+        <BlogDetailsPage slug={slug} />
+      </Suspense>
+    );
+  } else {
+    mainContent = (
+      <>
         {/* Above-the-fold content */}
         <Hero />
 
@@ -102,10 +117,28 @@ function AppContent() {
           <Testimonials />
           <Contact />
         </Suspense>
+      </>
+    );
+  }
 
+  return (
+    <div className="min-h-screen bg-surface-light dark:bg-surface-dark transition-colors duration-500 noise-overlay overflow-x-hidden w-full relative">
+
+      {/* Global UI Effects */}
+      <CursorGlow />
+      <ScrollProgress />
+      <ThemeCustomizer />
+      <LoadingScreen isLoading={isLoading} />
+
+      <Navbar />
+
+      <main className={`relative z-10 ${cleanPath.startsWith('/blog') ? 'pt-12 md:pt-14' : ''}`}>
+        {mainContent}
       </main>
 
       <Footer />
+
+      {cleanPath !== '/sicky-admin' && <GlobalAIAssistant />}
 
     </div>
   );

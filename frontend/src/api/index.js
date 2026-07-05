@@ -64,6 +64,34 @@ export const fetchProfile=()=>request("/profile").then(r=>r.data);
 export const fetchServices=()=>request("/services").then(r=>r.data);
 export const fetchTestimonials=()=>request("/testimonials").then(r=>r.data);
 
+export const fetchBlogs=(featured,category)=>{
+  let url="/blogs/public";
+  const params=[];
+  if(category) params.push(`category=${encodeURIComponent(category)}`);
+  if(params.length>0) url+=`?${params.join("&")}`;
+  return request(url).then(r=>r.data);
+};
+
+export const fetchAdminBlogs=(token)=>request("/blogs",{
+  method:"GET",
+  headers:adminHeaders(token)
+}).then(r=>r.data);
+export const fetchBlog=(slug)=>request(`/blogs/${slug}`).then(r=>r.data);
+export const createBlog=(data,token)=>request("/blogs",{
+ method:"POST",
+ headers:adminHeaders(token),
+ body:JSON.stringify(data)
+});
+export const updateBlog=(slug,data,token)=>request(`/blogs/${slug}`,{
+ method:"PUT",
+ headers:adminHeaders(token),
+ body:JSON.stringify(data)
+});
+export const deleteBlog=(slug,token)=>request(`/blogs/${slug}`,{
+ method:"DELETE",
+ headers:adminHeaders(token)
+});
+
 export const submitContact=(data)=>request("/contact",{
  method:"POST",
  body:JSON.stringify(data)
@@ -108,17 +136,41 @@ export const uploadFile=(file,token)=>{
  });
 };
 
+export const askAi = (prompt, context, history) => request("/ai/chat", {
+  method: "POST",
+  body: JSON.stringify({ prompt, context, history })
+});
+
+export const translateText = (text) => request("/ai/translate", {
+  method: "POST",
+  body: JSON.stringify({ text })
+});
+
+export const generateBlogContent = (prompt, title) => request("/ai/write-blog", {
+  method: "POST",
+  body: JSON.stringify({ prompt, title })
+});
+
 export default {
- fetchProjects,
- fetchProject,
- fetchProfile,
- fetchServices,
- fetchTestimonials,
- submitContact,
- createProject,
- updateProject,
- deleteProject,
- updateProfile,
- uploadImage,
- uploadFile
+  fetchProjects,
+  fetchProject,
+  fetchProfile,
+  fetchServices,
+  fetchTestimonials,
+  submitContact,
+  createProject,
+  updateProject,
+  deleteProject,
+  updateProfile,
+  uploadImage,
+  uploadFile,
+  fetchBlogs,
+  fetchAdminBlogs,
+  fetchBlog,
+  createBlog,
+  updateBlog,
+  deleteBlog,
+  askAi,
+  translateText,
+  generateBlogContent
 };

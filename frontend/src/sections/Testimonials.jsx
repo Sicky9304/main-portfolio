@@ -52,7 +52,7 @@ export const Testimonials = () => {
   if (loading) {
     return (
       <section id="testimonials" className="section-padding">
-        <div className="max-w-7xl mx-auto px-6 text-center">
+        <div className="max-w-6xl mx-auto px-6 text-center">
           <p className="text-slate-500 dark:text-slate-400">
             Loading testimonials...
           </p>
@@ -79,7 +79,7 @@ export const Testimonials = () => {
 
   return (
     <section id="testimonials" className="section-padding relative">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-6">
 
         <SectionHeading
           label="Testimonials"

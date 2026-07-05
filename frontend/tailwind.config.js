@@ -15,19 +15,19 @@ export default {
       },
       colors: {
         primary: {
-          DEFAULT: '#10B981',      // Emerald Green
-          light: '#34D399',        // Mint Green
-          dark: '#047857',         // Deep Emerald
+          DEFAULT: 'var(--color-primary)',
+          light: 'var(--color-primary-light)',
+          dark: 'var(--color-primary-dark)',
         },
         secondary: {
-          DEFAULT: '#06B6D4',      // Cyber Teal
-          light: '#22D3EE',        // Light Teal
-          dark: '#0891B2',         // Deep Teal
+          DEFAULT: 'var(--color-secondary)',
+          light: 'var(--color-secondary-light)',
+          dark: 'var(--color-secondary-dark)',
         },
         accent: {
-          DEFAULT: '#6366F1',      // Indigo Contrast Accent
-          light: '#818CF8',        // Light Indigo
-          dark: '#4F46E5',         // Deep Indigo
+          DEFAULT: 'var(--color-accent)',
+          light: 'var(--color-accent-light)',
+          dark: 'var(--color-accent-dark)',
         },
         pink: {
           DEFAULT: '#F43F5E',      // Rose Pink

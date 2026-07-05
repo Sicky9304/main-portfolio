@@ -4,7 +4,9 @@ import { ExternalLink, ChevronRight, X, Layers, Zap, Eye } from 'lucide-react';
 import { Github } from '../components/ui/BrandIcons';
 import { RevealOnScroll, SectionHeading } from '../components/ui/Animations';
 import { useApi } from '../hooks/useApi';
-import { fetchProjects } from '../api/index.js';
+import { fetchProjects, askAi } from '../api/index.js';
+import { MarkdownRenderer } from '../components/ai/MarkdownRenderer';
+import { Brain, RefreshCw } from 'lucide-react';
 import { TiltCard } from '../components/ui/TiltCard';
 
 // Fallback data (used when API is unavailable)
@@ -25,12 +27,12 @@ const FALLBACK_PROJECTS = [
       'Neon dropshadow glowing Lucide accents',
     ],
     tech: ['React.js', 'Node.js', 'Express.js', 'MongoDB', 'Cloudinary', 'Framer Motion'],
-    github: 'https://github.com/Sicky9304/Portfolio_With_AI.git',
-    demo: 'https://portfolio-with-ai-seven.vercel.app/',
+    github: 'https://github.com/Sicky9304/main-portfolio.git',
+    demo: 'https://sickykumar.in',
     color: 'from-primary to-accent',
     emoji: '🔮',
     status: 'Completed',
-    thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600&auto=format&fit=crop',
+    thumbnail: '/images/blogs/3d_portfolio.webp',
   },
   {
     _id: 'elearning',
@@ -46,7 +48,7 @@ const FALLBACK_PROJECTS = [
     color: 'from-primary to-secondary',
     emoji: '🎓',
     status: 'Completed',
-    thumbnail: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop',
+    thumbnail: '/images/blogs/e_learning.webp',
   },
   {
     _id: 'agriconnect',
@@ -62,7 +64,7 @@ const FALLBACK_PROJECTS = [
     color: 'from-emerald-500 to-accent',
     emoji: '🌱',
     status: 'Completed',
-    thumbnail: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=600&auto=format&fit=crop',
+    thumbnail: '/images/blogs/agri_connect.webp',
   },
   {
     _id: 'portfolio',
@@ -78,7 +80,7 @@ const FALLBACK_PROJECTS = [
     color: 'from-pink to-secondary',
     emoji: '🤖',
     status: 'Completed',
-    thumbnail: '',
+    thumbnail: '/images/blogs/portfolio_ai.webp',
   },
   {
     _id: 'newsportal',
@@ -94,7 +96,7 @@ const FALLBACK_PROJECTS = [
     color: 'from-accent to-primary',
     emoji: '📰',
     status: 'Completed',
-    thumbnail: '',
+    thumbnail: '/images/blogs/news_portal.webp',
   },
   {
     _id: 'pokemon',
@@ -110,7 +112,7 @@ const FALLBACK_PROJECTS = [
     color: 'from-amber-400 to-red-500',
     emoji: '⚡',
     status: 'Completed',
-    thumbnail: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=600&auto=format&fit=crop',
+    thumbnail: '/images/blogs/pokemon_search.webp',
   },
 ];
 
@@ -118,6 +120,39 @@ export const Projects = () => {
   const { data: projectsData, error } = useApi(fetchProjects, FALLBACK_PROJECTS);
   const projects = Array.isArray(projectsData) && projectsData.length > 0 ? projectsData : FALLBACK_PROJECTS;
   const [selectedProject, setSelectedProject] = useState(null);
+
+  // AI Project Recommendation states & query handler
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiRecommendation, setAiRecommendation] = useState('');
+  const [isAiLoading, setIsAiLoading] = useState(false);
+
+  const getAiRecommendation = async (promptText) => {
+    if (isAiLoading || !promptText.trim()) return;
+    setIsAiLoading(true);
+    setAiRecommendation('');
+    try {
+      const projectsContext = projects.map(p => ({
+        title: p.title,
+        tagline: p.tagline,
+        description: p.description,
+        tech: p.tech,
+        github: p.github,
+        demo: p.demo,
+        slug: p.slug
+      }));
+
+      const res = await askAi(
+        `The visitor is looking for a project matching: "${promptText}". Look at Sicky's projects and recommend the most suitable one(s). Explain why they fit the user's needs. Reference the project names, and keep it very brief (max 3 sentences).`,
+        { type: 'portfolio', projects: projectsContext }
+      );
+      setAiRecommendation(res?.text || "No recommendations found.");
+    } catch (err) {
+      console.error(err);
+      setAiRecommendation("Sorry, couldn't get a recommendation right now. Please check if the Gemini API key is configured.");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
 
   // Close modal on Escape key
   useEffect(() => {
@@ -136,7 +171,7 @@ export const Projects = () => {
 
   return (
     <section id="projects" className="section-padding relative">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-6">
         <SectionHeading
           label="Featured Projects"
           title="Work That Speaks"
@@ -149,6 +184,87 @@ export const Projects = () => {
           </p>
         )}
 
+        {/* ─── AI PROJECT RECOMMENDATION WIDGET ─── */}
+        <RevealOnScroll delay={0.1}>
+          <div className="mb-16 p-6 rounded-3xl glass border border-slate-200 dark:border-slate-800 shadow-xl relative overflow-hidden bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 max-w-3xl mx-auto">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="flex items-center gap-2 mb-3">
+              <Brain size={18} className="text-secondary animate-pulse" />
+              <h3 className="text-xs font-bold uppercase tracking-wider text-primary dark:text-primary-light font-heading">
+                AI Project Matchmaker
+              </h3>
+            </div>
+            <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 mb-4 text-left leading-relaxed">
+              Describe what kind of project, stack, or feature you are interested in (e.g., "MERN stack blog" or "something with 3D tilts"), and Sicky's AI will match you with the best work.
+            </p>
+            
+            <form 
+              onSubmit={(e) => {
+                e.preventDefault();
+                getAiRecommendation(aiPrompt);
+              }}
+              className="flex gap-2"
+            >
+              <input 
+                type="text"
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
+                placeholder="E.g., MERN stack database app..."
+                className="flex-1 px-4 py-2.5 rounded-2xl bg-white/40 dark:bg-slate-950/50 backdrop-blur-md border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-500 outline-none focus:border-primary/50 transition-colors"
+                disabled={isAiLoading}
+              />
+              <button
+                type="submit"
+                disabled={isAiLoading || !aiPrompt.trim()}
+                className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-semibold text-xs transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-md cursor-pointer whitespace-nowrap flex items-center gap-1.5"
+              >
+                {isAiLoading ? 'Analyzing...' : 'Match Me'}
+              </button>
+            </form>
+
+            {/* Quick preset suggestions */}
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              {['Full-stack MERN', '3D Creative Showcase', 'AgriConnect Marketplace'].map((suggestion) => (
+                <button
+                  key={suggestion}
+                  type="button"
+                  onClick={() => {
+                    setAiPrompt(suggestion);
+                    getAiRecommendation(suggestion);
+                  }}
+                  disabled={isAiLoading}
+                  className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 hover:border-primary/30 text-[9px] text-slate-650 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer disabled:opacity-40"
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+
+            {/* AI Result Area */}
+            <AnimatePresence>
+              {(aiRecommendation || isAiLoading) && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-5 pt-4 border-t border-slate-200 dark:border-slate-800 text-left text-xs text-slate-600 dark:text-slate-300 leading-relaxed overflow-hidden"
+                >
+                  {isAiLoading ? (
+                    <div className="flex items-center gap-2 text-slate-400 font-mono">
+                      <RefreshCw className="animate-spin text-secondary" size={12} />
+                      <span>Consulting the matchmaker...</span>
+                    </div>
+                  ) : (
+                    <div className="p-4 rounded-2xl bg-white/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 shadow-inner">
+                      <MarkdownRenderer content={aiRecommendation} />
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </RevealOnScroll>
+
         {/* Project Showcase */}
         <div className="space-y-20">
           {projects.map((project, index) => {
@@ -158,80 +274,87 @@ export const Projects = () => {
               <RevealOnScroll key={projectId} delay={0.1}>
                 <div className={`grid lg:grid-cols-2 gap-8 items-center`}>
                   {/* Preview Card with 3D Spring Tilt */}
-                  <TiltCard className={`${isEven ? '' : 'lg:order-2'}`}>
+                  <TiltCard className={`aspect-[16/10] ${isEven ? '' : 'lg:order-2'}`}>
                     {/* Gradient Background */}
                     <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-10 dark:opacity-20`} />
 
-                    {project.thumbnail ? (
-                      /* Actual Image Thumbnail */
-                      <img
-                        src={project.thumbnail}
-                        alt={project.title}
-                        loading="lazy"
-                        className="absolute inset-0 w-full h-full object-cover object-top border border-slate-200 dark:border-slate-800 transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      /* Mock Dashboard Fallback */
-                      <div className="absolute inset-0 flex items-center justify-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                        <div className="w-full h-full p-6 flex flex-col">
-                          {/* Mock Browser Chrome */}
-                          <div className="flex items-center gap-2 mb-4">
-                            <div className="flex gap-1.5">
-                              <div className="w-3 h-3 rounded-full bg-red-400" />
-                              <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                              <div className="w-3 h-3 rounded-full bg-green-400" />
-                            </div>
-                            <div className="flex-1 h-7 rounded-lg bg-slate-200 dark:bg-slate-800 ml-3 flex items-center px-3">
-                              <span className="text-[10px] text-slate-400 font-mono">localhost:3000/{project.slug}</span>
-                            </div>
-                          </div>
-                          {/* Mock Content */}
-                          <div className="flex-1 grid grid-cols-4 gap-3">
-                            {/* Sidebar */}
-                            <div className="col-span-1 rounded-xl bg-slate-100 dark:bg-slate-800/50 p-3 space-y-2">
-                              <div className="text-2xl text-center mb-3">{project.emoji}</div>
-                              {[1, 2, 3, 4].map((i) => (
-                                <div key={i} className={`h-2.5 rounded-full ${i === 1 ? `bg-gradient-to-r ${project.color}` : 'bg-slate-200 dark:bg-slate-700'}`} style={{ width: `${70 + i * 8}%` }} />
-                              ))}
-                            </div>
-                            {/* Main Content */}
-                            <div className="col-span-3 space-y-3">
-                              <div className="flex gap-3">
-                                <div className={`h-20 flex-1 rounded-xl bg-gradient-to-r ${project.color} opacity-20`} />
-                                <div className={`h-20 flex-1 rounded-xl bg-gradient-to-r ${project.color} opacity-10`} />
+                    {/* Thumbnail — click opens demo directly */}
+                    <a
+                      href={project.demo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute inset-0 block"
+                      aria-label={`Open ${project.title} demo`}
+                    >
+                      {project.thumbnail ? (
+                        <img
+                          src={project.thumbnail}
+                          alt={project.title}
+                          loading="lazy"
+                          className="w-full h-full object-cover object-top border border-slate-200 dark:border-slate-800 transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        /* Mock Dashboard Fallback */
+                        <div className="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                          <div className="w-full h-full p-6 flex flex-col">
+                            {/* Mock Browser Chrome */}
+                            <div className="flex items-center gap-2 mb-4">
+                              <div className="flex gap-1.5">
+                                <div className="w-3 h-3 rounded-full bg-red-400" />
+                                <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                                <div className="w-3 h-3 rounded-full bg-green-400" />
                               </div>
-                              <div className="h-24 rounded-xl bg-slate-100 dark:bg-slate-800/50 p-3">
-                                <div className="flex gap-2">
-                                  {[40, 65, 30, 55, 80, 45, 70].map((h, i) => (
-                                    <div key={i} className="flex-1 flex items-end">
-                                      <div className={`w-full rounded-t bg-gradient-to-t ${project.color} opacity-40`} style={{ height: `${h}%` }} />
-                                    </div>
-                                  ))}
+                              <div className="flex-1 h-7 rounded-lg bg-slate-200 dark:bg-slate-800 ml-3 flex items-center px-3">
+                                <span className="text-[10px] text-slate-400 font-mono">localhost:3000/{project.slug}</span>
+                              </div>
+                            </div>
+                            {/* Mock Content */}
+                            <div className="flex-1 grid grid-cols-4 gap-3">
+                              <div className="col-span-1 rounded-xl bg-slate-100 dark:bg-slate-800/50 p-3 space-y-2">
+                                <div className="text-2xl text-center mb-3">{project.emoji}</div>
+                                {[1, 2, 3, 4].map((i) => (
+                                  <div key={i} className={`h-2.5 rounded-full ${i === 1 ? `bg-gradient-to-r ${project.color}` : 'bg-slate-200 dark:bg-slate-700'}`} style={{ width: `${70 + i * 8}%` }} />
+                                ))}
+                              </div>
+                              <div className="col-span-3 space-y-3">
+                                <div className="flex gap-3">
+                                  <div className={`h-20 flex-1 rounded-xl bg-gradient-to-r ${project.color} opacity-20`} />
+                                  <div className={`h-20 flex-1 rounded-xl bg-gradient-to-r ${project.color} opacity-10`} />
+                                </div>
+                                <div className="h-24 rounded-xl bg-slate-100 dark:bg-slate-800/50 p-3">
+                                  <div className="flex gap-2">
+                                    {[40, 65, 30, 55, 80, 45, 70].map((h, i) => (
+                                      <div key={i} className="flex-1 flex items-end">
+                                        <div className={`w-full rounded-t bg-gradient-to-t ${project.color} opacity-40`} style={{ height: `${h}%` }} />
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </a>
 
                     {/* Hover Overlay with 3D Depth Lift */}
                     <div 
                       style={{ transformStyle: 'preserve-3d', transform: 'translateZ(50px)' }}
-                      className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8"
+                      className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-5 sm:p-8 pointer-events-none"
                     >
-                      <div className="flex gap-3">
+                      <div className="flex gap-3 pointer-events-auto">
                         <a
                           href={project.github}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/90 text-slate-900 text-xs font-semibold hover:bg-white transition-colors"
+                          className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-white/90 text-slate-900 text-xs font-semibold hover:bg-white transition-colors"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           <Github size={14} /> Source Code
                         </a>
                         <button
-                          onClick={() => setSelectedProject(project)}
-                          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary-dark transition-colors cursor-pointer"
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSelectedProject(project); }}
+                          className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary-dark transition-colors cursor-pointer"
                         >
                           <Eye size={14} /> Case Study
                         </button>
@@ -301,86 +424,98 @@ export const Projects = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-end sm:items-start justify-center sm:pt-20 sm:px-4 sm:pb-4 bg-black/60 backdrop-blur-sm"
+            style={{ touchAction: 'none' }}
             onClick={() => setSelectedProject(null)}
             role="dialog"
             aria-modal="true"
             aria-label={`${selectedProject.title} case study`}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 40 }}
+              initial={{ opacity: 0, scale: 0.95, y: 40 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 40 }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-[32px] shadow-2xl overflow-hidden max-h-[85vh] overflow-y-auto"
+              exit={{ opacity: 0, scale: 0.95, y: 40 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="w-full sm:max-w-lg bg-white dark:bg-slate-900 sm:rounded-2xl rounded-t-[28px] shadow-2xl overflow-hidden flex flex-col"
+              style={{ maxHeight: '90dvh' }}
               onClick={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
             >
-              {/* Header */}
-              <div className={`p-8 bg-gradient-to-r ${selectedProject.color} text-white relative`}>
-                <button
-                  onClick={() => setSelectedProject(null)}
-                  className="absolute top-4 right-4 p-2 rounded-xl bg-white/20 hover:bg-white/30 transition-colors cursor-pointer"
-                  aria-label="Close case study"
-                >
-                  <X size={16} />
-                </button>
-                <span className="text-4xl mb-4 block">{selectedProject.emoji}</span>
-                <h3 className="text-2xl font-bold" style={{ fontFamily: 'Satoshi, sans-serif' }}>
-                  {selectedProject.title}
-                </h3>
-                <p className="text-white/80 text-sm mt-2">{selectedProject.tagline}</p>
+              {/* Drag handle (mobile) */}
+              <div className="flex justify-center pt-3 pb-1 sm:hidden flex-shrink-0">
+                <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
               </div>
 
-              {/* Body */}
-              <div className="p-8 space-y-6">
-                <div>
-                  <div className="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-white mb-2">
-                    <Zap size={14} className="text-primary" /> Problem
-                  </div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                    {selectedProject.problem}
-                  </p>
+              {/* Scrollable content */}
+              <div className="overflow-y-auto flex-1 overscroll-contain">
+                {/* Header */}
+                <div className={`px-5 py-6 sm:p-8 bg-gradient-to-r ${selectedProject.color} text-white relative`}>
+                  <button
+                    onClick={() => setSelectedProject(null)}
+                    className="absolute top-4 right-4 p-2 rounded-xl bg-white/20 hover:bg-white/30 transition-colors cursor-pointer"
+                    aria-label="Close case study"
+                  >
+                    <X size={16} />
+                  </button>
+                  <span className="text-3xl sm:text-4xl mb-3 block">{selectedProject.emoji}</span>
+                  <h3 className="text-xl sm:text-2xl font-bold" style={{ fontFamily: 'Satoshi, sans-serif' }}>
+                    {selectedProject.title}
+                  </h3>
+                  <p className="text-white/80 text-xs sm:text-sm mt-2">{selectedProject.tagline}</p>
                 </div>
 
-                 <div>
-                  <div className="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-white mb-3">
-                    <Layers size={14} className="text-primary" /> Key Features
+                {/* Body */}
+                <div className="px-5 py-5 sm:p-8 space-y-5">
+                  <div>
+                    <div className="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-white mb-2">
+                      <Zap size={14} className="text-primary" /> Problem
+                    </div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                      {selectedProject.problem}
+                    </p>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {(selectedProject.features || []).map((f) => (
-                      <div key={f} className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-sm text-slate-700 dark:text-slate-300">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                        {f}
-                      </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-white mb-3">
+                      <Layers size={14} className="text-primary" /> Key Features
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {(selectedProject.features || []).map((f) => (
+                        <div key={f} className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                          {f}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {(selectedProject.tech || []).map((t) => (
+                      <span key={t} className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-primary/5 dark:bg-primary/10 text-primary dark:text-primary-light">
+                        {t}
+                      </span>
                     ))}
                   </div>
-                </div>
 
-                <div className="flex flex-wrap gap-2">
-                  {(selectedProject.tech || []).map((t) => (
-                    <span key={t} className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-primary/5 dark:bg-primary/10 text-primary dark:text-primary-light">
-                      {t}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <a
-                    href={selectedProject.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-primary/30 transition-colors"
-                  >
-                    <Github size={16} /> Source Code
-                  </a>
-                  <a
-                    href={selectedProject.demo}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg hover:shadow-primary/20 transition-all"
-                  >
-                    <ExternalLink size={16} /> Live Demo
-                  </a>
+                  {/* CTA Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                    <a
+                      href={selectedProject.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-primary/30 transition-colors"
+                    >
+                      <Github size={16} /> Source Code
+                    </a>
+                    <a
+                      href={selectedProject.demo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg hover:shadow-primary/20 transition-all"
+                    >
+                      <ExternalLink size={16} /> Explore Now
+                    </a>
+                  </div>
                 </div>
               </div>
             </motion.div>

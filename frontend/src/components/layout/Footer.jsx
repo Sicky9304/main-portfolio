@@ -14,6 +14,7 @@ export const Footer = () => {
     { label: 'About', href: '#about' },
     { label: 'Skills', href: '#skills' },
     { label: 'Projects', href: '#projects' },
+    { label: 'Blog', href: '/blog' },
     { label: 'Services', href: '#services' },
     { label: 'Contact', href: '#contact' },
   ];
@@ -29,10 +30,31 @@ export const Footer = () => {
 
   const scrollToSection = (e, href) => {
     e.preventDefault();
-    const el = document.getElementById(href.replace('#', ''));
-    if (el) {
-      const top = el.getBoundingClientRect().top + window.scrollY - 100;
-      window.scrollTo({ top, behavior: 'smooth' });
+    if (href === '/blog') {
+      window.history.pushState({}, '', '/blog');
+      const navEvent = new PopStateEvent('popstate');
+      window.dispatchEvent(navEvent);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      const sectionId = href.replace('#', '');
+      if (window.location.pathname !== '/' && window.location.pathname !== '') {
+        window.history.pushState({}, '', `/#${sectionId}`);
+        const navEvent = new PopStateEvent('popstate');
+        window.dispatchEvent(navEvent);
+        setTimeout(() => {
+          const el = document.getElementById(sectionId);
+          if (el) {
+            const top = el.getBoundingClientRect().top + window.scrollY - 100;
+            window.scrollTo({ top, behavior: 'smooth' });
+          }
+        }, 150);
+      } else {
+        const el = document.getElementById(sectionId);
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY - 100;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      }
     }
   };
 
@@ -46,7 +68,7 @@ export const Footer = () => {
         <div className="blob blob-primary w-[300px] h-[300px] -bottom-40 left-1/4 opacity-20" />
         <div className="blob blob-accent w-[200px] h-[200px] -bottom-20 right-1/4 opacity-15" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-20 pb-8">
+        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-20 pb-8">
           <RevealOnScroll>
             <div className="grid md:grid-cols-3 gap-12 mb-16">
               {/* Brand */}
@@ -85,7 +107,7 @@ export const Footer = () => {
                 <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-widest mb-4">
                   Connect
                 </h4>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                   {socialLinks.map(({ icon: Icon, href, label }) => (
                     <motion.a
                       key={label}

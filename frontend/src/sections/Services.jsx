@@ -60,7 +60,7 @@ export const Services = () => {
 
   return (
     <section id="services" className="section-padding relative">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-6">
         <SectionHeading
           label="Services"
           title="What I Can Do"

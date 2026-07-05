@@ -68,7 +68,7 @@ export const GitHubSection = () => {
 
   return (
     <section id="github" className="section-padding relative">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-6">
         <SectionHeading
           label="Open Source"
           title="GitHub Activity"

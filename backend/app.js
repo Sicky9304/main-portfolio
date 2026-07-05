@@ -12,6 +12,9 @@ import profileRoutes from './routes/profile.js';
 import serviceRoutes from './routes/services.js';
 import testimonialRoutes from './routes/testimonials.js';
 import uploadRoutes from './routes/upload.js';
+import blogRoutes from './blog/blogs.js';
+import aiRoutes from './routes/ai.js';
+import Blog from './blog/Blog.js';
 
 const app=express();
 
@@ -58,12 +61,37 @@ app.use('/api',apiLimiter);
 app.get('/',(_,res)=>res.json({success:true,message:'Server running'}));
 app.get('/api/health',(_,res)=>res.json({success:true}));
 
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const blogs = await Blog.find({ status: 'Published' }).select('slug updatedAt');
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+    
+    xml += `  <url>\n    <loc>https://sickykumar.in/</loc>\n    <lastmod>${new Date().toISOString()}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>1.0</priority>\n  </url>\n`;
+    
+    xml += `  <url>\n    <loc>https://sickykumar.in/blog</loc>\n    <lastmod>${new Date().toISOString()}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
+    
+    blogs.forEach(b => {
+      xml += `  <url>\n    <loc>https://sickykumar.in/blog/${b.slug}</loc>\n    <lastmod>${b.updatedAt ? b.updatedAt.toISOString() : new Date().toISOString()}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>\n`;
+    });
+    
+    xml += `</urlset>`;
+    
+    res.header('Content-Type', 'application/xml');
+    res.send(xml);
+  } catch (error) {
+    res.status(500).send('Error generating sitemap');
+  }
+});
+
 app.use('/api/projects',projectRoutes);
 app.use('/api/contact',contactLimiter,contactRoutes);
 app.use('/api/profile',profileRoutes);
 app.use('/api/services',serviceRoutes);
 app.use('/api/testimonials',testimonialRoutes);
 app.use('/api/upload',uploadRoutes);
+app.use('/api/blogs',blogRoutes);
+app.use('/api/ai', aiRoutes);
 
 app.use((req,res)=>{
  res.status(404).json({success:false,message:`Route ${req.originalUrl} not found`});

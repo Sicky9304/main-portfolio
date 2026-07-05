@@ -3,6 +3,115 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Global Theme Variable Defaults ───────────────── */
+:root {
+  /* Default: Emerald Aurora */
+  --color-primary: #10B981;
+  --color-primary-light: #34D399;
+  --color-primary-dark: #047857;
+  --color-secondary: #06B6D4;
+  --color-secondary-light: #22D3EE;
+  --color-secondary-dark: #0891B2;
+  --color-accent: #6366F1;
+  --color-accent-light: #818CF8;
+  --color-accent-dark: #4F46E5;
+  --bg-gradient-light: linear-gradient(135deg, #f0fdf4 0%, #e2e8f0 100%);
+  --bg-gradient-dark: linear-gradient(135deg, #030712 0%, #064e3b 100%);
+}
+
+/* ─── Global Background Styles (Apply to Light Theme ONLY) ─── */
+
+/* 1. Aura Style (Default theme mesh gradient) */
+html:not(.dark).bg-style-aura .bg-surface-light {
+  background: var(--bg-gradient-light) !important;
+}
+
+/* 2. Tech Grid Style (Mesh + Grid Grid Overlay) */
+html:not(.dark).bg-style-grid .bg-surface-light {
+  background: var(--bg-gradient-light) !important;
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.025) 1px, transparent 1px), 
+    linear-gradient(90deg, rgba(0, 0, 0, 0.025) 1px, transparent 1px),
+    var(--bg-gradient-light) !important;
+  background-size: 40px 40px, 40px 40px, 100% 100% !important;
+}
+
+/* 3. Minimalist Style (Solid Pure Canvas) */
+html:not(.dark).bg-style-minimal .bg-surface-light {
+  background: #ffffff !important;
+}
+
+/* 4. Celestial Style (Dynamic Glow Blobs Layer) */
+html:not(.dark).bg-style-celestial .bg-surface-light {
+  background: radial-gradient(circle at 15% 25%, rgba(var(--color-primary-rgb), 0.05) 0%, transparent 55%),
+              radial-gradient(circle at 85% 75%, rgba(var(--color-secondary-rgb), 0.05) 0%, transparent 55%),
+              var(--bg-gradient-light) !important;
+}
+
+/* ─── Night Theme Default (Unaffected by Customizer settings) ─── */
+.dark .bg-surface-dark,
+.dark .dark\:bg-surface-dark {
+  background: var(--bg-gradient-dark) !important;
+}
+
+/* ─── Pure White & Pure Black Theme Overrides (Light Mode Only) ─── */
+
+/* Pure White Theme */
+.theme-purewhite:not(.dark) body,
+.theme-purewhite:not(.dark) main,
+.theme-purewhite:not(.dark) section,
+.theme-purewhite:not(.dark) article,
+.theme-purewhite:not(.dark) aside,
+.theme-purewhite:not(.dark) footer,
+.theme-purewhite:not(.dark) nav,
+.theme-purewhite:not(.dark) div:not(.fixed):not(.fixed *),
+.theme-purewhite:not(.dark) span:not(.fixed *),
+.theme-purewhite:not(.dark) a:not(.fixed *),
+.theme-purewhite:not(.dark) button:not(.fixed *),
+.theme-purewhite:not(.dark) h1,
+.theme-purewhite:not(.dark) h2,
+.theme-purewhite:not(.dark) h3,
+.theme-purewhite:not(.dark) h4,
+.theme-purewhite:not(.dark) p,
+.theme-purewhite:not(.dark) li,
+.theme-purewhite:not(.dark) input,
+.theme-purewhite:not(.dark) textarea {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #000000 !important;
+  border-color: rgba(0, 0, 0, 0.15) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* Pure Black Theme */
+.theme-pureblack:not(.dark) body,
+.theme-pureblack:not(.dark) main,
+.theme-pureblack:not(.dark) section,
+.theme-pureblack:not(.dark) article,
+.theme-pureblack:not(.dark) aside,
+.theme-pureblack:not(.dark) footer,
+.theme-pureblack:not(.dark) nav,
+.theme-pureblack:not(.dark) div:not(.fixed):not(.fixed *),
+.theme-pureblack:not(.dark) span:not(.fixed *),
+.theme-pureblack:not(.dark) a:not(.fixed *),
+.theme-pureblack:not(.dark) button:not(.fixed *),
+.theme-pureblack:not(.dark) h1,
+.theme-pureblack:not(.dark) h2,
+.theme-pureblack:not(.dark) h3,
+.theme-pureblack:not(.dark) h4,
+.theme-pureblack:not(.dark) p,
+.theme-pureblack:not(.dark) li,
+.theme-pureblack:not(.dark) input,
+.theme-pureblack:not(.dark) textarea {
+  background-color: #000000 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
 /* ─── Base Styles ──────────────────────────────────── */
 
 html {
@@ -18,18 +127,18 @@ body {
 
 /* Selection / Highlight */
 ::selection {
-  background-color: rgba(16, 185, 129, 0.2);
-  color: inherit;
+  background-color: var(--color-primary-light);
+  color: #020617;
 }
 
 ::-moz-selection {
-  background-color: rgba(16, 185, 129, 0.2);
-  color: inherit;
+  background-color: var(--color-primary-light);
+  color: #020617;
 }
 
 /* Focus-visible — keyboard navigation only */
 *:focus-visible {
-  outline: 2px solid #10B981;
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -44,12 +153,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #10B981, #06B6D4);
+  background: linear-gradient(180deg, var(--color-primary), var(--color-secondary));
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #047857, #0891B2);
+  background: linear-gradient(180deg, var(--color-primary-dark), var(--color-secondary-dark));
 }
 
 /* Custom Scrollbar — Dark Mode */
@@ -58,20 +167,20 @@ body {
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #10B981, #6366F1);
+  background: linear-gradient(180deg, var(--color-primary), var(--color-accent));
   border-radius: 999px;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #34D399, #818CF8);
+  background: linear-gradient(180deg, var(--color-primary-light), var(--color-accent-light));
 }
 
 /* Firefox scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #10B981 #f1f5f9;
+  scrollbar-color: var(--color-primary) #f1f5f9;
 }
 
 .dark * {
-  scrollbar-color: #10B981 #0f172a;
+  scrollbar-color: var(--color-primary) #0f172a;
 }

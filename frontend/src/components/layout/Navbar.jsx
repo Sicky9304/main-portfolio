@@ -7,6 +7,7 @@ const NAV_LINKS = [
   { label: 'About', href: '#about' },
   { label: 'Skills', href: '#skills' },
   { label: 'Projects', href: '#projects' },
+  { label: 'Blog', href: '/blog' },
   { label: 'Services', href: '#services' },
   { label: 'Contact', href: '#contact' },
 ];
@@ -16,18 +17,21 @@ export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
 
-      // Detect active section
-      const sections = ['hero', 'about', 'skills', 'projects', 'services', 'contact'];
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const el = document.getElementById(sections[i]);
-        if (el && el.getBoundingClientRect().top <= 150) {
-          setActiveSection(sections[i]);
-          break;
+      // Detect active section if on home page
+      if (window.location.pathname === '/' || window.location.pathname === '') {
+        const sections = ['hero', 'about', 'skills', 'projects', 'services', 'contact'];
+        for (let i = sections.length - 1; i >= 0; i--) {
+          const el = document.getElementById(sections[i]);
+          if (el && el.getBoundingClientRect().top <= 150) {
+            setActiveSection(sections[i]);
+            break;
+          }
         }
       }
     };
@@ -35,14 +39,54 @@ export const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Listen to path changes to update active path and handle indicator
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
+
   const scrollToSection = (e, id) => {
     e.preventDefault();
     setMenuOpen(false);
-    const el = document.getElementById(id.replace('#', ''));
-    if (el) {
-      const offset = 100;
-      const top = el.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({ top, behavior: 'smooth' });
+    const sectionId = id.replace('#', '');
+    
+    if (window.location.pathname !== '/' && window.location.pathname !== '') {
+      // Redirect to home page with hash
+      window.history.pushState({}, '', `/#${sectionId}`);
+      const navEvent = new PopStateEvent('popstate');
+      window.dispatchEvent(navEvent);
+      
+      // Give a tiny timeout for home page to mount, then scroll
+      setTimeout(() => {
+        const el = document.getElementById(sectionId);
+        if (el) {
+          const offset = 100;
+          const top = el.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      }, 150);
+    } else {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        const offset = 100;
+        const top = el.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    }
+  };
+
+  const handleLinkClick = (e, href) => {
+    if (href === '/blog') {
+      e.preventDefault();
+      setMenuOpen(false);
+      window.history.pushState({}, '', '/blog');
+      const navEvent = new PopStateEvent('popstate');
+      window.dispatchEvent(navEvent);
+    } else {
+      scrollToSection(e, href);
     }
   };
 
@@ -51,7 +95,7 @@ export const Navbar = () => {
       <motion.nav
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, delay: 1.8, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.8, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
         className={`fixed top-4 left-0 right-0 mx-auto z-50 transition-all duration-500 ${
           scrolled ? 'w-[92%] max-w-5xl' : 'w-[100%] max-w-6xl'
         }`}
@@ -73,13 +117,17 @@ export const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map((link) => {
-              const sectionId = link.href.replace('#', '');
-              const isActive = activeSection === sectionId;
+              const isBlogLink = link.href === '/blog';
+              const cleanPath = currentPath.replace(/\/$/, '');
+              const isActive = isBlogLink
+                ? (cleanPath === '/blog' || cleanPath.startsWith('/blog/'))
+                : (cleanPath === '' || cleanPath === '/' ? activeSection === link.href.replace('#', '') : false);
+
               return (
                 <a
                   key={link.label}
                   href={link.href}
-                  onClick={(e) => scrollToSection(e, link.href)}
+                  onClick={(e) => handleLinkClick(e, link.href)}
                   className={`relative px-4 py-2 text-sm font-medium rounded-xl transition-colors duration-300 ${
                     isActive
                       ? 'text-primary dark:text-primary-light'
@@ -169,7 +217,7 @@ export const Navbar = () => {
                 <a
                   key={link.label}
                   href={link.href}
-                  onClick={(e) => scrollToSection(e, link.href)}
+                  onClick={(e) => handleLinkClick(e, link.href)}
                   className="block py-3 px-4 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary-light rounded-xl hover:bg-primary/5 transition-colors"
                 >
                   {link.label}
