@@ -7,6 +7,7 @@ import { Footer } from './components/layout/Footer';
 import { CursorGlow } from './components/ui/CursorGlow';
 import { ScrollProgress } from './components/ui/ScrollProgress';
 import { ThemeCustomizer } from './components/ui/ThemeCustomizer';
+import { CommandPalette } from './components/ui/CommandPalette';
 import { GlobalAIAssistant } from './components/ai/GlobalAIAssistant';
 
 import { Hero } from './sections/Hero';
@@ -139,6 +140,7 @@ function AppContent() {
       <CursorGlow />
       <ScrollProgress />
       <ThemeCustomizer />
+      <CommandPalette />
       <LoadingScreen isLoading={isLoading} />
 
       <Navbar />

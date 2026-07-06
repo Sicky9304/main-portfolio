@@ -11,19 +11,6 @@ import { TiltCard } from '../../components/ui/TiltCard';
 export const BlogPage = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [maxReadTime, setMaxReadTime] = useState(15);
-  const [selectedComplexity, setSelectedComplexity] = useState('All');
-
-  const categories = [
-    'All',
-    'Web Development',
-    'JavaScript',
-    'Backend',
-    'Tools & DevOps',
-    'Career & Productivity'
-  ];
 
   useEffect(() => {
     const loadBlogs = async () => {
@@ -40,26 +27,11 @@ export const BlogPage = () => {
     loadBlogs();
   }, []);
 
-  const getMinutes = (timeStr) => {
-    return parseInt(timeStr) || 5;
-  };
-
-  // Advanced Multi-dimensional Filter
-  const filteredBlogs = blogs.filter(blog => {
-    const matchesCategory = selectedCategory === 'All' || blog.category === selectedCategory;
-    const matchesSearch = blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          blog.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesReadTime = maxReadTime === 15 || getMinutes(blog.readTime) <= maxReadTime;
-    const matchesComplexity = selectedComplexity === 'All' || blog.complexity === selectedComplexity;
-
-    return matchesCategory && matchesSearch && matchesReadTime && matchesComplexity;
-  });
-
   // Featured Blog: Pick the first featured, or fallback to first overall
-  const featuredBlog = filteredBlogs.find(b => b.featured) || filteredBlogs[0];
+  const featuredBlog = blogs.find(b => b.featured) || blogs[0];
 
   // Grid blogs (excluding the featured one to prevent duplicates)
-  const gridBlogs = filteredBlogs.filter(b => b.slug !== (featuredBlog?.slug || ''));
+  const gridBlogs = blogs.filter(b => b.slug !== (featuredBlog?.slug || ''));
 
   const navigateToBlogDetails = (slug) => {
     window.history.pushState({}, '', `/blog/${slug}`);
@@ -131,13 +103,13 @@ export const BlogPage = () => {
 
           <div className="flex flex-wrap gap-4 pt-2">
             <button
-              onClick={() => document.getElementById('filters-hub')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => document.getElementById('articles-section')?.scrollIntoView({ behavior: 'smooth' })}
               className="px-6 py-3 bg-gradient-to-r from-primary via-secondary to-accent hover:shadow-lg hover:shadow-primary/25 rounded-xl font-bold text-sm text-white transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center gap-2"
             >
-              Open Filters Control <Sliders size={15} />
+              Read Articles <ArrowRight size={15} />
             </button>
             <a
-              href="/api/blogs"
+              href="/api/blogs/rss"
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-3 border border-slate-200 dark:border-slate-800 hover:border-slate-350 dark:hover:border-slate-700 bg-white/60 dark:bg-slate-950/60 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl font-bold text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all hover:-translate-y-0.5 flex items-center gap-2"
@@ -212,103 +184,8 @@ export const BlogPage = () => {
         </div>
       </section>
 
-      {/* ─── FILTERS & SLIDERS CONTROL HUB ─── */}
-      <section id="filters-hub" className="relative z-10 p-6 sm:p-8 rounded-3xl glass border border-slate-200 dark:border-slate-900 space-y-6 text-left shadow-2xl">
-        <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-900 pb-3.5">
-          <Sliders className="w-4 h-4 text-primary" />
-          <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-white font-heading">
-            Multidimensional Filter Control Hub
-          </h3>
-        </div>
-
-        <div className="grid md:grid-cols-12 gap-8 items-end">
-          {/* Search Field */}
-          <div className="md:col-span-4 space-y-2">
-            <label className="text-[10px] text-slate-500 font-mono uppercase tracking-widest pl-0.5">Instant Title Search</label>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search matching blogs..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/70 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-850 text-xs text-slate-900 dark:text-white placeholder-slate-450 dark:placeholder-slate-650 focus:border-primary/50 focus:outline-none transition-all duration-300 shadow-inner"
-              />
-              <Search className="w-4 h-4 text-slate-400 dark:text-slate-600 absolute left-3.5 top-3" />
-            </div>
-          </div>
-
-          {/* Reading Time Slider */}
-          <div className="md:col-span-4 space-y-2">
-            <div className="flex justify-between items-center px-0.5">
-              <label htmlFor="max-reading-duration" className="text-[10px] text-slate-500 font-mono uppercase tracking-widest">Max Reading Duration</label>
-              <span className="text-[11px] font-bold font-mono text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-lg">
-                ≤ {maxReadTime} mins
-              </span>
-            </div>
-            <div className="relative pt-2">
-              <input
-                id="max-reading-duration"
-                type="range"
-                min="2"
-                max="15"
-                step="1"
-                value={maxReadTime}
-                onChange={(e) => setMaxReadTime(parseInt(e.target.value))}
-                className="w-full accent-primary h-1 bg-slate-900 rounded-lg cursor-pointer"
-              />
-              <div className="flex justify-between text-[8px] text-slate-600 font-mono pt-1">
-                <span>2m</span>
-                <span>5m</span>
-                <span>8m</span>
-                <span>12m</span>
-                <span>15m+</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Complexity Toggle */}
-          <div className="md:col-span-4 space-y-2">
-            <label className="text-[10px] text-slate-500 font-mono uppercase tracking-widest pl-0.5">Select Complexity Tier</label>
-            <div className="grid grid-cols-4 gap-1.5 p-1 bg-slate-100/80 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-850 rounded-xl">
-              {['All', 'Beginner', 'Intermediate', 'Advanced'].map(lvl => (
-                <button
-                  key={lvl}
-                  onClick={() => setSelectedComplexity(lvl)}
-                  className={`py-1.5 rounded-lg text-[9px] font-bold uppercase transition-all cursor-pointer ${
-                    selectedComplexity === lvl
-                      ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-200/50 dark:border-slate-800 shadow-sm'
-                      : 'text-slate-500 dark:text-slate-450 hover:text-slate-900 dark:hover:text-slate-300'
-                  }`}
-                >
-                  {lvl.slice(0, 5)}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Category Carousel Row */}
-        <div className="pt-4 border-t border-slate-200 dark:border-slate-900 flex flex-wrap gap-2 items-center">
-          <span className="text-[9px] uppercase tracking-widest text-slate-600 dark:text-slate-500 font-bold mr-1">Categories:</span>
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 text-[10px] font-semibold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                selectedCategory === cat
-                  ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-md shadow-primary/10'
-                  : 'bg-white/70 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-850 text-slate-600 dark:text-slate-400 hover:text-slate-900 hover:bg-slate-50 dark:hover:text-white dark:hover:bg-slate-900'
-              }`}
-            >
-              {cat !== 'All' && getCategoryIcon(cat)}
-              {cat}
-            </button>
-          ))}
-        </div>
-      </section>
-
       {/* ─── DYNAMIC HERO FEATURED POST ─── */}
-      <section className="relative z-10 text-left">
+      <section id="articles-section" className="relative z-10 text-left">
         <AnimatePresence mode="wait">
           {featuredBlog ? (
             <motion.div
@@ -388,8 +265,8 @@ export const BlogPage = () => {
               </div>
             </motion.div>
           ) : (
-            <div className="text-center p-16 glass border border-slate-900 rounded-3xl text-slate-555">
-              No matching SaaS articles match the specified filters. Try adjusting your filter controls.
+            <div className="text-center p-16 glass border border-slate-200 dark:border-slate-900 rounded-3xl text-slate-500">
+              No articles published yet. Stay tuned, or publish some blogs from the admin panel!
             </div>
           )}
         </AnimatePresence>

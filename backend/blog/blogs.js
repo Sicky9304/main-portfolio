@@ -25,6 +25,47 @@ router.get('/public', async (req, res, next) => {
 });
 
 /**
+ * GET /api/blogs/rss
+ * Public — Serve standard XML RSS feed of published blogs
+ */
+router.get('/rss', async (req, res, next) => {
+  try {
+    const blogs = await Blog.find({ status: 'Published' }).sort({ order: 1 });
+    
+    let rssItems = '';
+    blogs.forEach(blog => {
+      rssItems += `
+    <item>
+      <title><![CDATA[${blog.title}]]></title>
+      <link>${req.protocol}://${req.get('host')}/blog/${blog.slug}</link>
+      <guid isPermaLink="true">${req.protocol}://${req.get('host')}/blog/${blog.slug}</guid>
+      <description><![CDATA[${blog.description}]]></description>
+      <category><![CDATA[${blog.category}]]></category>
+      <pubDate>${new Date(blog.createdAt).toUTCString()}</pubDate>
+    </item>`;
+    });
+
+    const rssXml = `<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Sicky Kumar | SaaS Engineering Blog</title>
+    <link>${req.protocol}://${req.get('host')}/blog</link>
+    <description>Latest engineering posts on Web Development, DevOps, and MERN stack architectures by Sicky Kumar.</description>
+    <language>en-us</language>
+    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+    <atom:link href="${req.protocol}://${req.get('host')}/api/blogs/rss" rel="self" type="application/rss+xml" />
+    ${rssItems}
+  </channel>
+</rss>`;
+
+    res.set('Content-Type', 'application/rss+xml');
+    res.send(rssXml);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
  * GET /api/blogs/latest
  * Public — Fetch the top 3 latest published blogs
  */

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Moon, Sun, Menu, X, FileText, Download } from 'lucide-react';
+import { Moon, Sun, Menu, X, FileText, Download, Search } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
 const NAV_LINKS = [
@@ -162,6 +162,17 @@ export const Navbar = () => {
 
           {/* Right Actions */}
           <div className="hidden md:flex items-center gap-3">
+            {/* Search/Command Palette Button */}
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('open-command-palette'))}
+              className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-300 cursor-pointer flex items-center gap-1.5"
+              aria-label="Open Command Palette"
+              title="Search / Command Palette (Ctrl+K)"
+            >
+              <Search size={16} />
+              <kbd className="text-[9px] font-mono opacity-60 bg-white/40 dark:bg-slate-900/60 px-1.5 py-0.5 rounded border border-slate-200/20 dark:border-slate-800">⌘K</kbd>
+            </button>
+
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -200,8 +211,15 @@ export const Navbar = () => {
           {/* Mobile Toggle */}
           <div className="flex md:hidden items-center gap-2">
             <button
-              onClick={toggleTheme}
+              onClick={() => window.dispatchEvent(new CustomEvent('open-command-palette'))}
               className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 cursor-pointer"
+              aria-label="Open Command Palette"
+            >
+              <Search size={16} />
+            </button>
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800/60 text-slate-655 dark:text-slate-300 cursor-pointer"
               aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
             >
               {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}

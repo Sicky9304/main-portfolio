@@ -94,6 +94,7 @@ portfolio/
 │   │   │   └── ui/
 │   │   │       ├── Animations.jsx         # Custom Framer Motion / GSAP animations
 │   │   │       ├── BrandIcons.jsx         # Dynamic tech logo SVG rendering
+│   │   │       ├── CommandPalette.jsx     # Global search command menu (Ctrl+K)
 │   │   │       ├── CursorGlow.jsx         # Interactive follow cursor halo glows
 │   │   │       ├── HolographicOverlay.jsx # Matrix/Grid HUD holographic overlay
 │   │   │       ├── MagneticButton.jsx     # GSAP magnet pull button script
@@ -221,7 +222,7 @@ The sitemap located at `/sitemap.xml` is served dynamically via Express. It quer
 *   **Architecture Page**: An interactive, glassmorphic route (`/architecture`) served dynamically. It pulls the updated [`AGENTS.md`](file:///d:/Google%20Antigravity/portfolio/.agents/AGENTS.md) content via `GET /api/profile/architecture` and displays the system design, features, and file structure using the `<MarkdownRenderer />` component.
 *   **Footer Links**: Organized into a clean, space-saving **2-column responsive grid** in [`Footer.jsx`](file:///d:/Google%20Antigravity/portfolio/frontend/src/components/layout/Footer.jsx). The "Architecture" link is conditionally rendered so that it only appears in the portfolio section (main landing page) and is hidden when in the blog section.
 *   **SPA Route & Hash Synchronization**: The global `pushState` and `replaceState` methods are patched in [`main.jsx`](file:///d:/Google%20Antigravity/portfolio/frontend/src/main.jsx) to dispatch custom `locationchange` events. [`App.jsx`](file:///d:/Google%20Antigravity/portfolio/frontend/src/App.jsx), the navbar, and the footer listen to this event reactively, resolving URL lagging. Additionally, scroll listeners in [`Navbar.jsx`](file:///d:/Google%20Antigravity/portfolio/frontend/src/components/layout/Navbar.jsx) track and replace the URL hash dynamically as the user scrolls through homepage sections, ensuring the URL bar is always in sync with the viewport section without polluting the browser history.
-*   **No-Limit Read Duration Bypass**: In [`BlogPage.jsx`](file:///d:/Google%20Antigravity/portfolio/frontend/src/sections/blog/BlogPage.jsx), the read duration filter check is optimized to bypass filtering when `maxReadTime` is set to `15` (which represents the `15m+` label), ensuring all blogs load by default on first visit without filters.
+*   **Global Command Palette (Spotlight Search)**: A premium, glassmorphic command center component [`CommandPalette.jsx`](file:///d:/Google%20Antigravity/portfolio/frontend/src/components/ui/CommandPalette.jsx) triggered globally by pressing `Ctrl + K` (or `Cmd + K`) or clicking the search icon in the navbar. It allows visitors to filter and navigate to all website sections, toggle dark/light theme, select dynamic HSL theme presets (e.g., Emerald, Purple, Cyberpunk), change backdrop modes, trigger the AI twin clone assistant, and search/redirect instantly. Supported by arrow key focus controls (`ArrowUp`/`ArrowDown`), `Enter` select, and `Escape` exit hooks.
 
 ---
 
