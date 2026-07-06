@@ -33,9 +33,9 @@ export const BlogPage = () => {
     return null;
   }
 
-  const rssUrl = import.meta.env.VITE_API_URL
-    ? `${import.meta.env.VITE_API_URL.replace(/\/$/, "")}/api/blogs/rss`
-    : '/api/blogs/rss';
+  // RSS Feed served live from Vercel Serverless Function → direct MongoDB query
+  // URL: https://www.sickykumar.in/api/rss
+  const rssUrl = '/api/rss';
 
   // Featured Blog: Pick the first featured, or fallback to first overall
   const featuredBlog = blogs.find(b => b.featured) || blogs[0];
