@@ -88,12 +88,12 @@ export const CommandPalette = () => {
   // Define commands
   const navigationCommands = [
     { id: 'nav-home', label: 'Go to Hero / Home', category: 'Navigation', icon: Compass, action: () => navigateTo('#hero'), keywords: 'home hero start landing' },
+    { id: 'nav-blog', label: 'View Blog Catalog', category: 'Navigation', icon: FileText, action: () => navigateTo('/blog'), keywords: 'blog articles tech software writing dev stories devanagari hindi translation' },
     { id: 'nav-about', label: 'Go to About Section', category: 'Navigation', icon: User, action: () => navigateTo('#about'), keywords: 'about biography history education statistics cgpa' },
     { id: 'nav-skills', label: 'Go to Skills / TechStack', category: 'Navigation', icon: Cpu, action: () => navigateTo('#skills'), keywords: 'skills tech stack languages node react javascript database mongo' },
     { id: 'nav-projects', label: 'Go to Projects Section', category: 'Navigation', icon: Briefcase, action: () => navigateTo('#projects'), keywords: 'projects portfolio cases showcase live source github code' },
     { id: 'nav-services', label: 'Go to Services Offered', category: 'Navigation', icon: Layers, action: () => navigateTo('#services'), keywords: 'services hiring capabilities backend frontend development API' },
     { id: 'nav-contact', label: 'Go to Contact / Hire Me', category: 'Navigation', icon: Settings, action: () => navigateTo('#contact'), keywords: 'contact hire message email submit mail' },
-    { id: 'nav-blog', label: 'View Blog Catalog', category: 'Navigation', icon: FileText, action: () => navigateTo('/blog'), keywords: 'blog articles tech software writing dev stories devanagari hindi translation' },
     { id: 'nav-architecture', label: 'View Project Architecture System Design', category: 'Navigation', icon: Terminal, action: () => navigateTo('/architecture'), keywords: 'architecture guide design rulebook agents layout vercel express database schemas' },
   ];
 
@@ -108,6 +108,7 @@ export const CommandPalette = () => {
       action: () => setGradientTheme(key),
       keywords: `preset theme color accent style gradient ${key} ${gradientThemes[key].name.toLowerCase()}`
     })),
+    
     // Backdrop Types
     { id: 'bg-aura', label: 'Background Style: Aura Glows', category: 'Backgrounds', icon: Sparkles, action: () => setBgStyle('aura'), keywords: 'backdrop style aura glow gradients' },
     { id: 'bg-grid', label: 'Background Style: Holographic Grid', category: 'Backgrounds', icon: Layers, action: () => setBgStyle('grid'), keywords: 'backdrop style grid HUD matrix neon' },
@@ -157,7 +158,7 @@ export const CommandPalette = () => {
   // Helper action: trigger AI twin chatbot
   const openAiAssistant = () => {
     setIsOpen(false);
-    const triggerBtn = document.querySelector('[aria-label="Toggle AI assistant"]');
+    const triggerBtn = document.querySelector('[title="Ask Portfolio AI"]');
     if (triggerBtn) {
       triggerBtn.click();
     } else {

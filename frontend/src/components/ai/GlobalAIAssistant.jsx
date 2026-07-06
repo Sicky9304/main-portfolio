@@ -59,6 +59,15 @@ export const GlobalAIAssistant = () => {
     };
   }, [isOpen]);
 
+  // Listen to external triggers (like Command Palette) to open/close chat panel
+  useEffect(() => {
+    const handleToggleChat = () => {
+      setIsOpen((prev) => !prev);
+    };
+    window.addEventListener('toggle-ai-chat', handleToggleChat);
+    return () => window.removeEventListener('toggle-ai-chat', handleToggleChat);
+  }, []);
+
   const handleSendMessage = async (text) => {
     if (isTyping || !text.trim()) return;
 
