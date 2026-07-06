@@ -49,7 +49,7 @@ export const BlogPage = () => {
     const matchesCategory = selectedCategory === 'All' || blog.category === selectedCategory;
     const matchesSearch = blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           blog.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesReadTime = getMinutes(blog.readTime) <= maxReadTime;
+    const matchesReadTime = maxReadTime === 15 || getMinutes(blog.readTime) <= maxReadTime;
     const matchesComplexity = selectedComplexity === 'All' || blog.complexity === selectedComplexity;
 
     return matchesCategory && matchesSearch && matchesReadTime && matchesComplexity;
@@ -240,13 +240,14 @@ export const BlogPage = () => {
           {/* Reading Time Slider */}
           <div className="md:col-span-4 space-y-2">
             <div className="flex justify-between items-center px-0.5">
-              <label className="text-[10px] text-slate-500 font-mono uppercase tracking-widest">Max Reading Duration</label>
+              <label htmlFor="max-reading-duration" className="text-[10px] text-slate-500 font-mono uppercase tracking-widest">Max Reading Duration</label>
               <span className="text-[11px] font-bold font-mono text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-lg">
                 ≤ {maxReadTime} mins
               </span>
             </div>
             <div className="relative pt-2">
               <input
+                id="max-reading-duration"
                 type="range"
                 min="2"
                 max="15"

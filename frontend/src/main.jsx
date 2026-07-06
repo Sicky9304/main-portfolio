@@ -4,6 +4,20 @@ import './index.css';
 import App from './App.jsx';
 import { initAnalytics } from './lib/analytics.js';
 import { initClarity } from './lib/clarity.js';
+import { Analytics } from '@vercel/analytics/react';
+
+// Patch history methods to dispatch custom events for reliable SPA routing
+const patchHistory = (type) => {
+  const original = window.history[type];
+  return function (...args) {
+    const result = original.apply(this, args);
+    const changeEvent = new Event('locationchange');
+    window.dispatchEvent(changeEvent);
+    return result;
+  };
+};
+window.history.pushState = patchHistory('pushState');
+window.history.replaceState = patchHistory('replaceState');
 
 // Initialize analytics and tracking (Production Only)
 initAnalytics();
@@ -12,5 +26,6 @@ initClarity();
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
+    <Analytics />
   </StrictMode>,
 );

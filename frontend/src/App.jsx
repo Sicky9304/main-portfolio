@@ -49,6 +49,9 @@ const BlogPage = lazy(() =>
 const BlogDetailsPage = lazy(() =>
   import('./sections/blog/BlogDetailsPage').then((m) => ({ default: m.BlogDetailsPage }))
 );
+const ArchitecturePage = lazy(() =>
+  import('./sections/ArchitecturePage').then((m) => ({ default: m.ArchitecturePage }))
+);
 
 function AppContent() {
   const [isLoading, setIsLoading] = useState(true);
@@ -70,9 +73,12 @@ function AppContent() {
     };
 
     window.addEventListener('popstate', handleLocationChange);
+    window.addEventListener('locationchange', handleLocationChange);
 
-    return () =>
+    return () => {
       window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener('locationchange', handleLocationChange);
+    };
   }, []);
 
   const cleanPath = currentPath.replace(/\/$/, '');
@@ -86,7 +92,6 @@ function AppContent() {
     );
   }
 
-  // Determine page content
   let mainContent;
   if (cleanPath === '/blog') {
     mainContent = (
@@ -99,6 +104,12 @@ function AppContent() {
     mainContent = (
       <Suspense fallback={null}>
         <BlogDetailsPage slug={slug} />
+      </Suspense>
+    );
+  } else if (cleanPath === '/architecture') {
+    mainContent = (
+      <Suspense fallback={null}>
+        <ArchitecturePage />
       </Suspense>
     );
   } else {
@@ -132,7 +143,7 @@ function AppContent() {
 
       <Navbar />
 
-      <main className={`relative z-10 ${cleanPath.startsWith('/blog') ? 'pt-12 md:pt-14' : ''}`}>
+      <main className={`relative z-10 ${(cleanPath.startsWith('/blog') || cleanPath === '/architecture') ? 'pt-12 md:pt-14' : ''}`}>
         {mainContent}
       </main>
 

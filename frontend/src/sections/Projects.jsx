@@ -186,7 +186,7 @@ export const Projects = () => {
 
         {/* ─── AI PROJECT RECOMMENDATION WIDGET ─── */}
         <RevealOnScroll delay={0.1}>
-          <div className="mb-16 p-6 rounded-3xl glass border border-slate-200 dark:border-slate-800 shadow-xl relative overflow-hidden bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 max-w-3xl mx-auto">
+          <div className="mb-16 p-4 sm:p-6 rounded-3xl glass border border-slate-200 dark:border-slate-800 shadow-xl relative overflow-hidden bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 max-w-3xl mx-auto">
             <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
             <div className="flex items-center gap-2 mb-3">
               <Brain size={18} className="text-secondary animate-pulse" />
@@ -203,20 +203,20 @@ export const Projects = () => {
                 e.preventDefault();
                 getAiRecommendation(aiPrompt);
               }}
-              className="flex gap-2"
+              className="flex flex-col sm:flex-row gap-2"
             >
               <input 
                 type="text"
                 value={aiPrompt}
                 onChange={(e) => setAiPrompt(e.target.value)}
                 placeholder="E.g., MERN stack database app..."
-                className="flex-1 px-4 py-2.5 rounded-2xl bg-white/40 dark:bg-slate-950/50 backdrop-blur-md border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-500 outline-none focus:border-primary/50 transition-colors"
+                className="flex-1 w-full px-4 py-2.5 rounded-2xl bg-white/40 dark:bg-slate-950/50 backdrop-blur-md border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-500 outline-none focus:border-primary/50 transition-colors"
                 disabled={isAiLoading}
               />
               <button
                 type="submit"
                 disabled={isAiLoading || !aiPrompt.trim()}
-                className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-semibold text-xs transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-md cursor-pointer whitespace-nowrap flex items-center gap-1.5"
+                className="w-full sm:w-auto justify-center px-5 py-2.5 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-semibold text-xs transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-md cursor-pointer whitespace-nowrap flex items-center gap-1.5"
               >
                 {isAiLoading ? 'Analyzing...' : 'Match Me'}
               </button>

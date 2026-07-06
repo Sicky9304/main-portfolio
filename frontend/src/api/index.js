@@ -151,6 +151,8 @@ export const generateBlogContent = (prompt, title) => request("/ai/write-blog", 
   body: JSON.stringify({ prompt, title })
 });
 
+export const fetchArchitecture = () => request("/profile/architecture").then(r => r.markdown);
+
 export default {
   fetchProjects,
   fetchProject,
@@ -172,5 +174,6 @@ export default {
   deleteBlog,
   askAi,
   translateText,
-  generateBlogContent
+  generateBlogContent,
+  fetchArchitecture
 };

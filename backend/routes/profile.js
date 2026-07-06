@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import Profile from '../models/Profile.js';
 import adminAuth from '../middleware/adminAuth.js';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const router = Router();
 
@@ -20,6 +25,20 @@ router.get('/resume', async (req, res, next) => {
     res.setHeader('Content-Type', profile.resumeMimeType || 'application/pdf');
     res.setHeader('Content-Disposition', 'inline; filename="resume.pdf"');
     res.send(pdfBuffer);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * GET /api/profile/architecture
+ * Public — Fetch the system architecture markdown content
+ */
+router.get('/architecture', async (req, res, next) => {
+  try {
+    const agentsPath = path.resolve(__dirname, '../../.agents/AGENTS.md');
+    const content = await fs.readFile(agentsPath, 'utf8');
+    res.json({ success: true, markdown: content });
   } catch (error) {
     next(error);
   }

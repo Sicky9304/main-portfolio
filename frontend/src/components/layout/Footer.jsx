@@ -1,14 +1,31 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUp, Code2, Mail, Heart } from 'lucide-react';
 import { Github, Linkedin, Whatsapp, Telegram } from '../ui/BrandIcons';
 import { RevealOnScroll } from '../ui/Animations';
 
 export const Footer = () => {
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handleLocationChange);
+    window.addEventListener('locationchange', handleLocationChange);
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener('locationchange', handleLocationChange);
+    };
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const currentYear = new Date().getFullYear();
+
+  const isBlogPage = currentPath.startsWith('/blog');
 
   const footerLinks = [
     { label: 'About', href: '#about' },
@@ -17,6 +34,7 @@ export const Footer = () => {
     { label: 'Blog', href: '/blog' },
     { label: 'Services', href: '#services' },
     { label: 'Contact', href: '#contact' },
+    ...(!isBlogPage ? [{ label: 'Architecture', href: '/architecture' }] : []),
   ];
 
   const socialLinks = [
@@ -30,15 +48,17 @@ export const Footer = () => {
 
   const scrollToSection = (e, href) => {
     e.preventDefault();
-    if (href === '/blog') {
-      window.history.pushState({}, '', '/blog');
+    if (href.startsWith('/')) {
+      window.history.pushState({}, '', href);
       const navEvent = new PopStateEvent('popstate');
       window.dispatchEvent(navEvent);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       const sectionId = href.replace('#', '');
+      const targetHash = sectionId === 'hero' ? '/' : `/#${sectionId}`;
+      window.history.pushState({}, '', targetHash);
+
       if (window.location.pathname !== '/' && window.location.pathname !== '') {
-        window.history.pushState({}, '', `/#${sectionId}`);
         const navEvent = new PopStateEvent('popstate');
         window.dispatchEvent(navEvent);
         setTimeout(() => {
@@ -87,7 +107,7 @@ export const Footer = () => {
                 <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-widest mb-4">
                   Quick Links
                 </h4>
-                <ul className="space-y-2.5">
+                <ul className="grid grid-cols-2 gap-x-4 gap-y-2.5">
                   {footerLinks.map((link) => (
                     <li key={link.label}>
                       <a

@@ -370,7 +370,7 @@ export const Hero = () => {
               <motion.img
                 src={theme === 'dark' ? '/profile_night.webp' : '/profile_day.webp'}
                 alt={name}
-                fetchpriority="high"
+                fetchPriority="high"
                 className="w-full h-full object-cover object-center"
                 style={{
                   x: imageX,

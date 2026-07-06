@@ -26,18 +26,25 @@ export const Navbar = () => {
       // Detect active section if on home page
       if (window.location.pathname === '/' || window.location.pathname === '') {
         const sections = ['hero', 'about', 'skills', 'projects', 'services', 'contact'];
+        let currentSection = 'hero';
         for (let i = sections.length - 1; i >= 0; i--) {
           const el = document.getElementById(sections[i]);
           if (el && el.getBoundingClientRect().top <= 150) {
-            setActiveSection(sections[i]);
+            currentSection = sections[i];
             break;
           }
+        }
+        
+        if (currentSection !== activeSection) {
+          setActiveSection(currentSection);
+          const targetHash = currentSection === 'hero' ? '/' : `/#${currentSection}`;
+          window.history.replaceState(null, '', targetHash);
         }
       }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [activeSection]);
 
   // Listen to path changes to update active path and handle indicator
   useEffect(() => {
@@ -45,7 +52,11 @@ export const Navbar = () => {
       setCurrentPath(window.location.pathname);
     };
     window.addEventListener('popstate', handleLocationChange);
-    return () => window.removeEventListener('popstate', handleLocationChange);
+    window.addEventListener('locationchange', handleLocationChange);
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener('locationchange', handleLocationChange);
+    };
   }, []);
 
   const scrollToSection = (e, id) => {
@@ -53,9 +64,11 @@ export const Navbar = () => {
     setMenuOpen(false);
     const sectionId = id.replace('#', '');
     
+    // Update hash in browser address bar immediately
+    const targetHash = sectionId === 'hero' ? '/' : `/#${sectionId}`;
+    window.history.pushState({}, '', targetHash);
+    
     if (window.location.pathname !== '/' && window.location.pathname !== '') {
-      // Redirect to home page with hash
-      window.history.pushState({}, '', `/#${sectionId}`);
       const navEvent = new PopStateEvent('popstate');
       window.dispatchEvent(navEvent);
       
