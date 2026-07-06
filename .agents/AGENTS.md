@@ -82,11 +82,8 @@ portfolio/
 │   │   │   │   ├── AudioReader.jsx        # Screen-reader voice speech synthesis helper
 │   │   │   │   ├── GlobalAIAssistant.jsx  # Floating 3D/Canvas chatbot twin widget
 │   │   │   │   └── MarkdownRenderer.jsx   # Renders Markdown text dynamically
-│   │   │   ├── blogUI/
-│   │   │   │   ├── BlogAiChatCompanion.jsx# Explainer chatbot embedded in blogs
-│   │   │   │   ├── BlogContentArea.jsx    # Blog detail markdown content area
-│   │   │   │   └── BlogHeaderHub.jsx      # Top section details in blog reading view
 │   │   │   ├── layout/
+│   │   │   │   ├── AppLayout.jsx          # Shared Page Layout wrapper using Outlet
 │   │   │   │   ├── Footer.jsx             # Core Footer component (capped at max-w-6xl)
 │   │   │   │   ├── LoadingScreen.jsx      # Site boot loading overlay
 │   │   │   │   ├── Navbar.jsx             # Navigation bar (fixed, capped at max-w-6xl)
@@ -96,9 +93,7 @@ portfolio/
 │   │   │       ├── BrandIcons.jsx         # Dynamic tech logo SVG rendering
 │   │   │       ├── CommandPalette.jsx     # Global search command menu (Ctrl+K)
 │   │   │       ├── CursorGlow.jsx         # Interactive follow cursor halo glows
-│   │   │       ├── HolographicOverlay.jsx # Matrix/Grid HUD holographic overlay
 │   │   │       ├── MagneticButton.jsx     # GSAP magnet pull button script
-│   │   │       ├── PlexusBackground.jsx   # Interactive canvas plexus nodes network
 │   │   │       ├── ScrollProgress.jsx     # Header reading tracker gauge
 │   │   │       ├── ThemeCustomizer.jsx    # Panel for theme, styles, presets & layouts
 │   │   │       └── TiltCard.jsx           # Immersive 3D hover layout tilt script
@@ -106,9 +101,13 @@ portfolio/
 │   │   │   └── ThemeContext.jsx   # Manage states for fonts, theme presets, modes
 │   │   ├── hooks/
 │   │   │   └── useApi.js          # Generic API data fetcher hook
-│   │   ├── sections/
+│   │   ├── pages/
 │   │   │   ├── blog/
-│   │   │   │   ├── components/
+│   │   │   │   ├── blogUI/                 # Formatted content elements inside blog details view
+│   │   │   │   │   ├── BlogAiChatCompanion.jsx# Explainer chatbot embedded in blogs
+│   │   │   │   │   ├── BlogContentArea.jsx    # Blog detail markdown content area
+│   │   │   │   │   └── BlogHeaderHub.jsx      # Top section details in blog reading view
+│   │   │   │   ├── components/            # Admin dashboard components
 │   │   │   │   │   ├── BlogListView.jsx        # Grid list of existing articles
 │   │   │   │   │   ├── CategoriesManagerView.jsx# Category manager widget
 │   │   │   │   │   ├── DashboardView.jsx       # Admin dashboard stats/home view
@@ -122,19 +121,22 @@ portfolio/
 │   │   │   │   ├── hooks/
 │   │   │   │   │   └── useBlogWorkspace.js     # State machine for the admin blog studio
 │   │   │   │   ├── AdminBlogTab.jsx        # Sub-container for editor panels
+│   │   │   │   ├── AdminDashboard.jsx      # Admin console editor frame (with mouse split resizers)
 │   │   │   │   ├── BlogDetailsPage.jsx     # Individual blog rendering page
 │   │   │   │   └── BlogPage.jsx            # Public blogs catalog list interface
-│   │   │   ├── About.jsx          # General profile stats & education
-│   │   │   ├── AdminDashboard.jsx # Admin console editor frame (with mouse split resizers)
-│   │   │   ├── ArchitecturePage.jsx # Technical system architecture guide page
-│   │   │   ├── Contact.jsx        # Mail submission panel
-│   │   │   ├── GitHubSection.jsx  # Active calendar activity and public repos
-│   │   │   ├── Hero.jsx           # Site top banner section
-│   │   │   ├── Projects.jsx       # Custom catalog projects grid (with fallback items)
-│   │   │   ├── Services.jsx       # Professional capabilities lists
-│   │   │   ├── TechStack.jsx      # Categorized skill badges grid
-│   │   │   └── Testimonials.jsx   # Scrolling quote cards carousel
-│   │   ├── App.jsx                # Main Application routing and shell
+│   │   │   ├── home/
+│   │   │   │   ├── About.jsx               # General profile stats & education
+│   │   │   │   ├── ArchitecturePage.jsx    # Technical system architecture guide page
+│   │   │   │   ├── Contact.jsx             # Mail submission panel
+│   │   │   │   ├── GitHubSection.jsx       # Active calendar activity and public repos
+│   │   │   │   ├── Hero.jsx                # Site top banner section
+│   │   │   │   ├── Projects.jsx            # Custom catalog projects grid (with fallback items)
+│   │   │   │   ├── Services.jsx            # Professional capabilities lists
+│   │   │   │   ├── TechStack.jsx           # Categorized skill badges grid
+│   │   │   │   └── Testimonials.jsx        # Scrolling quote cards carousel
+│   │   ├── routes/
+│   │   │   └── Routes.jsx         # Centralized routing definitions (React Router)
+│   │   ├── App.jsx                # Main entry app provider mounting RouterProvider
 │   │   ├── index.css              # Core styles and design system variables
 │   │   └── main.jsx               # React DOM rendering and tracking triggers
 │   ├── .env                       # Environment variables config (ignored by git)

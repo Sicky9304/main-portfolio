@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ExternalLink, ChevronRight, X, Layers, Zap, Eye } from 'lucide-react';
-import { Github } from '../components/ui/BrandIcons';
-import { RevealOnScroll, SectionHeading } from '../components/ui/Animations';
-import { useApi } from '../hooks/useApi';
-import { fetchProjects, askAi } from '../api/index.js';
-import { MarkdownRenderer } from '../components/ai/MarkdownRenderer';
+import { Github } from '../../components/ui/BrandIcons';
+import { RevealOnScroll, SectionHeading } from '../../components/ui/Animations';
+import { useApi } from '../../hooks/useApi';
+import { fetchProjects, askAi } from '../../api/index.js';
+import { MarkdownRenderer } from '../../components/ai/MarkdownRenderer';
 import { Brain, RefreshCw } from 'lucide-react';
-import { TiltCard } from '../components/ui/TiltCard';
+import { TiltCard } from '../../components/ui/TiltCard';
 
 // Fallback data (used when API is unavailable)
 const FALLBACK_PROJECTS = [

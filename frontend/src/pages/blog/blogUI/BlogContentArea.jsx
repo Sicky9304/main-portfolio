@@ -1,6 +1,6 @@
 
 import { Link2, Linkedin, Twitter, Star, ArrowLeft, ArrowRight } from 'lucide-react';
-import { MarkdownRenderer } from '../ai/MarkdownRenderer';
+import { MarkdownRenderer } from '../../../components/ai/MarkdownRenderer';
 
 export const BlogContentArea = ({ blog, handleShare, copied }) => {
   if (!blog) return null;

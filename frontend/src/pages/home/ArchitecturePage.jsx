@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, RefreshCw, Cpu, Layers, Terminal } from 'lucide-react';
-import { fetchArchitecture } from '../api/index.js';
-import { MarkdownRenderer } from '../components/ai/MarkdownRenderer';
+import { fetchArchitecture } from '../../api/index.js';
+import { MarkdownRenderer } from '../../components/ai/MarkdownRenderer';
 
 export const ArchitecturePage = () => {
   const [markdown, setMarkdown] = useState('');

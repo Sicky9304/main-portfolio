@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 import { Code2, Palette, Server, LayoutDashboard, Brain, Zap } from 'lucide-react';
-import { RevealOnScroll, SectionHeading } from '../components/ui/Animations';
-import { useApi } from '../hooks/useApi';
-import { fetchServices } from '../api/index.js';
+import { RevealOnScroll, SectionHeading } from '../../components/ui/Animations';
+import { useApi } from '../../hooks/useApi';
+import { fetchServices } from '../../api/index.js';
 
 // Map icon string names from the database to actual Lucide components
 const ICON_MAP = {

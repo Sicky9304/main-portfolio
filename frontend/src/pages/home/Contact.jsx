@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Send, Mail, MapPin } from 'lucide-react';
-import { RevealOnScroll, SectionHeading } from '../components/ui/Animations';
-import { MagneticButton } from '../components/ui/MagneticButton';
-import { submitContact } from '../api/index.js';
+import { RevealOnScroll, SectionHeading } from '../../components/ui/Animations';
+import { MagneticButton } from '../../components/ui/MagneticButton';
+import { submitContact } from '../../api/index.js';
 
 export const Contact = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });

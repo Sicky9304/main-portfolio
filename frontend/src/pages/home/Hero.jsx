@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { MapPin, Sparkles, ArrowDown, Code2 } from 'lucide-react';
-import { Github, Linkedin, Whatsapp, Telegram } from '../components/ui/BrandIcons';
-import { useTheme } from '../context/ThemeContext';
-import { MagneticButton } from '../components/ui/MagneticButton';
-import { useApi } from '../hooks/useApi';
-import { fetchProfile } from '../api/index.js';
+import { Github, Linkedin, Whatsapp, Telegram } from '../../components/ui/BrandIcons';
+import { useTheme } from '../../context/ThemeContext';
+import { MagneticButton } from '../../components/ui/MagneticButton';
+import { useApi } from '../../hooks/useApi';
+import { fetchProfile } from '../../api/index.js';
 
 // Fallback data (used when API is unavailable)
 const FALLBACK_ROLES = [

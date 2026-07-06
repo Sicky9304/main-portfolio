@@ -4,13 +4,13 @@ import {
   Lock, ArrowLeft, Upload, FileText, Plus, Trash2, 
   Edit3, ExternalLink, Link2, Sparkles, RefreshCw, X, CheckCircle 
 } from 'lucide-react';
-import { Github } from '../components/ui/BrandIcons';
-import { useTheme } from '../context/ThemeContext';
+import { Github } from '../../components/ui/BrandIcons';
+import { useTheme } from '../../context/ThemeContext';
 import { 
   createProject, updateProject, deleteProject, 
   updateProfile, uploadImage, fetchProjects, fetchProfile 
-} from '../api/index.js';
-import { AdminBlogTab } from './blog/AdminBlogTab';
+} from '../../api/index.js';
+import { AdminBlogTab } from './AdminBlogTab';
 
 export const AdminDashboard = () => {
   const { theme } = useTheme();

@@ -1,5 +1,5 @@
 import { ChevronLeft, Calendar, Clock, BookOpen, Sparkles, User, RefreshCcw } from 'lucide-react';
-import { AudioReader } from '../ai/AudioReader';
+import { AudioReader } from '../../../components/ai/AudioReader';
 
 export const BlogHeaderHub = ({ blog, handleBack }) => {
   if (!blog) return null;

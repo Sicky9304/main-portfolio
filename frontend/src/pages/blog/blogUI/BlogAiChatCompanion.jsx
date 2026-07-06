@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Brain, X, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { askAi } from '../../api/index.js';
-import { MarkdownRenderer } from '../ai/MarkdownRenderer';
+import { askAi } from '../../../api/index.js';
+import { MarkdownRenderer } from '../../../components/ai/MarkdownRenderer';
 
 export const BlogAiChatCompanion = ({ blog }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);

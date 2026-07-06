@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RevealOnScroll, SectionHeading } from '../components/ui/Animations';
+import { RevealOnScroll, SectionHeading } from '../../components/ui/Animations';
 
 const CATEGORIES = [
   {

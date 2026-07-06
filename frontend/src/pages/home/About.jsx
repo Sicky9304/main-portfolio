@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 import { GraduationCap, Code2, FolderGit2, Award, Coffee, Rocket, Target } from 'lucide-react';
-import { RevealOnScroll, SectionHeading } from '../components/ui/Animations';
-import { useApi } from '../hooks/useApi';
-import { fetchProfile } from '../api/index.js';
+import { RevealOnScroll, SectionHeading } from '../../components/ui/Animations';
+import { useApi } from '../../hooks/useApi';
+import { fetchProfile } from '../../api/index.js';
 
 const ICON_MAP = {
   FolderGit2, Code2, Target, Award, Coffee, Rocket, GraduationCap,

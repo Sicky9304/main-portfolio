@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 
-import { RevealOnScroll, SectionHeading } from "../components/ui/Animations";
-import { useApi } from "../hooks/useApi";
-import { fetchTestimonials } from "../api";
+import { RevealOnScroll, SectionHeading } from "../../components/ui/Animations";
+import { useApi } from "../../hooks/useApi";
+import { fetchTestimonials } from "../../api";
 
 const FALLBACK_TESTIMONIALS = [
   {

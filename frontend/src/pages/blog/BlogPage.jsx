@@ -14,6 +14,7 @@ export const BlogPage = () => {
 
   useEffect(() => {
     const loadBlogs = async () => {
+      window.dispatchEvent(new CustomEvent('start-global-loading'));
       setLoading(true);
       try {
         const fetchedBlogs = await fetchBlogs();
@@ -22,10 +23,19 @@ export const BlogPage = () => {
         console.error('Error loading blogs', err);
       } finally {
         setLoading(false);
+        window.dispatchEvent(new CustomEvent('stop-global-loading'));
       }
     };
     loadBlogs();
   }, []);
+
+  if (loading) {
+    return null;
+  }
+
+  const rssUrl = import.meta.env.VITE_API_URL
+    ? `${import.meta.env.VITE_API_URL.replace(/\/$/, "")}/api/blogs/rss`
+    : '/api/blogs/rss';
 
   // Featured Blog: Pick the first featured, or fallback to first overall
   const featuredBlog = blogs.find(b => b.featured) || blogs[0];
@@ -109,7 +119,7 @@ export const BlogPage = () => {
               Read Articles <ArrowRight size={15} />
             </button>
             <a
-              href="/api/blogs/rss"
+              href={rssUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-3 border border-slate-200 dark:border-slate-800 hover:border-slate-350 dark:hover:border-slate-700 bg-white/60 dark:bg-slate-950/60 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl font-bold text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all hover:-translate-y-0.5 flex items-center gap-2"

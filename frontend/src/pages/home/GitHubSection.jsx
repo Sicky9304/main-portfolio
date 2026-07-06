@@ -1,9 +1,9 @@
 import { useRef, useEffect, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { GitBranch, Star, GitFork, Activity } from 'lucide-react';
-import { RevealOnScroll, SectionHeading } from '../components/ui/Animations';
-import { useApi } from '../hooks/useApi';
-import { fetchProfile } from '../api/index.js';
+import { RevealOnScroll, SectionHeading } from '../../components/ui/Animations';
+import { useApi } from '../../hooks/useApi';
+import { fetchProfile } from '../../api/index.js';
 
 const AnimatedCounter = ({ target, suffix = '', duration = 2 }) => {
   const ref = useRef(null);
