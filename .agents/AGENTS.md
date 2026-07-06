@@ -69,6 +69,8 @@ portfolio/
 │   └── server.js                  # Main server listener
 │
 ├── frontend/
+│   ├── api/
+│   │   └── rss.js                 # Vercel Serverless Function — live RSS 2.0 feed (direct MongoDB query)
 │   ├── public/                    # Static assets
 │   ├── src/
 │   │   ├── api/
@@ -220,6 +222,14 @@ The secured control room for updating site configuration and posting articles. I
 ### Dynamic Sitemap
 The sitemap located at `/sitemap.xml` is served dynamically via Express. It queries MongoDB in real-time to list all published blogs immediately for SEO indexing without requiring static generation.
 
+### Live RSS Feed (`/api/rss`)
+Located in [`frontend/api/rss.js`](file:///d:/Google%20Antigravity/portfolio/frontend/api/rss.js), this is a **Vercel Serverless Function** that:
+*   Connects **directly to MongoDB Atlas** on every request — no Render backend involved.
+*   Fetches all `Published` blogs sorted by newest first.
+*   Returns a valid **RSS 2.0 XML** feed with 1-hour CDN cache headers.
+*   Served at `https://www.sickykumar.in/api/rss` — always live, zero redeploys needed when new blogs are published.
+*   **Required**: `MONGODB_URI` must be set in **Vercel Project Settings → Environment Variables** (same value as `backend/.env`).
+
 ### System Architecture Page & SPA Routing Engine
 *   **Architecture Page**: An interactive, glassmorphic route (`/architecture`) served dynamically. It pulls the updated [`AGENTS.md`](file:///d:/Google%20Antigravity/portfolio/.agents/AGENTS.md) content via `GET /api/profile/architecture` and displays the system design, features, and file structure using the `<MarkdownRenderer />` component.
 *   **Footer Links**: Organized into a clean, space-saving **2-column responsive grid** in [`Footer.jsx`](file:///d:/Google%20Antigravity/portfolio/frontend/src/components/layout/Footer.jsx). The "Architecture" link is conditionally rendered so that it only appears in the portfolio section (main landing page) and is hidden when in the blog section.
@@ -298,5 +308,8 @@ Use these rules and guidelines when making future modifications or upgrades to t
 *   **Column Resizing & Full Width**: Admin workspace panels support dynamic resizer dragging handles via mouse event listeners (`sidebarWidth`, `rightPanelWidth`, `editorSplitRatio`). Toggle collapse controls allow complete hiding for a full-screen canvas. When active, page width scales to `w-full max-w-none` to maximize interface space.
 *   **Client WebP Conversion**: Images are pre-processed, converted to WebP, and compressed to 80% quality via browser HTML5 Canvas before uploading to Cloudinary, ensuring zero dependency on server-side binary image compiler tools (like `sharp`).
 *   **Dynamic Sitemap**: The public `/sitemap.xml` is served dynamically from the Express backend database query rather than a static file, reflecting changes to Published blogs instantly.
+*   **Live RSS Feed**: The `/api/rss` endpoint is a Vercel Serverless Function (`frontend/api/rss.js`) that queries MongoDB directly. Do NOT convert it back to a static file or a backend proxy. The `mongodb` package is an intentional dependency in `frontend/package.json` for this function only.
+*   **Vercel Environment Variables**: The Vercel project requires `MONGODB_URI` set under Project Settings → Environment Variables for the RSS serverless function to work in production.
+*   **Bundle Splitting**: `vite.config.js` uses `manualChunks` to split heavy vendor libraries (React, Framer Motion, GSAP, Lenis, Lucide, React Router) into separate cacheable chunks. Do NOT remove or simplify this configuration — it reduces repeat-visit download size by ~90%.
 *   **Desktop Layout Filter**: Complex editors and SEO publishers are restricted to desktop viewports (>= 1024px) with descriptive instructions displayed on smaller devices.
 *   **Bypass Smooth Scroll**: Smooth scroll managers (e.g. Lenis) must be bypassed on `/sicky-admin` routes to restore standard native mouse wheel scrolling in all sidebar, settings, and editor canvas sections.
