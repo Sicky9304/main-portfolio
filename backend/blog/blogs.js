@@ -53,7 +53,7 @@ router.get('/rss', async (req, res, next) => {
     <description>Latest engineering posts on Web Development, DevOps, and MERN stack architectures by Sicky Kumar.</description>
     <language>en-us</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
-    <atom:link href="https://www.sickykumar.in/api/blogs/rss" rel="self" type="application/rss+xml" />
+    <atom:link href="${req.protocol}://${req.get('host')}/api/blogs/rss" rel="self" type="application/rss+xml" />
     ${rssItems}
   </channel>
 </rss>`;
