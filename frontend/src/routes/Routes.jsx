@@ -22,6 +22,7 @@ const BlogDetailsPage = lazy(() => import('../pages/blog/BlogDetailsPage').then(
 const ArchitecturePage = lazy(() => import('../pages/home/ArchitecturePage').then(m => ({ default: m.ArchitecturePage })));
 const AdminDashboard = lazy(() => import('../pages/blog/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
 import { LoadingScreen } from '../components/layout/LoadingScreen';
+import { ErrorPage } from '../pages/home/ErrorPage';
 
 // Wrapper component to render the global loader when route chunks are fetched
 const RouteSuspense = ({ children }) => (
@@ -53,6 +54,7 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <AppLayout />,
+    errorElement: <ErrorPage />,
     children: [
       // 1. Portfolio Section (Landing Homepage)
       {
