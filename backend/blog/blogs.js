@@ -37,8 +37,8 @@ router.get('/rss', async (req, res, next) => {
       rssItems += `
     <item>
       <title><![CDATA[${blog.title}]]></title>
-      <link>${req.protocol}://${req.get('host')}/blog/${blog.slug}</link>
-      <guid isPermaLink="true">${req.protocol}://${req.get('host')}/blog/${blog.slug}</guid>
+      <link>https://www.sickykumar.in/blog/${blog.slug}</link>
+      <guid isPermaLink="true">https://www.sickykumar.in/blog/${blog.slug}</guid>
       <description><![CDATA[${blog.description}]]></description>
       <category><![CDATA[${blog.category}]]></category>
       <pubDate>${new Date(blog.createdAt).toUTCString()}</pubDate>
@@ -49,11 +49,11 @@ router.get('/rss', async (req, res, next) => {
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Sicky Kumar | SaaS Engineering Blog</title>
-    <link>${req.protocol}://${req.get('host')}/blog</link>
+    <link>https://www.sickykumar.in/blog</link>
     <description>Latest engineering posts on Web Development, DevOps, and MERN stack architectures by Sicky Kumar.</description>
     <language>en-us</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
-    <atom:link href="${req.protocol}://${req.get('host')}/api/blogs/rss" rel="self" type="application/rss+xml" />
+    <atom:link href="https://www.sickykumar.in/api/blogs/rss" rel="self" type="application/rss+xml" />
     ${rssItems}
   </channel>
 </rss>`;
