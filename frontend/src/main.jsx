@@ -5,8 +5,7 @@ import App from './App.jsx';
 import { initAnalytics } from './lib/analytics.js';
 import { initClarity } from './lib/clarity.js';
 import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from "@vercel/speed-insights/next"
-
+import { SpeedInsights } from "@vercel/speed-insights/react"
 // Patch history methods to dispatch custom events for reliable SPA routing
 const patchHistory = (type) => {
   const original = window.history[type];
