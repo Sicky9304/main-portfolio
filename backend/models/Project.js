@@ -68,6 +68,22 @@ const projectSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    challenges: {
+      type: String,
+      default: '',
+    },
+    architecture: {
+      type: String,
+      default: '',
+    },
+    results: {
+      type: String,
+      default: '',
+    },
+    codeSnippet: {
+      type: String,
+      default: '',
+    },
   },
   {
     timestamps: true,

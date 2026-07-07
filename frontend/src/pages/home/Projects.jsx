@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ExternalLink, ChevronRight, X, Layers, Zap, Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Github } from '../../components/ui/BrandIcons';
 import { RevealOnScroll, SectionHeading } from '../../components/ui/Animations';
 import { useApi } from '../../hooks/useApi';
@@ -140,9 +141,9 @@ const FALLBACK_PROJECTS = [
 ];
 
 export const Projects = () => {
+  const navigate = useNavigate();
   const { data: projectsData, error } = useApi(fetchProjects, FALLBACK_PROJECTS);
   const projects = Array.isArray(projectsData) && projectsData.length > 0 ? projectsData : FALLBACK_PROJECTS;
-  const [selectedProject, setSelectedProject] = useState(null);
 
   // AI Project Recommendation states & query handler
   const [aiPrompt, setAiPrompt] = useState('');
@@ -176,21 +177,6 @@ export const Projects = () => {
       setIsAiLoading(false);
     }
   };
-
-  // Close modal on Escape key
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') setSelectedProject(null);
-    };
-    if (selectedProject) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
-    };
-  }, [selectedProject]);
 
   return (
     <section id="projects" className="section-padding relative">
@@ -302,12 +288,10 @@ export const Projects = () => {
                     <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-10 dark:opacity-20`} />
 
                     {/* Thumbnail — click opens demo directly */}
-                    <a
-                      href={project.demo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute inset-0 block"
-                      aria-label={`Open ${project.title} demo`}
+                    <button
+                      onClick={() => navigate(`/projects/${project.slug}`)}
+                      className="absolute inset-0 block w-full h-full cursor-pointer text-left"
+                      aria-label={`Open ${project.title} case study`}
                     >
                       {project.thumbnail ? (
                         <img
@@ -358,7 +342,7 @@ export const Projects = () => {
                           </div>
                         </div>
                       )}
-                    </a>
+                    </button>
 
                     {/* Hover Overlay with 3D Depth Lift */}
                     <div 
@@ -376,7 +360,7 @@ export const Projects = () => {
                           <Github size={14} /> Source Code
                         </a>
                         <button
-                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSelectedProject(project); }}
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/projects/${project.slug}`); }}
                           className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary-dark transition-colors cursor-pointer"
                         >
                           <Eye size={14} /> Case Study
@@ -426,7 +410,7 @@ export const Projects = () => {
                         <Github size={16} /> View Code
                       </a>
                       <button
-                        onClick={() => setSelectedProject(project)}
+                        onClick={() => navigate(`/projects/${project.slug}`)}
                         className="flex items-center gap-2 text-sm font-semibold text-primary dark:text-primary-light hover:gap-3 transition-all cursor-pointer"
                       >
                         Learn More <ChevronRight size={16} />
@@ -439,112 +423,6 @@ export const Projects = () => {
           })}
         </div>
       </div>
-
-      {/* ===== Case Study Modal ===== */}
-      <AnimatePresence>
-        {selectedProject && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end sm:items-start justify-center sm:pt-20 sm:px-4 sm:pb-4 bg-black/60 backdrop-blur-sm"
-            style={{ touchAction: 'none' }}
-            onClick={() => setSelectedProject(null)}
-            role="dialog"
-            aria-modal="true"
-            aria-label={`${selectedProject.title} case study`}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 40 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 40 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="w-full sm:max-w-lg bg-white dark:bg-slate-900 sm:rounded-2xl rounded-t-[28px] shadow-2xl overflow-hidden flex flex-col"
-              style={{ maxHeight: '90dvh' }}
-              onClick={(e) => e.stopPropagation()}
-              onTouchMove={(e) => e.stopPropagation()}
-            >
-              {/* Drag handle (mobile) */}
-              <div className="flex justify-center pt-3 pb-1 sm:hidden flex-shrink-0">
-                <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
-              </div>
-
-              {/* Scrollable content */}
-              <div className="overflow-y-auto flex-1 overscroll-contain">
-                {/* Header */}
-                <div className={`px-5 py-6 sm:p-8 bg-gradient-to-r ${selectedProject.color} text-white relative`}>
-                  <button
-                    onClick={() => setSelectedProject(null)}
-                    className="absolute top-4 right-4 p-2 rounded-xl bg-white/20 hover:bg-white/30 transition-colors cursor-pointer"
-                    aria-label="Close case study"
-                  >
-                    <X size={16} />
-                  </button>
-                  <span className="text-3xl sm:text-4xl mb-3 block">{selectedProject.emoji}</span>
-                  <h3 className="text-xl sm:text-2xl font-bold" style={{ fontFamily: 'Satoshi, sans-serif' }}>
-                    {selectedProject.title}
-                  </h3>
-                  <p className="text-white/80 text-xs sm:text-sm mt-2">{selectedProject.tagline}</p>
-                </div>
-
-                {/* Body */}
-                <div className="px-5 py-5 sm:p-8 space-y-5">
-                  <div>
-                    <div className="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-white mb-2">
-                      <Zap size={14} className="text-primary" /> Problem
-                    </div>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                      {selectedProject.problem}
-                    </p>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-white mb-3">
-                      <Layers size={14} className="text-primary" /> Key Features
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {(selectedProject.features || []).map((f) => (
-                        <div key={f} className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
-                          <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                          {f}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    {(selectedProject.tech || []).map((t) => (
-                      <span key={t} className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-primary/5 dark:bg-primary/10 text-primary dark:text-primary-light">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* CTA Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                    <a
-                      href={selectedProject.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-primary/30 transition-colors"
-                    >
-                      <Github size={16} /> Source Code
-                    </a>
-                    <a
-                      href={selectedProject.demo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg hover:shadow-primary/20 transition-all"
-                    >
-                      <ExternalLink size={16} /> Explore Now
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </section>
   );
 };

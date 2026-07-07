@@ -267,6 +267,55 @@ export const ProjectFormModal = ({
                   placeholder="Or enter custom image URL directly"
                 />
               </div>
+              
+              {/* Case Study Details */}
+              <div className="border-t border-slate-800 pt-4 space-y-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-primary font-heading">Case Study Content (Markdown Supported)</h4>
+                
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1.5 pl-0.5">Technical Challenges & Solutions</label>
+                  <textarea 
+                    rows={4}
+                    value={projectForm.challenges || ''}
+                    onChange={(e) => setProjectForm(prev => ({ ...prev, challenges: e.target.value }))}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary/50 focus:outline-none text-xs text-white font-mono"
+                    placeholder="Describe challenges faced and solutions used..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1.5 pl-0.5">System Architecture Flow</label>
+                  <textarea 
+                    rows={4}
+                    value={projectForm.architecture || ''}
+                    onChange={(e) => setProjectForm(prev => ({ ...prev, architecture: e.target.value }))}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary/50 focus:outline-none text-xs text-white font-mono"
+                    placeholder="Explain system design details or Mermaid flowchart..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1.5 pl-0.5">Core Code Snippet</label>
+                  <textarea 
+                    rows={4}
+                    value={projectForm.codeSnippet || ''}
+                    onChange={(e) => setProjectForm(prev => ({ ...prev, codeSnippet: e.target.value }))}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary/50 focus:outline-none text-xs text-white font-mono"
+                    placeholder="Show key implementation code snippet..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1.5 pl-0.5">Key Results / Metrics</label>
+                  <textarea 
+                    rows={3}
+                    value={projectForm.results || ''}
+                    onChange={(e) => setProjectForm(prev => ({ ...prev, results: e.target.value }))}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary/50 focus:outline-none text-xs text-white font-mono"
+                    placeholder="Detail speed improvements, responsiveness, user metrics..."
+                  />
+                </div>
+              </div>
 
               <div className="h-2"></div>
             </form>

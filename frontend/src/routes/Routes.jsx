@@ -21,6 +21,7 @@ const BlogPage = lazy(() => import('../pages/blog/BlogPage').then(m => ({ defaul
 const BlogDetailsPage = lazy(() => import('../pages/blog/BlogDetailsPage').then(m => ({ default: m.BlogDetailsPage })));
 const ArchitecturePage = lazy(() => import('../pages/home/ArchitecturePage').then(m => ({ default: m.ArchitecturePage })));
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const ProjectDetailsPage = lazy(() => import('../pages/project/ProjectDetailsPage').then(m => ({ default: m.ProjectDetailsPage })));
 import { LoadingScreen } from '../components/layout/LoadingScreen';
 import { ErrorPage } from '../pages/home/ErrorPage';
 
@@ -94,6 +95,15 @@ export const router = createBrowserRouter([
         element: (
           <RouteSuspense>
             <AdminDashboard />
+          </RouteSuspense>
+        )
+      },
+      // 6. Project Details Case Study Route
+      {
+        path: 'projects/:slug',
+        element: (
+          <RouteSuspense>
+            <ProjectDetailsPage />
           </RouteSuspense>
         )
       }

@@ -300,11 +300,15 @@ export const AdminDashboard = () => {
       github: '',
       demo: '',
       color: 'from-primary to-secondary',
-      emoji: 'ðŸš€',
+      emoji: '🚀',
       status: 'Completed',
       order: projects.length,
       thumbnail: '',
-      featured: true
+      featured: true,
+      challenges: '',
+      architecture: '',
+      results: '',
+      codeSnippet: ''
     });
     setShowForm(true);
   };
@@ -323,11 +327,15 @@ export const AdminDashboard = () => {
       github: proj.github || '',
       demo: proj.demo || '',
       color: proj.color || 'from-primary to-secondary',
-      emoji: proj.emoji || 'ðŸš€',
+      emoji: proj.emoji || '🚀',
       status: proj.status || 'Completed',
       order: proj.order || 0,
       thumbnail: proj.thumbnail || '',
-      featured: proj.featured !== undefined ? proj.featured : true
+      featured: proj.featured !== undefined ? proj.featured : true,
+      challenges: proj.challenges || '',
+      architecture: proj.architecture || '',
+      results: proj.results || '',
+      codeSnippet: proj.codeSnippet || ''
     });
     setShowForm(true);
   };
