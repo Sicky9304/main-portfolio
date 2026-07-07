@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, RefreshCw } from 'lucide-react';
 import { fetchBlog } from '../../api/index.js';
 import { BlogHeaderHub } from './blogUI/BlogHeaderHub';
@@ -8,6 +8,7 @@ import { BlogAiChatCompanion } from './blogUI/BlogAiChatCompanion';
 
 export const BlogDetailsPage = ({ slug: propSlug }) => {
   const { slug: routeSlug } = useParams();
+  const navigate = useNavigate();
   const slug = propSlug || routeSlug;
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -141,9 +142,7 @@ export const BlogDetailsPage = ({ slug: propSlug }) => {
   }, [blog]);
 
   const handleBack = () => {
-    window.history.pushState({}, '', '/blog');
-    const navEvent = new PopStateEvent('popstate');
-    window.dispatchEvent(navEvent);
+    navigate('/blog');
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 

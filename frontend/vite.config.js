@@ -21,6 +21,11 @@ export default defineConfig({
 
     rollupOptions: {
       output: {
+        minify: {
+          compress: {
+            dropConsole: true,
+          },
+        },
         // Split vendor libraries into focused, cacheable chunks
         manualChunks(id) {
           // React core — tiny, rarely changes, always cached
@@ -38,10 +43,6 @@ export default defineConfig({
             return 'framer-motion';
           }
 
-          // GSAP — large animation library
-          if (id.includes('node_modules/gsap')) {
-            return 'gsap';
-          }
 
           // Lenis smooth scroll
           if (id.includes('node_modules/lenis') || id.includes('node_modules/@studio-freight')) {
@@ -53,26 +54,6 @@ export default defineConfig({
             return 'lucide';
           }
 
-          // Markdown rendering (marked, highlight, etc.)
-          if (
-            id.includes('node_modules/marked') ||
-            id.includes('node_modules/highlight.js') ||
-            id.includes('node_modules/@uiw/react-md-editor') ||
-            id.includes('node_modules/react-markdown') ||
-            id.includes('node_modules/remark') ||
-            id.includes('node_modules/rehype')
-          ) {
-            return 'markdown';
-          }
-
-          // Code editor (CodeMirror / Monaco)
-          if (
-            id.includes('node_modules/@codemirror') ||
-            id.includes('node_modules/codemirror') ||
-            id.includes('node_modules/@monaco-editor')
-          ) {
-            return 'editor';
-          }
 
           // Everything else in node_modules → generic vendor chunk
           if (id.includes('node_modules')) {

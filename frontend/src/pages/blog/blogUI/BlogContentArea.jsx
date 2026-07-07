@@ -1,14 +1,13 @@
-
+import { useNavigate } from 'react-router-dom';
 import { Link2, Linkedin, Twitter, Star, ArrowLeft, ArrowRight } from 'lucide-react';
 import { MarkdownRenderer } from '../../../components/ai/MarkdownRenderer';
 
 export const BlogContentArea = ({ blog, handleShare, copied }) => {
+  const navigate = useNavigate();
   if (!blog) return null;
 
   const navigateToBlog = (slug) => {
-    window.history.pushState({}, '', `/blog/${slug}`);
-    const navEvent = new PopStateEvent('popstate');
-    window.dispatchEvent(navEvent);
+    navigate(`/blog/${slug}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

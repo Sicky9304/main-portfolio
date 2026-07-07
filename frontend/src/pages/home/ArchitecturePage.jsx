@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, Cpu, Layers, Terminal } from 'lucide-react';
 import { fetchArchitecture } from '../../api/index.js';
 import { MarkdownRenderer } from '../../components/ai/MarkdownRenderer';
@@ -6,6 +7,8 @@ import { MarkdownRenderer } from '../../components/ai/MarkdownRenderer';
 export const ArchitecturePage = () => {
   const [markdown, setMarkdown] = useState('');
   const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadArchitecture = async () => {
@@ -23,9 +26,7 @@ export const ArchitecturePage = () => {
   }, []);
 
   const handleBack = () => {
-    window.history.pushState({}, '', '/');
-    const navEvent = new PopStateEvent('popstate');
-    window.dispatchEvent(navEvent);
+    navigate('/');
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 

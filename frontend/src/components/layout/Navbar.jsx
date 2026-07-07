@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Moon, Sun, Menu, X, FileText, Download, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 
 const NAV_LINKS = [
@@ -14,6 +15,7 @@ const NAV_LINKS = [
 
 export const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
   const [menuOpen, setMenuOpen] = useState(false);
@@ -66,11 +68,9 @@ export const Navbar = () => {
     
     // Update hash in browser address bar immediately
     const targetHash = sectionId === 'hero' ? '/' : `/#${sectionId}`;
-    window.history.pushState({}, '', targetHash);
     
     if (window.location.pathname !== '/' && window.location.pathname !== '') {
-      const navEvent = new PopStateEvent('popstate');
-      window.dispatchEvent(navEvent);
+      navigate(targetHash);
       
       // Give a tiny timeout for home page to mount, then scroll
       setTimeout(() => {
@@ -82,6 +82,7 @@ export const Navbar = () => {
         }
       }, 150);
     } else {
+      navigate(targetHash);
       const el = document.getElementById(sectionId);
       if (el) {
         const offset = 100;
@@ -95,9 +96,7 @@ export const Navbar = () => {
     if (href === '/blog') {
       e.preventDefault();
       setMenuOpen(false);
-      window.history.pushState({}, '', '/blog');
-      const navEvent = new PopStateEvent('popstate');
-      window.dispatchEvent(navEvent);
+      navigate('/blog');
     } else {
       scrollToSection(e, href);
     }

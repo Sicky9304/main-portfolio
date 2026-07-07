@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { 
   fetchAdminBlogs, createBlog, updateBlog, deleteBlog, uploadImage, generateBlogContent 
 } from '../../../api/index.js';
+import { compressToWebP } from '../../../lib/imageCompressor.js';
 import { 
   DEFAULT_CATEGORIES, DEFAULT_TAGS, DEFAULT_MEDIA_ITEMS, INITIAL_BLOG_FORM 
 } from '../components/editorDefaults';
@@ -332,21 +333,19 @@ export const useBlogWorkspace = (token) => {
   const handleMediaUpload = async (e) => {
     if (e.target.files && e.target.files[0]) {
       setLoading(true);
-      const reader = new FileReader();
-      reader.readAsDataURL(e.target.files[0]);
-      reader.onload = async () => {
-        try {
-          const res = await uploadImage(reader.result, token);
-          if (res.success) {
-            const newItem = { url: res.url, name: e.target.files[0].name, date: '2026-07-05', size: '80 KB', category: 'Uploads' };
-            setMediaItems(prev => [newItem, ...prev]);
-          }
-        } catch (err) {
-          alert('Upload failed.');
-        } finally {
-          setLoading(false);
+      try {
+        const file = e.target.files[0];
+        const compressedBase64 = await compressToWebP(file);
+        const res = await uploadImage(compressedBase64, token);
+        if (res.success) {
+          const newItem = { url: res.url, name: file.name, date: new Date().toISOString().split('T')[0], size: 'Compressed WebP', category: 'Uploads' };
+          setMediaItems(prev => [newItem, ...prev]);
         }
-      };
+      } catch (err) {
+        alert('Upload failed.');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 

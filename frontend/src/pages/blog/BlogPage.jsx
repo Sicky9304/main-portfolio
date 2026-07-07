@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight, Rss, Terminal, Database, Zap, Brain,
@@ -11,6 +12,7 @@ import { TiltCard } from '../../components/ui/TiltCard';
 export const BlogPage = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadBlogs = async () => {
@@ -44,9 +46,7 @@ export const BlogPage = () => {
   const gridBlogs = blogs.filter(b => b.slug !== (featuredBlog?.slug || ''));
 
   const navigateToBlogDetails = (slug) => {
-    window.history.pushState({}, '', `/blog/${slug}`);
-    const navEvent = new PopStateEvent('popstate');
-    window.dispatchEvent(navEvent);
+    navigate(`/blog/${slug}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

@@ -19,9 +19,18 @@ const patchHistory = (type) => {
 window.history.pushState = patchHistory('pushState');
 window.history.replaceState = patchHistory('replaceState');
 
-// Initialize analytics and tracking (Production Only)
-initAnalytics();
-initClarity();
+// Helper to defer initialization until the main thread is idle
+const deferInit = (fn) => {
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(() => fn());
+  } else {
+    setTimeout(fn, 1500);
+  }
+};
+
+// Initialize analytics and tracking when idle (Production Only)
+deferInit(initAnalytics);
+deferInit(initClarity);
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { ArrowUp, Code2, Mail, Heart } from 'lucide-react';
 import { Github, Linkedin, Whatsapp, Telegram } from '../ui/BrandIcons';
 import { RevealOnScroll } from '../ui/Animations';
 
 export const Footer = () => {
+  const navigate = useNavigate();
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
 
   useEffect(() => {
@@ -49,18 +51,14 @@ export const Footer = () => {
   const scrollToSection = (e, href) => {
     e.preventDefault();
     if (href.startsWith('/')) {
-      window.history.pushState({}, '', href);
-      const navEvent = new PopStateEvent('popstate');
-      window.dispatchEvent(navEvent);
+      navigate(href);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       const sectionId = href.replace('#', '');
       const targetHash = sectionId === 'hero' ? '/' : `/#${sectionId}`;
-      window.history.pushState({}, '', targetHash);
 
       if (window.location.pathname !== '/' && window.location.pathname !== '') {
-        const navEvent = new PopStateEvent('popstate');
-        window.dispatchEvent(navEvent);
+        navigate(targetHash);
         setTimeout(() => {
           const el = document.getElementById(sectionId);
           if (el) {
@@ -69,6 +67,7 @@ export const Footer = () => {
           }
         }, 150);
       } else {
+        navigate(targetHash);
         const el = document.getElementById(sectionId);
         if (el) {
           const top = el.getBoundingClientRect().top + window.scrollY - 100;

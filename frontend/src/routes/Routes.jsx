@@ -20,7 +20,7 @@ const Contact = lazy(() => import('../pages/home/Contact').then(m => ({ default:
 const BlogPage = lazy(() => import('../pages/blog/BlogPage').then(m => ({ default: m.BlogPage })));
 const BlogDetailsPage = lazy(() => import('../pages/blog/BlogDetailsPage').then(m => ({ default: m.BlogDetailsPage })));
 const ArchitecturePage = lazy(() => import('../pages/home/ArchitecturePage').then(m => ({ default: m.ArchitecturePage })));
-const AdminDashboard = lazy(() => import('../pages/blog/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
 import { LoadingScreen } from '../components/layout/LoadingScreen';
 import { ErrorPage } from '../pages/home/ErrorPage';
 

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, X, Terminal, Sun, Moon, Sparkles, 
@@ -8,6 +9,7 @@ import {
 import { useTheme, gradientThemes } from '../../context/ThemeContext';
 
 export const CommandPalette = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -128,16 +130,13 @@ export const CommandPalette = () => {
   const navigateTo = (href) => {
     setIsOpen(false);
     if (href.startsWith('/')) {
-      window.history.pushState({}, '', href);
-      const navEvent = new PopStateEvent('popstate');
-      window.dispatchEvent(navEvent);
+      navigate(href);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       const sectionId = href.replace('#', '');
+      const targetHash = sectionId === 'hero' ? '/' : `/#${sectionId}`;
       if (window.location.pathname !== '/' && window.location.pathname !== '') {
-        window.history.pushState({}, '', `/#${sectionId}`);
-        const navEvent = new PopStateEvent('popstate');
-        window.dispatchEvent(navEvent);
+        navigate(targetHash);
         setTimeout(() => {
           const el = document.getElementById(sectionId);
           if (el) {
@@ -146,6 +145,7 @@ export const CommandPalette = () => {
           }
         }, 150);
       } else {
+        navigate(targetHash);
         const el = document.getElementById(sectionId);
         if (el) {
           const top = el.getBoundingClientRect().top + window.scrollY - 100;
