@@ -55,7 +55,7 @@ const FALLBACK_PROJECTS = [
     color: 'from-violet-500 to-pink-500',
     emoji: '🎵',
     status: 'Completed',
-    thumbnail: null,
+    thumbnail: '/images/blogs/music_player.webp',
   },
   {
     _id: 'elearning',
