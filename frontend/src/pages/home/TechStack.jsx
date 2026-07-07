@@ -15,6 +15,7 @@ const CATEGORIES = [
       { name: 'JavaScript (ES6+)', level: 88 },
       { name: 'Tailwind CSS', level: 85 },
       { name: 'Framer Motion', level: 75 },
+      { name: 'Vite', level: 80 },
       { name: 'Axios', level: 80 },
       { name: 'TanStack Query', level: 70 },
     ],
@@ -54,6 +55,7 @@ const CATEGORIES = [
     borderColor: 'hover:border-pink/20',
     skills: [
       { name: 'Git & GitHub', level: 90 },
+      { name: 'Electron.js', level: 75 },
       { name: 'Postman', level: 85 },
       { name: 'VS Code', level: 95 },
       { name: 'Google Stitch', level: 80 },
