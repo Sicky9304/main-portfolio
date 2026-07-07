@@ -5,6 +5,7 @@ import Project from '../models/Project.js';
 import Service from '../models/Service.js';
 import Testimonial from '../models/Testimonial.js';
 import Profile from '../models/Profile.js';
+import TechStack from '../models/TechStack.js';
 import Blog from '../blog/Blog.js';
 
 // ─── Seed Data ────────────────────────────────────
@@ -823,7 +824,94 @@ const seed = async () => {
       console.log(`  ⏭️  Testimonials already exist (${existingTestimonials} found), skipping`);
     }
 
-    // Profile — upsert (create if not exists)
+    // TechStack — separate collection, always upsert
+    const TECH_CATEGORIES = [
+      {
+        id: 'frontend',
+        label: 'Frontend',
+        emoji: '🎨',
+        color: 'from-primary/10 to-accent/10',
+        borderColor: 'hover:border-primary/20',
+        skills: [
+          { name: 'React.js', level: 90 },
+          { name: 'HTML5 / CSS3', level: 95 },
+          { name: 'JavaScript (ES6+)', level: 88 },
+          { name: 'Tailwind CSS', level: 85 },
+          { name: 'Framer Motion', level: 75 },
+          { name: 'Vite', level: 80 },
+          { name: 'Axios', level: 80 },
+          { name: 'TanStack Query', level: 70 },
+        ],
+      },
+      {
+        id: 'backend',
+        label: 'Backend',
+        emoji: '⚙️',
+        color: 'from-accent/10 to-primary/10',
+        borderColor: 'hover:border-accent/20',
+        skills: [
+          { name: 'Node.js', level: 85 },
+          { name: 'Express.js', level: 85 },
+          { name: 'REST APIs', level: 90 },
+          { name: 'Prisma ORM', level: 70 },
+          { name: 'Authentication', level: 75 },
+        ],
+      },
+      {
+        id: 'database',
+        label: 'Database',
+        emoji: '🗄️',
+        color: 'from-emerald-500/10 to-accent/10',
+        borderColor: 'hover:border-emerald-500/20',
+        skills: [
+          { name: 'MongoDB', level: 82 },
+          { name: 'PostgreSQL', level: 78 },
+          { name: 'MySQL', level: 75 },
+          { name: 'Oracle', level: 60 },
+        ],
+      },
+      {
+        id: 'tools',
+        label: 'Tools & DevOps',
+        emoji: '🛠️',
+        color: 'from-pink/10 to-primary/10',
+        borderColor: 'hover:border-pink/20',
+        skills: [
+          { name: 'Git & GitHub', level: 90 },
+          { name: 'Electron.js', level: 75 },
+          { name: 'Postman', level: 85 },
+          { name: 'VS Code', level: 95 },
+          { name: 'Google Stitch', level: 80 },
+          { name: 'Google Flow', level: 85 },
+          { name: 'AWS', level: 55 },
+          { name: 'Vercel', level: 85 },
+          { name: 'Netlify', level: 80 },
+          { name: 'Render', level: 70 },
+        ],
+      },
+      {
+        id: 'languages',
+        label: 'Languages',
+        emoji: '💻',
+        color: 'from-secondary/10 to-pink/10',
+        borderColor: 'hover:border-secondary/20',
+        skills: [
+          { name: 'JavaScript', level: 88 },
+          { name: 'Java', level: 72 },
+          { name: 'Python', level: 70 },
+          { name: 'C', level: 65 },
+        ],
+      },
+    ];
+
+    await TechStack.findOneAndUpdate(
+      {},
+      { $set: { categories: TECH_CATEGORIES } },
+      { upsert: true, new: true }
+    );
+    console.log('  ✅ TechStack collection seeded/updated');
+
+    // Profile — upsert (create if not exists, no techStack here anymore)
     const existingProfile = await Profile.findOne();
     if (!existingProfile) {
       await Profile.create({});
@@ -831,7 +919,6 @@ const seed = async () => {
     } else {
       console.log('  ⏭️  Profile already exists, skipping');
     }
-
     console.log('\n✅ Seed complete!\n');
     process.exit(0);
   } catch (error) {

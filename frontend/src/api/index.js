@@ -61,6 +61,12 @@ async function request(endpoint, options={}){
 export const fetchProjects=()=>request("/projects?featured=true").then(r=>r.data);
 export const fetchProject=(slug)=>request(`/projects/${slug}`).then(r=>r.data);
 export const fetchProfile=()=>request("/profile").then(r=>r.data);
+export const fetchTechStack=()=>request("/techstack").then(r=>r.data ?? []);
+export const updateTechStack=(categories,token)=>request("/techstack",{
+ method:"PUT",
+ headers:{"x-admin-token":token},
+ body:JSON.stringify({categories})
+});
 export const fetchServices=()=>request("/services").then(r=>r.data);
 export const fetchTestimonials=()=>request("/testimonials").then(r=>r.data);
 

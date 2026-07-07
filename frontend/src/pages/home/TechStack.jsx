@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RevealOnScroll, SectionHeading } from '../../components/ui/Animations';
+import { useApi } from '../../hooks/useApi';
+import { fetchTechStack } from '../../api/index.js';
 
-const CATEGORIES = [
+// ── Fallback data (used when backend returns empty or is unavailable) ──
+const FALLBACK_CATEGORIES = [
   {
     id: 'frontend',
     label: 'Frontend',
@@ -82,8 +85,17 @@ const CATEGORIES = [
 ];
 
 export const TechStack = () => {
+  const { data: apiCategories } = useApi(fetchTechStack, []);
+
+  // Use backend data if non-empty, else use fallback
+  const CATEGORIES = Array.isArray(apiCategories) && apiCategories.length > 0
+    ? apiCategories
+    : FALLBACK_CATEGORIES;
+
   const [activeCategory, setActiveCategory] = useState('frontend');
-  const activeCat = CATEGORIES.find((c) => c.id === activeCategory);
+
+  // Ensure activeCategory is valid after data loads
+  const activeCat = CATEGORIES.find((c) => c.id === activeCategory) || CATEGORIES[0];
 
   return (
     <section id="skills" className="section-padding relative">
@@ -124,7 +136,7 @@ export const TechStack = () => {
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
           >
-            {activeCat.skills.map((skill, index) => (
+            {(activeCat?.skills || []).map((skill, index) => (
               <motion.div
                 key={skill.name}
                 initial={{ opacity: 0, y: 20 }}

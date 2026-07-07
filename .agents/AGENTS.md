@@ -48,6 +48,7 @@ portfolio/
 │   │   ├── Profile.js             # User Profile schema (CGPA, education, etc.)
 │   │   ├── Project.js             # Project schema
 │   │   ├── Service.js             # Service schema
+│   │   ├── TechStack.js           # Tech Stack categories schema (new standalone model)
 │   │   └── Testimonial.js         # Testimonial schema
 │   ├── routes/
 │   │   ├── ai.js                  # Gemini AI Chatbot, Translate, and Ghostwriter endpoints
@@ -55,6 +56,7 @@ portfolio/
 │   │   ├── profile.js             # Profile fetch & update endpoints
 │   │   ├── projects.js            # Projects REST endpoints
 │   │   ├── services.js            # Services REST endpoints
+│   │   ├── techstack.js           # TechStack CRUD endpoints (/api/techstack)
 │   │   ├── testimonials.js        # Testimonials REST endpoints
 │   │   └── upload.js              # Media upload helper (Cloudinary integration)
 │   ├── seed/
@@ -282,9 +284,9 @@ Ensure you have **Node.js (v18+)** and **npm** or **bun** installed on your syst
 
 ## 🔄 Data Synchronization Pattern
 When updating projects, blogs, or profile information, ensure synchronization across the following layers:
-1.  **Frontend Static Fallbacks**: Update default states in React components (e.g., `FALLBACK_PROJECTS` inside [`Projects.jsx`](file:///d:/Google%20Antigravity/portfolio/frontend/src/sections/Projects.jsx)).
-2.  **Database Seeds**: Ensure [`seed.js`](file:///d:/Google%20Antigravity/portfolio/backend/seed/seed.js) in the backend matches the upgraded information.
-3.  **Active Database (MongoDB)**: Run a database query or script to sync modifications directly with the live database collections.
+1.  **Frontend Static Fallbacks**: Update default states in React components (e.g., `FALLBACK_PROJECTS` inside [`Projects.jsx`](file:///d:/Google%20Antigravity/portfolio/frontend/src/sections/Projects.jsx) and `FALLBACK_CATEGORIES` in [`TechStack.jsx`](file:///d:/Google%20Antigravity/portfolio/frontend/src/pages/home/TechStack.jsx)).
+2.  **Database Seeds**: Ensure [`seed.js`](file:///d:/Google%20Antigravity/portfolio/backend/seed/seed.js) in the backend matches the upgraded information (specifically the standalone `TechStack` collection).
+3.  **Active Database (MongoDB)**: Run a database query or script to sync modifications directly with the live database collections (e.g. `techstacks` for categories and skills).
 
 ---
 

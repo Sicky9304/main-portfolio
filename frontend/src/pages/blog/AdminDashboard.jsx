@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Lock, ArrowLeft, Upload, FileText, Plus, Trash2, 
@@ -8,7 +8,8 @@ import { Github } from '../../components/ui/BrandIcons';
 import { useTheme } from '../../context/ThemeContext';
 import { 
   createProject, updateProject, deleteProject, 
-  updateProfile, uploadImage, fetchProjects, fetchProfile 
+  updateProfile, uploadImage, fetchProjects, fetchProfile,
+  fetchTechStack, updateTechStack
 } from '../../api/index.js';
 import { AdminBlogTab } from './AdminBlogTab';
 
@@ -23,7 +24,23 @@ export const AdminDashboard = () => {
   const [projects, setProjects] = useState([]);
   const [profile, setProfile] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [activeTab, setActiveTab] = useState('projects'); // 'projects' or 'blogs'
+  const [activeTab, setActiveTab] = useState('projects'); // 'projects', 'blogs', or 'techskills'
+
+  // Tech Skills states
+  const [techStack, setTechStack] = useState([]);
+  const [techSaving, setTechSaving] = useState(false);
+  const [techSaveMsg, setTechSaveMsg] = useState('');
+  const [newSkillCategory, setNewSkillCategory] = useState('frontend');
+  const [newSkillName, setNewSkillName] = useState('');
+  const [newSkillLevel, setNewSkillLevel] = useState(75);
+
+  const CATEGORY_DEFAULTS = [
+    { id: 'frontend', label: 'Frontend', emoji: 'ðŸŽ¨', color: 'from-primary/10 to-accent/10', borderColor: 'hover:border-primary/20' },
+    { id: 'backend', label: 'Backend', emoji: 'âš™ï¸', color: 'from-accent/10 to-primary/10', borderColor: 'hover:border-accent/20' },
+    { id: 'database', label: 'Database', emoji: 'ðŸ—„ï¸', color: 'from-emerald-500/10 to-accent/10', borderColor: 'hover:border-emerald-500/20' },
+    { id: 'tools', label: 'Tools & DevOps', emoji: 'ðŸ› ï¸', color: 'from-pink/10 to-primary/10', borderColor: 'hover:border-pink/20' },
+    { id: 'languages', label: 'Languages', emoji: 'ðŸ’»', color: 'from-secondary/10 to-pink/10', borderColor: 'hover:border-secondary/20' },
+  ];
   
   // Resume upload states
   const [resumeFile, setResumeFile] = useState(null);
@@ -45,7 +62,7 @@ export const AdminDashboard = () => {
     github: '',
     demo: '',
     color: 'from-primary to-secondary',
-    emoji: '🚀',
+    emoji: 'ðŸš€',
     status: 'Completed',
     order: 0,
     thumbnail: '',
@@ -103,6 +120,12 @@ export const AdminDashboard = () => {
           
           const prof = await fetchProfile();
           setProfile(prof);
+
+          // Load techStack
+          const ts = await fetchTechStack();
+          if (Array.isArray(ts) && ts.length > 0) {
+            setTechStack(ts);
+          }
         } catch (err) {
           console.error("Failed to load dashboard data", err);
         }
@@ -277,7 +300,7 @@ export const AdminDashboard = () => {
       github: '',
       demo: '',
       color: 'from-primary to-secondary',
-      emoji: '🚀',
+      emoji: 'ðŸš€',
       status: 'Completed',
       order: projects.length,
       thumbnail: '',
@@ -300,7 +323,7 @@ export const AdminDashboard = () => {
       github: proj.github || '',
       demo: proj.demo || '',
       color: proj.color || 'from-primary to-secondary',
-      emoji: proj.emoji || '🚀',
+      emoji: proj.emoji || 'ðŸš€',
       status: proj.status || 'Completed',
       order: proj.order || 0,
       thumbnail: proj.thumbnail || '',
@@ -377,7 +400,7 @@ export const AdminDashboard = () => {
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-heading">
               Admin Portal
             </h2>
-            <p className="text-xs text-slate-555 dark:text-slate-400">Authorized Access Only • Secure Session Mode</p>
+            <p className="text-xs text-slate-555 dark:text-slate-400">Authorized Access Only â€¢ Secure Session Mode</p>
           </div>
 
           <form onSubmit={handleLoginSubmit} className="space-y-4 text-left">
@@ -387,7 +410,7 @@ export const AdminDashboard = () => {
               </label>
               <input
                 type="password"
-                placeholder="••••••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
                 disabled={loading}
@@ -396,7 +419,7 @@ export const AdminDashboard = () => {
             </div>
             {errorMsg && (
               <p className="text-xs font-semibold text-red-500 dark:text-red-400 text-center bg-red-500/10 dark:bg-red-950/20 py-2 rounded-lg border border-red-200 dark:border-red-900/30">
-                ⚠️ {errorMsg}
+                âš ï¸ {errorMsg}
               </p>
             )}
             
@@ -444,7 +467,7 @@ export const AdminDashboard = () => {
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-555 dark:bg-emerald-400 animate-pulse"></span>
                 Authorized Session Active
               </span>
-              <span className="text-slate-300 dark:text-slate-700 hidden xs:inline">•</span>
+              <span className="text-slate-300 dark:text-slate-700 hidden xs:inline">â€¢</span>
               <span className="bg-slate-100 dark:bg-slate-900/50 text-slate-650 dark:text-slate-400 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-800">
                 Secure Storage Mode
               </span>
@@ -476,7 +499,7 @@ export const AdminDashboard = () => {
                 : 'border-transparent text-slate-500 dark:text-slate-405'
             }`}
           >
-            📂 Project Manager
+            ðŸ“‚ Project Manager
           </button>
           <button
             onClick={() => setActiveTab('blogs')}
@@ -486,7 +509,17 @@ export const AdminDashboard = () => {
                 : 'border-transparent text-slate-500 dark:text-slate-405'
             }`}
           >
-            ✍️ Blog Manager
+            âœï¸ Blog Manager
+          </button>
+          <button
+            onClick={() => setActiveTab('techskills')}
+            className={`pb-4 text-xs sm:text-sm font-semibold tracking-wide transition-all border-b-2 hover:text-primary cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'techskills'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-slate-500 dark:text-slate-405'
+            }`}
+          >
+            ðŸ› ï¸ Tech Skills
           </button>
         </div>
 
@@ -525,7 +558,7 @@ export const AdminDashboard = () => {
 
                 {resumeError && (
                   <p className="text-xs text-red-555 dark:text-red-400 font-semibold bg-red-500/10 dark:bg-red-950/15 p-2 rounded-lg border border-red-200 dark:border-red-900/20 text-center">
-                    ⚠️ {resumeError}
+                    âš ï¸ {resumeError}
                   </p>
                 )}
                 
@@ -547,7 +580,7 @@ export const AdminDashboard = () => {
 
                 {resumeStatus === 'success' && (
                   <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center justify-center gap-1.5 bg-emerald-500/10 dark:bg-emerald-950/20 p-2.5 rounded-xl border border-emerald-250 dark:border-emerald-900/20">
-                    ✔️ Resume uploaded successfully!
+                    âœ”ï¸ Resume uploaded successfully!
                   </p>
                 )}
 
@@ -683,7 +716,7 @@ export const AdminDashboard = () => {
                               value={projectForm.emoji}
                               onChange={(e) => setProjectForm(prev => ({ ...prev, emoji: e.target.value }))}
                               className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 focus:outline-none text-sm text-center text-white transition-all duration-300"
-                              placeholder="🌱"
+                              placeholder="ðŸŒ±"
                             />
                           </div>
                           <div>
@@ -891,7 +924,7 @@ export const AdminDashboard = () => {
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <h2 className="text-base sm:text-lg font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 font-heading">
-                  📂 Manage Projects ({projects.length})
+                  ðŸ“‚ Manage Projects ({projects.length})
                 </h2>
                 <button 
                   onClick={openCreateForm}
@@ -914,7 +947,7 @@ export const AdminDashboard = () => {
                         {proj.thumbnail ? (
                           <img src={proj.thumbnail} alt={proj.title} className="w-full h-full object-cover" />
                         ) : (
-                          <span className="text-lg">{proj.emoji || '🚀'}</span>
+                          <span className="text-lg">{proj.emoji || 'ðŸš€'}</span>
                         )}
                       </div>
 
@@ -979,9 +1012,181 @@ export const AdminDashboard = () => {
               </div>
             </div>
           </>
-        ) : (
+        ) : activeTab === 'blogs' ? (
           <div className="flex-1 flex flex-col min-h-0 w-full">
             <AdminBlogTab token={localStorage.getItem('adminPasscode')} />
+          </div>
+        ) : (
+          /* â”€â”€ Tech Skills Manager â”€â”€ */
+          <div className="space-y-6 pb-8">
+
+            {/* Add New Skill Card */}
+            <div className="glass border border-slate-200 dark:border-slate-800/80 rounded-3xl p-4 sm:p-6 shadow-lg">
+              <div className="flex items-center gap-2 mb-1">
+                <Plus size={15} className="text-primary" />
+                <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">Add New Skill</h3>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-5">
+                Category select karo, skill naam aur proficiency level daalo.
+              </p>
+
+              {/* Form Grid â€” stacks on mobile */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+
+                {/* Category Dropdown */}
+                <div className="space-y-1.5">
+                  <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Category
+                  </label>
+                  <select
+                    value={newSkillCategory}
+                    onChange={(e) => setNewSkillCategory(e.target.value)}
+                    className="w-full px-3 sm:px-4 py-2.5 rounded-xl bg-white/60 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 text-sm text-slate-800 dark:text-white focus:border-primary/50 focus:outline-none transition-all"
+                  >
+                    {CATEGORY_DEFAULTS.map((c) => (
+                      <option key={c.id} value={c.id}>{c.emoji} {c.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Skill Name */}
+                <div className="space-y-1.5">
+                  <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Skill Name
+                  </label>
+                  <input
+                    type="text"
+                    value={newSkillName}
+                    onChange={(e) => setNewSkillName(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
+                    placeholder="e.g. Next.js"
+                    className="w-full px-3 sm:px-4 py-2.5 rounded-xl bg-white/60 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 text-sm text-slate-800 dark:text-white focus:border-primary/50 focus:outline-none transition-all"
+                  />
+                </div>
+
+                {/* Level Slider */}
+                <div className="space-y-1.5">
+                  <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Level â€” <span className="text-primary font-bold">{newSkillLevel}%</span>
+                  </label>
+                  <div className="flex items-center gap-3 pt-1">
+                    <input
+                      type="range"
+                      min={10} max={100} step={5}
+                      value={newSkillLevel}
+                      onChange={(e) => setNewSkillLevel(Number(e.target.value))}
+                      className="flex-1 accent-primary cursor-pointer h-2 touch-pan-x"
+                    />
+                    <span className="text-xs font-bold text-primary w-8 text-right shrink-0">{newSkillLevel}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Add Button â€” full width on mobile */}
+              <button
+                onClick={() => {
+                  if (!newSkillName.trim()) return;
+                  const catDefault = CATEGORY_DEFAULTS.find(c => c.id === newSkillCategory);
+                  setTechStack(prev => {
+                    const existing = prev.find(c => c.id === newSkillCategory);
+                    if (existing) {
+                      return prev.map(c =>
+                        c.id === newSkillCategory
+                          ? { ...c, skills: [...c.skills, { name: newSkillName.trim(), level: newSkillLevel }] }
+                          : c
+                      );
+                    }
+                    return [...prev, { ...catDefault, skills: [{ name: newSkillName.trim(), level: newSkillLevel }] }];
+                  });
+                  setNewSkillName('');
+                  setNewSkillLevel(75);
+                }}
+                disabled={!newSkillName.trim()}
+                className="mt-5 w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-white text-sm font-semibold hover:shadow-lg hover:shadow-primary/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+              >
+                <Plus size={15} /> Add Skill
+              </button>
+            </div>
+
+            {/* Existing Skills per Category */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {CATEGORY_DEFAULTS.map((cat) => {
+                const catData = techStack.find(c => c.id === cat.id);
+                const skills = catData?.skills || [];
+                return (
+                  <div key={cat.id} className="glass border border-slate-200 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow">
+                    {/* Category Header */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-base">{cat.emoji}</span>
+                      <h4 className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200">{cat.label}</h4>
+                      <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-900 text-slate-400 dark:text-slate-500 font-medium">
+                        {skills.length} skills
+                      </span>
+                    </div>
+
+                    {/* Skills List */}
+                    {skills.length === 0 ? (
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 italic py-2">
+                        Koi skill nahi â€” upar se add karo
+                      </p>
+                    ) : (
+                      <div className="flex flex-wrap gap-1.5">
+                        {skills.map((skill, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-lg bg-white/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-[11px] sm:text-xs font-medium text-slate-700 dark:text-slate-300 group"
+                          >
+                            <span className="truncate max-w-[90px] sm:max-w-none">{skill.name}</span>
+                            <span className="text-primary font-bold shrink-0">{skill.level}%</span>
+                            <button
+                              onClick={() => setTechStack(prev => prev.map(c =>
+                                c.id === cat.id
+                                  ? { ...c, skills: c.skills.filter((_, i) => i !== idx) }
+                                  : c
+                              ))}
+                              className="text-slate-400 hover:text-red-500 transition-colors cursor-pointer p-0.5 rounded shrink-0"
+                              title="Remove"
+                            >
+                              <X size={11} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Save Button Row â€” stacks on mobile */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 pt-2">
+              <button
+                onClick={async () => {
+                  setTechSaving(true);
+                  setTechSaveMsg('');
+                  try {
+                    const savedCode = localStorage.getItem('adminPasscode');
+                    await updateTechStack(techStack, savedCode);
+                    setTechSaveMsg('âœ… Tech Skills saved successfully!');
+                    setTimeout(() => setTechSaveMsg(''), 3000);
+                  } catch (err) {
+                    setTechSaveMsg('âŒ ' + (err.message || 'Save failed'));
+                  } finally {
+                    setTechSaving(false);
+                  }
+                }}
+                disabled={techSaving}
+                className="w-full sm:w-auto px-8 py-3 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-semibold text-sm hover:shadow-xl hover:shadow-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+              >
+                {techSaving ? <RefreshCw size={15} className="animate-spin" /> : <CheckCircle size={15} />}
+                {techSaving ? 'Saving...' : 'Save to Backend'}
+              </button>
+              {techSaveMsg && (
+                <span className={`text-xs sm:text-sm font-semibold ${
+                  techSaveMsg.startsWith('âœ…') ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500'
+                }`}>{techSaveMsg}</span>
+              )}
+            </div>
           </div>
         )}
       </div>
