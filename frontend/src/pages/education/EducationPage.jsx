@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  GraduationCap, FileText, Award, Eye, X, Shield, Lock, ExternalLink
+  GraduationCap, FileText, Award, Eye, X, Shield, Lock
 } from 'lucide-react';
 import { educationData } from '../../data/educationData';
-import { RevealOnScroll, SectionHeading } from '../../components/ui/Animations';
-import { TiltCard } from '../../components/ui/TiltCard';
+import { RevealOnScroll } from '../../components/ui/Animations';
 
 // ── Mini document thumbnail render component
 const DocumentThumbnail = ({ doc }) => {
