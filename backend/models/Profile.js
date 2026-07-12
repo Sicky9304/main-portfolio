@@ -46,7 +46,7 @@ const profileSchema = new mongoose.Schema(
       ],
       default: [
         { icon: 'FolderGit2', value: '30+', label: 'Projects Built' },
-        { icon: 'Code2', value: '500+', label: 'GitHub Contributions' },
+        { icon: 'Code2', value: '100+', label: 'GitHub Contributions' },
         { icon: 'Target', value: '10+', label: 'Technologies' },
         { icon: 'Award', value: '8.69', label: 'CGPA' },
       ],
@@ -103,7 +103,7 @@ const profileSchema = new mongoose.Schema(
       type: {
         repos: { type: String, default: '20' },
         reposSuffix: { type: String, default: '+' },
-        contributions: { type: String, default: '500' },
+        contributions: { type: String, default: '100' },
         contributionsSuffix: { type: String, default: '+' },
         stars: { type: String, default: '15' },
         starsSuffix: { type: String, default: '+' },
