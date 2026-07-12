@@ -22,6 +22,9 @@ const BlogDetailsPage = lazy(() => import('../pages/blog/BlogDetailsPage').then(
 const ArchitecturePage = lazy(() => import('../pages/home/ArchitecturePage').then(m => ({ default: m.ArchitecturePage })));
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
 const ProjectDetailsPage = lazy(() => import('../pages/project/ProjectDetailsPage').then(m => ({ default: m.ProjectDetailsPage })));
+const ProjectsPage = lazy(() => import('../pages/project/ProjectsPage').then(m => ({ default: m.ProjectsPage })));
+const AboutPage = lazy(() => import('../pages/about/AboutPage').then(m => ({ default: m.AboutPage })));
+const EducationPage = lazy(() => import('../pages/education/EducationPage').then(m => ({ default: m.EducationPage })));
 import { LoadingScreen } from '../components/layout/LoadingScreen';
 import { ErrorPage } from '../pages/home/ErrorPage';
 
@@ -62,6 +65,24 @@ export const router = createBrowserRouter([
         index: true,
         element: <PortfolioHome />
       },
+      // 1.1 Detailed About Page Route
+      {
+        path: 'about',
+        element: (
+          <RouteSuspense>
+            <AboutPage />
+          </RouteSuspense>
+        )
+      },
+      // 1.2 Academic Journey / Education Page Route
+      {
+        path: 'education',
+        element: (
+          <RouteSuspense>
+            <EducationPage />
+          </RouteSuspense>
+        )
+      },
       // 2. Blog Page Route (Engineering Articles Index)
       {
         path: 'blog',
@@ -95,6 +116,15 @@ export const router = createBrowserRouter([
         element: (
           <RouteSuspense>
             <AdminDashboard />
+          </RouteSuspense>
+        )
+      },
+      // 5.5 Projects Catalog Route
+      {
+        path: 'projects',
+        element: (
+          <RouteSuspense>
+            <ProjectsPage />
           </RouteSuspense>
         )
       },

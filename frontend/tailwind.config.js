@@ -113,9 +113,9 @@ export default {
 
         /* Section Padding */
         '.section-padding': {
-          'padding': '120px 0',
+          'padding': '80px 0',
           '@media (max-width: 768px)': {
-            'padding': '80px 0',
+            'padding': '60px 0',
           }
         },
 

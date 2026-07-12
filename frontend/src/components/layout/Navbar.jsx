@@ -5,11 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 
 const NAV_LINKS = [
-  { label: 'About', href: '#about' },
-  { label: 'Skills', href: '#skills' },
-  { label: 'Projects', href: '#projects' },
+  { label: 'About', href: '/about' },
   { label: 'Blog', href: '/blog' },
-  { label: 'Services', href: '#services' },
+  { label: 'Education', href: '/education' },
+  { label: 'Projects', href: '/projects' },
   { label: 'Contact', href: '#contact' },
 ];
 
@@ -93,10 +92,11 @@ export const Navbar = () => {
   };
 
   const handleLinkClick = (e, href) => {
-    if (href === '/blog') {
+    if (href.startsWith('/')) {
       e.preventDefault();
       setMenuOpen(false);
-      navigate('/blog');
+      navigate(href);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       scrollToSection(e, href);
     }
@@ -129,11 +129,21 @@ export const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map((link) => {
-              const isBlogLink = link.href === '/blog';
+              const isRouteLink = link.href.startsWith('/');
               const cleanPath = currentPath.replace(/\/$/, '');
-              const isActive = isBlogLink
-                ? (cleanPath === '/blog' || cleanPath.startsWith('/blog/'))
-                : (cleanPath === '' || cleanPath === '/' ? activeSection === link.href.replace('#', '') : false);
+              
+              let isActive = false;
+              if (isRouteLink) {
+                if (link.href === '/blog') {
+                  isActive = cleanPath === '/blog' || cleanPath.startsWith('/blog/');
+                } else if (link.href === '/projects') {
+                  isActive = cleanPath === '/projects' || cleanPath.startsWith('/projects/');
+                } else {
+                  isActive = cleanPath === link.href;
+                }
+              } else {
+                isActive = (cleanPath === '' || cleanPath === '/') && activeSection === link.href.replace('#', '');
+              }
 
               return (
                 <a

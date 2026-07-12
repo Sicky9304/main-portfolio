@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowUp, Code2, Mail, Heart } from 'lucide-react';
+import { ArrowUp, Instagram, Mail, Heart } from 'lucide-react';
 import { Github, Linkedin, Whatsapp, Telegram } from '../ui/BrandIcons';
 import { RevealOnScroll } from '../ui/Animations';
 
@@ -42,7 +42,7 @@ export const Footer = () => {
   const socialLinks = [
     { icon: Github, href: 'https://github.com/Sicky9304', label: 'GitHub' },
     { icon: Linkedin, href: 'https://linkedin.com/in/sickykumar', label: 'LinkedIn' },
-    { icon: Code2, href: 'https://leetcode.com/u/Sicky9304', label: 'LeetCode' },
+    { icon: Instagram, href: 'https://instagram.com/sicky9304s', label: 'Instagram' },
     { icon: Whatsapp, href: 'https://wa.me/919304490856', label: 'WhatsApp' },
     { icon: Telegram, href: 'https://t.me/+919304490856', label: 'Telegram' },
     { icon: Mail, href: 'mailto:sickykumar01@gmail.com', label: 'Email' },

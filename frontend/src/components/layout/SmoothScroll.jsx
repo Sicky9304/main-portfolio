@@ -44,11 +44,12 @@ export const SmoothScrollProvider = ({ children }) => {
     }
 
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      duration: 0.8,
+      easing: (t) => 1 - Math.pow(1 - t, 4), // easeOutQuart for premium snappiness
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
+      wheelMultiplier: 1.15,
     });
 
     lenisRef.current = lenis;

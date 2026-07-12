@@ -81,6 +81,9 @@ portfolio/
 │   │   │   ├── hero.png           # Hero section avatar
 │   │   │   ├── react.svg          # React SVG asset
 │   │   │   └── vite.svg           # Vite SVG asset
+│   │   ├── data/                  # Static Data layers
+│   │   │   ├── aboutData.js       # About page section variables
+│   │   │   └── educationData.js   # Education transcript parameters
 │   │   ├── components/
 │   │   │   ├── ai/
 │   │   │   │   ├── AudioReader.jsx        # Screen-reader voice speech synthesis helper
@@ -106,6 +109,8 @@ portfolio/
 │   │   ├── hooks/
 │   │   │   └── useApi.js          # Generic API data fetcher hook
 │   │   ├── pages/
+│   │   │   ├── about/
+│   │   │   │   └── AboutPage.jsx       # Detailed profile and biography page
 │   │   │   ├── blog/
 │   │   │   │   ├── blogUI/                 # Formatted content elements inside blog details view
 │   │   │   │   │   ├── BlogAiChatCompanion.jsx# Explainer chatbot embedded in blogs
@@ -128,16 +133,22 @@ portfolio/
 │   │   │   │   ├── AdminDashboard.jsx      # Admin console editor frame (with mouse split resizers)
 │   │   │   │   ├── BlogDetailsPage.jsx     # Individual blog rendering page
 │   │   │   │   └── BlogPage.jsx            # Public blogs catalog list interface
+│   │   │   ├── education/
+│   │   │   │   └── EducationPage.jsx   # Academic journey transcript credentials dashboard
 │   │   │   ├── home/
 │   │   │   │   ├── About.jsx               # General profile stats & education
 │   │   │   │   ├── ArchitecturePage.jsx    # Technical system architecture guide page
 │   │   │   │   ├── Contact.jsx             # Mail submission panel
 │   │   │   │   ├── GitHubSection.jsx       # Active calendar activity and public repos
 │   │   │   │   ├── Hero.jsx                # Site top banner section
-│   │   │   │   ├── Projects.jsx            # Custom catalog projects grid (with fallback items)
+│   │   │   │   ├── Projects.jsx            # Custom catalog projects grid (showing top 3 items)
 │   │   │   │   ├── Services.jsx            # Professional capabilities lists
 │   │   │   │   ├── TechStack.jsx           # Categorized skill badges grid
 │   │   │   │   └── Testimonials.jsx        # Scrolling quote cards carousel
+│   │   │   ├── project/
+│   │   │   │   ├── ProjectDetailsPage.jsx # Individual project case study details
+│   │   │   │   └── ProjectsPage.jsx       # Complete dynamic project catalog page
+│   │   │   │   └── components/            # Project case study sub-components
 │   │   ├── routes/
 │   │   │   └── Routes.jsx         # Centralized routing definitions (React Router)
 │   │   ├── App.jsx                # Main entry app provider mounting RouterProvider
@@ -222,7 +233,12 @@ The secured control room for updating site configuration and posting articles. I
 *   **Smooth Scroll Bypass**: Automatically disables Lenis on admin paths to restore native wheel scrolling for sidebars and editor panels.
 
 ### Dynamic Sitemap
-The sitemap located at `/sitemap.xml` is served dynamically via Express. It queries MongoDB in real-time to list all published blogs immediately for SEO indexing without requiring static generation.
+The sitemap located at `/sitemap.xml` is served dynamically via Express. It queries MongoDB in real-time to list all published blogs and dynamic project case studies immediately for SEO indexing without requiring static generation. It also crawls static pages (`/about`, `/education`, `/projects`, and `/architecture`) automatically.
+
+### Custom Sub-Pages
+- **Biography Page (`/about`)**: Lists professional bio paragraphs, numeric milestones (counters), tech toolkits (badges), and magnetic call-to-actions.
+- **Academic Credentials (`/education`)**: Displays courses inside dashboard cards. Fullscreen preview modal renders vector certificates/transcripts dynamically with watermarks and blurred privacy fields.
+- **Projects Catalog (`/projects`)**: Dedicated projects catalog carrying dynamic cards and the AI matchmaking widget.
 
 ### Live RSS Feed (`/api/rss`)
 Located in [`frontend/api/rss.js`](file:///d:/Google%20Antigravity/portfolio/frontend/api/rss.js), this is a **Vercel Serverless Function** that:

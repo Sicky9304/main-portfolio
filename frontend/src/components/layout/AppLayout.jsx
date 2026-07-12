@@ -65,7 +65,7 @@ export const AppLayout = () => {
   }
 
   // Adjust padding-top for full pages (like blogs or architecture guides)
-  const isDocPage = cleanPath.startsWith('/blog') || cleanPath === '/architecture' || cleanPath.startsWith('/projects');
+  const isDocPage = cleanPath.startsWith('/blog') || cleanPath === '/architecture' || cleanPath.startsWith('/projects') || cleanPath === '/about' || cleanPath === '/education';
 
   return (
     <div className="min-h-screen bg-surface-light dark:bg-surface-dark transition-colors duration-500 noise-overlay overflow-x-hidden w-full relative">

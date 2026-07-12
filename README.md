@@ -14,15 +14,29 @@ A premium, interactive personal developer portfolio featuring a glassmorphism de
 - **Parallax Z-Depth**: Buttons and labels hover on a separate 3D plane, physically lifting off the thumbnail canvas when hovered.
 - **Dynamic Fallbacks**: Cards render Cloudinary-hosted image thumbnails if present, and dynamically fall back to an interactive Mock Browser Dashboard if empty.
 
-### 2. Passcode-Guarded Admin Portal (`/sicky-admin`)
+### 2. Detailed Biography Page (`/about`)
+- **3D Hero Avatar**: Interactive mouse-tilt profile card synced with daytime/nighttime background visual customizer nodes.
+- **Milestone Stats**: Animated numeric count-up stats representing key contributions (projects, contributions, technologies).
+- **Core Toolkits**: Clean grouped badges displaying tech stack categories (Frontend, Backend, Database, Cloud, Tools, AI) with dedicated Lucide vector icons.
+
+### 3. Academic Transcript Dashboard (`/education`)
+- **Verified Credentials**: A centralized academic dashboard grouping academic levels (Class 10, Diploma, B.Tech CSE) as premium, glowing glassmorphic cards.
+- **Vector Transcript Rendering**: Instead of rendering blurry raw scans, it draws crisp vector transcripts in the DOM inside a zoom-animated fullscreen modal.
+- **Watermarks & Privacy Redaction**: Automatically overlays diagonal verification text ("Sicky Kumar Portfolio / For Verification Only") and blurs sensitive inputs (Roll Numbers, Registration Numbers, Addresses, QR Verification Blocks).
+- **Scroll Locks**: Prevents body layout shifts and mouse scroll bleed when modals are active.
+
+### 4. Projects Catalog (`/projects`)
+- **Dynamic Catalog**: Fetches the complete project roster dynamically from MongoDB endpoints, maintaining full-fidelity search tags.
+- **AI Matchmaker Integration**: Provides a search assistant powered by Gemini 2.5 Flash to automatically match description queries with the developer's work.
+
+### 5. Passcode-Guarded Admin Portal (`/sicky-admin`)
 - **Session Verification**: Access is locked behind a custom single-passcode credential check (`ADMIN_PASSCODE`) validated by backend middleware and persisted via local browser storage.
 - **Secure File Stream**: Allows uploading PDF resume documents. The files are converted to Base64 strings and stored directly in MongoDB.
 - **REST Cloudinary Image Upload**: Drag-and-drop zones sign payloads dynamically using Node's native `crypto` module, uploading them straight to Cloudinary without exposing secrets.
 
-### 3. Theme-Aware Video Backdrops
+### 6. Theme-Aware Video Backdrops
 - **Dark Mode**: Loop-plays a screening of glowing neon holographic plexus particles (`hologram_bg.mp4`).
 - **Light Mode**: Color-tunes the day loop (`hologram_day.mp4`) with color inversion, saturation boosts, and soft blurs to ensure text readability without compromising aesthetics.
-- **Cutoff Masks**: Uses an overlay transition gradient mask at the bottom boundary to blend the loops into the next page section.
 
 ---
 
@@ -30,12 +44,16 @@ A premium, interactive personal developer portfolio featuring a glassmorphism de
 
 ```bash
 portfolio/
+├── .agents/
+│   └── AGENTS.md         # Project Guide & AI Rulebook
 ├── frontend/             # React SPA (Vite, Tailwind, Framer Motion)
 │   ├── public/           # Static asset directory (videos, icons)
 │   ├── src/
 │   │   ├── api/          # Centralized API service requests
-│   │   ├── components/   # Reusable UI layout and visual assets
-│   │   ├── sections/     # Modular portfolio pages (Hero, Projects, Admin)
+│   │   ├── components/   # Reusable UI layouts and visual overlays
+│   │   ├── data/         # Static data layers (aboutData, educationData)
+│   │   ├── pages/        # Route page views (About, Education, Projects, Blog, Admin)
+│   │   ├── routes/       # Centralized route mapping rules
 │   │   └── App.jsx       # Client router and context wrapper
 │   └── package.json
 └── backend/              # Node.js, Express & MongoDB API Server
@@ -51,9 +69,9 @@ portfolio/
 
 ## 🛠️ Tech Stack & Integrations
 
-- **Frontend**: React.js, Vite, Tailwind CSS, Framer Motion, Lucide Icons.
+- **Frontend**: React.js, Vite, Tailwind CSS, Framer Motion, GSAP, Lenis, Lucide Icons.
 - **Backend**: Node.js, Express.js, MongoDB Atlas (Mongoose ORM).
-- **APIs & Clouds**: Cloudinary REST Uploader, Dynamic PDF stream buffer.
+- **APIs & Clouds**: Google Gemini 2.5 Flash, Cloudinary REST Uploader.
 
 ---
 

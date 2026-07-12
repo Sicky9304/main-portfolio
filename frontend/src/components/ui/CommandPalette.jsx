@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, X, Terminal, Sun, Moon, Sparkles, 
   User, Cpu, Briefcase, Settings, MessageSquare, 
-  ArrowUp, Compass, ArrowRight, Layers, FileText
+  ArrowUp, Compass, ArrowRight, Layers, FileText,
+  GraduationCap
 } from 'lucide-react';
 import { useTheme, gradientThemes } from '../../context/ThemeContext';
 
@@ -91,6 +92,8 @@ export const CommandPalette = () => {
   const navigationCommands = [
     { id: 'nav-home', label: 'Go to Hero / Home', category: 'Navigation', icon: Compass, action: () => navigateTo('#hero'), keywords: 'home hero start landing' },
     { id: 'nav-blog', label: 'View Blog Catalog', category: 'Navigation', icon: FileText, action: () => navigateTo('/blog'), keywords: 'blog articles tech software writing dev stories devanagari hindi translation' },
+    { id: 'nav-about-page', label: 'View Detailed About Page', category: 'Navigation', icon: User, action: () => navigateTo('/about'), keywords: 'about details page bio profile history stats cgpa achievements' },
+    { id: 'nav-education-page', label: 'View Academic Records & Documents', category: 'Navigation', icon: GraduationCap, action: () => navigateTo('/education'), keywords: 'education marksheet certificate results semester cgpa diploma btech class 10 verified academic journey' },
     { id: 'nav-about', label: 'Go to About Section', category: 'Navigation', icon: User, action: () => navigateTo('#about'), keywords: 'about biography history education statistics cgpa' },
     { id: 'nav-skills', label: 'Go to Skills / TechStack', category: 'Navigation', icon: Cpu, action: () => navigateTo('#skills'), keywords: 'skills tech stack languages node react javascript database mongo' },
     { id: 'nav-projects', label: 'Go to Projects Section', category: 'Navigation', icon: Briefcase, action: () => navigateTo('#projects'), keywords: 'projects portfolio cases showcase live source github code' },

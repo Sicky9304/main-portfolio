@@ -31,6 +31,61 @@ export const BlogPage = () => {
     loadBlogs();
   }, []);
 
+  // SEO metadata setup
+  useEffect(() => {
+    const prevTitle = document.title;
+    document.title = "Sicky Kumar | Technical Blog & Insights";
+    
+    // Meta updates helper
+    const setMeta = (nameOrProperty, value, isProperty = false) => {
+      if (!value) return null;
+      const attr = isProperty ? 'property' : 'name';
+      let element = document.querySelector(`meta[${attr}="${nameOrProperty}"]`);
+      let created = false;
+      if (!element) {
+        element = document.createElement('meta');
+        element.setAttribute(attr, nameOrProperty);
+        document.head.appendChild(element);
+        created = true;
+      }
+      const prevVal = element.getAttribute('content');
+      element.setAttribute('content', value);
+      return { element, created, prevVal };
+    };
+
+    // Set Canonical link
+    let canonical = document.querySelector('link[rel="canonical"]');
+    const prevCanonical = canonical ? canonical.getAttribute('href') : '';
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', window.location.href);
+
+    const descText = "Read articles, development tutorials, and tech stack insights written by Sicky Kumar. Covering MERN stack, React, Node.js, and AI integrations.";
+    
+    const dMeta = setMeta('description', descText);
+    const ogTitle = setMeta('og:title', "Sicky Kumar | Technical Blog & Insights", true);
+    const ogDesc = setMeta('og:description', descText, true);
+    const ogUrl = setMeta('og:url', window.location.href, true);
+    const twitterTitle = setMeta('twitter:title', "Sicky Kumar | Technical Blog & Insights");
+    const twitterDesc = setMeta('twitter:description', descText);
+
+    return () => {
+      document.title = prevTitle;
+      if (canonical) {
+        canonical.setAttribute('href', prevCanonical || 'https://www.sickykumar.in/');
+      }
+      if (dMeta?.element) dMeta.element.setAttribute('content', dMeta.prevVal || '');
+      if (ogTitle?.element) ogTitle.element.setAttribute('content', ogTitle.prevVal || '');
+      if (ogDesc?.element) ogDesc.element.setAttribute('content', ogDesc.prevVal || '');
+      if (ogUrl?.element) ogUrl.element.setAttribute('content', ogUrl.prevVal || '');
+      if (twitterTitle?.element) twitterTitle.element.setAttribute('content', twitterTitle.prevVal || '');
+      if (twitterDesc?.element) twitterDesc.element.setAttribute('content', twitterDesc.prevVal || '');
+    };
+  }, []);
+
   if (loading) {
     return null;
   }

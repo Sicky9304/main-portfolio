@@ -16,6 +16,7 @@ import blogRoutes from './blog/blogs.js';
 import aiRoutes from './routes/ai.js';
 import techStackRoutes from './routes/techstack.js';
 import Blog from './blog/Blog.js';
+import Project from './models/Project.js';
 
 const app=express();
 
@@ -65,15 +66,36 @@ app.get('/api/health',(_,res)=>res.json({success:true}));
 app.get('/sitemap.xml', async (req, res) => {
   try {
     const blogs = await Blog.find({ status: 'Published' }).select('slug updatedAt');
+    const projects = await Project.find().select('slug updatedAt');
+    const currentDate = new Date().toISOString().split('T')[0];
+    
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
     xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
     
-    xml += `  <url>\n    <loc>https://sickykumar.in/</loc>\n    <lastmod>${new Date().toISOString()}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>1.0</priority>\n  </url>\n`;
+    // Homepage
+    xml += `  <url>\n    <loc>https://sickykumar.in/</loc>\n    <lastmod>${currentDate}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>1.0</priority>\n  </url>\n`;
     
-    xml += `  <url>\n    <loc>https://sickykumar.in/blog</loc>\n    <lastmod>${new Date().toISOString()}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
+    // Static Pages
+    xml += `  <url>\n    <loc>https://sickykumar.in/about</loc>\n    <lastmod>${currentDate}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
     
+    xml += `  <url>\n    <loc>https://sickykumar.in/education</loc>\n    <lastmod>${currentDate}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
+    
+    xml += `  <url>\n    <loc>https://sickykumar.in/projects</loc>\n    <lastmod>${currentDate}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
+    
+    xml += `  <url>\n    <loc>https://sickykumar.in/blog</loc>\n    <lastmod>${currentDate}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
+    
+    xml += `  <url>\n    <loc>https://sickykumar.in/architecture</loc>\n    <lastmod>${currentDate}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.5</priority>\n  </url>\n`;
+    
+    // Dynamic Blogs
     blogs.forEach(b => {
-      xml += `  <url>\n    <loc>https://sickykumar.in/blog/${b.slug}</loc>\n    <lastmod>${b.updatedAt ? b.updatedAt.toISOString() : new Date().toISOString()}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>\n`;
+      const bDate = b.updatedAt ? b.updatedAt.toISOString().split('T')[0] : currentDate;
+      xml += `  <url>\n    <loc>https://sickykumar.in/blog/${b.slug}</loc>\n    <lastmod>${bDate}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>\n`;
+    });
+    
+    // Dynamic Projects
+    projects.forEach(p => {
+      const pDate = p.updatedAt ? p.updatedAt.toISOString().split('T')[0] : currentDate;
+      xml += `  <url>\n    <loc>https://sickykumar.in/projects/${p.slug}</loc>\n    <lastmod>${pDate}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
     });
     
     xml += `</urlset>`;

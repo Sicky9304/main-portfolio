@@ -49,7 +49,6 @@ const FALLBACK_REPOS = [
   { name: 'e-learning-platform', desc: 'Full-stack e-learning platform', lang: 'JavaScript', stars: 3, forks: 1 },
   { name: 'agriconnect', desc: 'Farmer-to-market platform', lang: 'JavaScript', stars: 2, forks: 1 },
   { name: 'world-art-gallery', desc: 'Art collection browser', lang: 'JavaScript', stars: 4, forks: 2 },
-  { name: 'news-portal', desc: 'Real-time news aggregator', lang: 'JavaScript', stars: 1, forks: 0 },
 ];
 
 export const GitHubSection = () => {
@@ -57,7 +56,7 @@ export const GitHubSection = () => {
 
   const ghStats = profile?.githubStats || FALLBACK_GITHUB_STATS;
   const languages = profile?.languages || FALLBACK_LANGUAGES;
-  const featuredRepos = profile?.featuredRepos || FALLBACK_REPOS;
+  const featuredRepos = (profile?.featuredRepos || FALLBACK_REPOS).filter(r => r.name !== 'news-portal');
 
   const GITHUB_STATS = [
     { icon: GitBranch, label: 'Repositories', value: ghStats.repos, suffix: ghStats.reposSuffix, color: 'text-primary' },
@@ -94,14 +93,14 @@ export const GitHubSection = () => {
           </div>
         </RevealOnScroll>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-8 items-stretch">
           {/* Most Used Languages */}
-          <RevealOnScroll delay={0.1}>
-            <div className="glass rounded-[28px] p-8">
+          <RevealOnScroll delay={0.1} className="h-full">
+            <div className="glass rounded-[28px] p-8 h-full flex flex-col">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6" style={{ fontFamily: 'Satoshi, sans-serif' }}>
                 Most Used Languages
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-4 flex-1 flex flex-col justify-center">
                 {languages.map((lang) => (
                   <div key={lang.name}>
                     <div className="flex justify-between items-center mb-1.5">
@@ -125,12 +124,12 @@ export const GitHubSection = () => {
           </RevealOnScroll>
 
           {/* Featured Repositories */}
-          <RevealOnScroll delay={0.15}>
-            <div className="glass rounded-[28px] p-8">
+          <RevealOnScroll delay={0.15} className="h-full">
+            <div className="glass rounded-[28px] p-8 h-full flex flex-col">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6" style={{ fontFamily: 'Satoshi, sans-serif' }}>
                 Featured Repositories
               </h3>
-              <div className="space-y-3">
+              <div className="space-y-3 flex-1 flex flex-col justify-center">
                 {featuredRepos.map((repo) => (
                   <motion.a
                     key={repo.name}

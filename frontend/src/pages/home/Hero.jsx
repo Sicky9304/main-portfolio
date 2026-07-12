@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { MapPin, Sparkles, ArrowDown, Code2 } from 'lucide-react';
+import { MapPin, Sparkles, ArrowDown, Instagram } from 'lucide-react';
 import { Github, Linkedin, Whatsapp, Telegram } from '../../components/ui/BrandIcons';
 import { useTheme } from '../../context/ThemeContext';
 import { MagneticButton } from '../../components/ui/MagneticButton';
@@ -18,7 +18,7 @@ const FALLBACK_ROLES = [
 const SOCIAL_ICON_MAP = {
   GitHub: Github,
   LinkedIn: Linkedin,
-  LeetCode: Code2,
+  Instagram: Instagram,
   WhatsApp: Whatsapp,
   Telegram: Telegram,
 };
@@ -35,11 +35,21 @@ export const Hero = () => {
   const location = profile?.location || 'West Bengal, India';
   const available = profile?.available ?? true;
 
-  let rawSocialLinks = profile?.socialLinks || [
-    { platform: 'GitHub', url: 'https://github.com/Sicky9304', handle: '@Sicky9304' },
-    { platform: 'LinkedIn', url: 'https://linkedin.com/in/sickykumar', handle: '/in/sickykumar' },
-    { platform: 'LeetCode', url: 'https://leetcode.com/u/Sicky9304', handle: '@Sicky9304' },
-  ];
+  let rawSocialLinks = profile?.socialLinks 
+    ? profile.socialLinks.filter(s => s.platform !== 'LeetCode')
+    : [
+        { platform: 'GitHub', url: 'https://github.com/Sicky9304', handle: '@Sicky9304' },
+        { platform: 'LinkedIn', url: 'https://linkedin.com/in/sickykumar', handle: '/in/sickykumar' },
+        { platform: 'Instagram', url: 'https://instagram.com/sicky9304s', handle: '@sicky9304s' },
+      ];
+
+  // Ensure Instagram is appended if profile exists but doesn't have it yet
+  if (profile && !rawSocialLinks.some(s => s.platform === 'Instagram')) {
+    rawSocialLinks = [
+      ...rawSocialLinks,
+      { platform: 'Instagram', url: 'https://instagram.com/sicky9304s', handle: '@sicky9304s' }
+    ];
+  }
 
   // Ensure WhatsApp and Telegram are always appended if not present
   if (!rawSocialLinks.some((s) => s.platform === 'WhatsApp')) {
