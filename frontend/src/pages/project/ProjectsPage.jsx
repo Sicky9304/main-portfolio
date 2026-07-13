@@ -12,6 +12,29 @@ import { TiltCard } from '../../components/ui/TiltCard';
 // Fallback data (same as homepage fallback)
 const FALLBACK_PROJECTS = [
   {
+    _id: 'ai-food-app',
+    slug: 'ai-food-app',
+    title: 'AI-Powered Food App',
+    tagline: 'MERN food delivery platform with Stripe checkout & on-demand AI review analysis',
+    description: 'A premium full-stack MERN food ordering application integrated with Stripe payment checkout, admin dashboard order processing, dynamic cart management, and on-demand LLM sentiment analysis for restaurant reviews.',
+    problem: 'Standard food delivery templates lack interactive AI capabilities, secure and automated order status update panels for administrators, and robust, crash-free review aggregation tools.',
+    features: [
+      'Stripe hosted checkout sessions with dynamic cart serialization',
+      'On-demand AI sentiment analysis of customer reviews using Groq Llama 3.1',
+      'Secure admin order panel for updating delivery status from Processing to Delivered',
+      'Robust AI-driven dish description and allergens metadata generator',
+      'Global error handler with development and production fallback environments',
+      'Vite build optimization with Rollup dynamic manual code splitting',
+    ],
+    tech: ['React.js', 'Redux Toolkit', 'Node.js', 'Express.js', 'MongoDB', 'Stripe', 'Groq AI'],
+    github: 'https://github.com/Sicky9304/ai-powered-food-app.git',
+    demo: 'https://github.com/Sicky9304/ai-powered-food-app',
+    color: 'from-orange-500 to-amber-500',
+    emoji: '🍔',
+    status: 'Completed',
+    thumbnail: '/images/blogs/food_app.png',
+  },
+  {
     _id: 'portfolio-admin',
     slug: 'portfolio-admin',
     title: '3D AI Portfolio & Admin Portal',
