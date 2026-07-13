@@ -165,7 +165,17 @@ const FALLBACK_PROJECTS = [
 export const ProjectsPage = () => {
   const navigate = useNavigate();
   const { data: projectsData, error } = useApi(fetchProjects, FALLBACK_PROJECTS);
-  const projects = Array.isArray(projectsData) && projectsData.length > 0 ? projectsData : FALLBACK_PROJECTS;
+  
+  let projects = Array.isArray(projectsData) && projectsData.length > 0 ? [...projectsData] : [...FALLBACK_PROJECTS];
+  if (Array.isArray(projectsData) && projectsData.length > 0) {
+    const hasFoodApp = projects.some(p => p.slug === 'ai-food-app');
+    if (!hasFoodApp) {
+      const foodAppFallback = FALLBACK_PROJECTS.find(p => p.slug === 'ai-food-app');
+      if (foodAppFallback) {
+        projects.unshift(foodAppFallback);
+      }
+    }
+  }
 
   // AI Project Recommendation states & query handler
   const [aiPrompt, setAiPrompt] = useState('');
