@@ -11,13 +11,15 @@ async function start(){
      console.log(`Server running on ${PORT}`);
    });
 
-   const shutdown=()=>{
-     console.log('Gracefully shutting down...');
-     server.close(()=>process.exit(0));
-   };
+    const shutdown=()=>{
+      console.log('Gracefully shutting down...');
+      server.close(()=>process.exit(0));
+    };
 
-   process.on('SIGINT',shutdown);
-   process.on('SIGTERM',shutdown);
+    if (process.platform !== 'win32') {
+      process.on('SIGINT',shutdown);
+      process.on('SIGTERM',shutdown);
+    }
 
  }catch(err){
    console.error(err);
