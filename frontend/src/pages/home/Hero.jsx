@@ -378,7 +378,7 @@ export const Hero = () => {
             >
               {/* Profile Image with Zoom and 3D Cursor Pull */}
               <motion.img
-                src={theme === 'dark' ? '/profile_night.webp' : '/profile_day.webp'}
+                src={theme === 'dark' ? '/profile_night.webp' : '/profile.webp'}
                 alt={name}
                 fetchPriority="high"
                 className="w-full h-full object-cover object-center"
