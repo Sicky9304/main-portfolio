@@ -295,7 +295,7 @@ export const AboutPage = () => {
               className="relative w-[190px] h-[190px] sm:w-[280px] sm:h-[280px] rounded-full overflow-hidden border-4 border-white dark:border-slate-900 shadow-2xl z-10 flex items-center justify-center"
             >
               <motion.img
-                src={theme === 'dark' ? '/profile_night.webp' : '/profile_day.webp'}
+                src={theme === 'dark' ? '/profile_night.webp' : '/profile.webp'}
                 alt={hero.name}
                 className="w-full h-full object-cover object-center"
                 style={{
