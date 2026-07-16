@@ -27,6 +27,7 @@ const EducationPage = lazy(() => import('../pages/education/EducationPage').then
 const ContactPage = lazy(() => import('../pages/contact/Contact'));
 const PrivacyPolicyPage = lazy(() => import('../pages/privacy-policy/PrivacyPolicy'));
 const TermsPage = lazy(() => import('../pages/term/Terms'));
+const DataDeletionPage = lazy(() => import('../pages/data-deletion/DataDeletion'));
 import { LoadingScreen } from '../components/layout/LoadingScreen';
 import { ErrorPage } from '../pages/home/ErrorPage';
 
@@ -162,6 +163,15 @@ export const router = createBrowserRouter([
         element: (
           <RouteSuspense>
             <TermsPage />
+          </RouteSuspense>
+        )
+      },
+      // 10. Data Deletion Page
+      {
+        path: 'data-deletion',
+        element: (
+          <RouteSuspense>
+            <DataDeletionPage />
           </RouteSuspense>
         )
       }
