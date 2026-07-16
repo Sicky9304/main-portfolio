@@ -6,6 +6,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { MagneticButton } from '../../components/ui/MagneticButton';
 import { useApi } from '../../hooks/useApi';
 import { fetchProfile } from '../../api/index.js';
+import { useNavigate } from 'react-router-dom';
 
 // Fallback data (used when API is unavailable)
 const FALLBACK_ROLES = [
@@ -25,6 +26,7 @@ const SOCIAL_ICON_MAP = {
 
 export const Hero = () => {
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const { data: profile } = useApi(fetchProfile, null);
 
   const roles = profile?.roles || FALLBACK_ROLES;
@@ -163,11 +165,7 @@ export const Hero = () => {
 
   const scrollToContact = (e) => {
     e.preventDefault();
-    const el = document.getElementById('contact');
-    if (el) {
-      const top = el.getBoundingClientRect().top + window.scrollY - 100;
-      window.scrollTo({ top, behavior: 'smooth' });
-    }
+    navigate('/contact');
   };
 
   // Split name for gradient on last name

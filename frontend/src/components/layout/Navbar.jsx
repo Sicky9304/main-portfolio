@@ -9,7 +9,7 @@ const NAV_LINKS = [
   { label: 'Blog', href: '/blog' },
   { label: 'Education', href: '/education' },
   { label: 'Projects', href: '/projects' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 export const Navbar = () => {

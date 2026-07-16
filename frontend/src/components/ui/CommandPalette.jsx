@@ -5,7 +5,7 @@ import {
   Search, X, Terminal, Sun, Moon, Sparkles, 
   User, Cpu, Briefcase, Settings, MessageSquare, 
   ArrowUp, Compass, ArrowRight, Layers, FileText,
-  GraduationCap
+  GraduationCap, Mail, Shield, Scale
 } from 'lucide-react';
 import { useTheme, gradientThemes } from '../../context/ThemeContext';
 
@@ -98,8 +98,10 @@ export const CommandPalette = () => {
     { id: 'nav-skills', label: 'Go to Skills / TechStack', category: 'Navigation', icon: Cpu, action: () => navigateTo('#skills'), keywords: 'skills tech stack languages node react javascript database mongo' },
     { id: 'nav-projects', label: 'Go to Projects Section', category: 'Navigation', icon: Briefcase, action: () => navigateTo('#projects'), keywords: 'projects portfolio cases showcase live source github code' },
     { id: 'nav-services', label: 'Go to Services Offered', category: 'Navigation', icon: Layers, action: () => navigateTo('#services'), keywords: 'services hiring capabilities backend frontend development API' },
-    { id: 'nav-contact', label: 'Go to Contact / Hire Me', category: 'Navigation', icon: Settings, action: () => navigateTo('#contact'), keywords: 'contact hire message email submit mail' },
+    { id: 'nav-contact', label: 'Go to Contact / Hire Me', category: 'Navigation', icon: Mail, action: () => navigateTo('/contact'), keywords: 'contact hire message email submit mail page social media connect reach out' },
     { id: 'nav-architecture', label: 'View Project Architecture System Design', category: 'Navigation', icon: Terminal, action: () => navigateTo('/architecture'), keywords: 'architecture guide design rulebook agents layout vercel express database schemas' },
+    { id: 'nav-privacy-policy', label: 'View Privacy Policy', category: 'Legal', icon: Shield, action: () => navigateTo('/privacy-policy'), keywords: 'privacy policy data information cookies gdpr legal security' },
+    { id: 'nav-terms', label: 'View Terms & Conditions', category: 'Legal', icon: Scale, action: () => navigateTo('/terms'), keywords: 'terms conditions usage rules intellectual property disclaimer legal' },
   ];
 
   const themeCommands = [

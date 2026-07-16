@@ -35,7 +35,7 @@ export const Footer = () => {
     { label: 'Projects', href: '#projects' },
     { label: 'Blog', href: '/blog' },
     { label: 'Services', href: '#services' },
-    { label: 'Contact', href: '#contact' },
+    { label: 'Contact', href: '/contact' },
     ...(!isBlogPage ? [{ label: 'Architecture', href: '/architecture' }] : []),
   ];
 

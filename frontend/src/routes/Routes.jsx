@@ -12,7 +12,6 @@ const Projects = lazy(() => import('../pages/home/Projects').then(m => ({ defaul
 const GitHubSection = lazy(() => import('../pages/home/GitHubSection').then(m => ({ default: m.GitHubSection })));
 const Services = lazy(() => import('../pages/home/Services').then(m => ({ default: m.Services })));
 const Testimonials = lazy(() => import('../pages/home/Testimonials').then(m => ({ default: m.Testimonials })));
-const Contact = lazy(() => import('../pages/home/Contact').then(m => ({ default: m.Contact })));
 
 // ==========================================
 // LAZY LOAD DYNAMIC PAGES (PRODUCTION PATTERN)
@@ -25,6 +24,9 @@ const ProjectDetailsPage = lazy(() => import('../pages/project/ProjectDetailsPag
 const ProjectsPage = lazy(() => import('../pages/project/ProjectsPage').then(m => ({ default: m.ProjectsPage })));
 const AboutPage = lazy(() => import('../pages/about/AboutPage').then(m => ({ default: m.AboutPage })));
 const EducationPage = lazy(() => import('../pages/education/EducationPage').then(m => ({ default: m.EducationPage })));
+const ContactPage = lazy(() => import('../pages/contact/Contact'));
+const PrivacyPolicyPage = lazy(() => import('../pages/privacy-policy/PrivacyPolicy'));
+const TermsPage = lazy(() => import('../pages/term/Terms'));
 import { LoadingScreen } from '../components/layout/LoadingScreen';
 import { ErrorPage } from '../pages/home/ErrorPage';
 
@@ -46,7 +48,6 @@ const PortfolioHome = () => (
       <GitHubSection />
       <Services />
       <Testimonials />
-      <Contact />
     </Suspense>
   </>
 );
@@ -134,6 +135,33 @@ export const router = createBrowserRouter([
         element: (
           <RouteSuspense>
             <ProjectDetailsPage />
+          </RouteSuspense>
+        )
+      },
+      // 7. Standalone Contact Page
+      {
+        path: 'contact',
+        element: (
+          <RouteSuspense>
+            <ContactPage />
+          </RouteSuspense>
+        )
+      },
+      // 8. Privacy Policy Page
+      {
+        path: 'privacy-policy',
+        element: (
+          <RouteSuspense>
+            <PrivacyPolicyPage />
+          </RouteSuspense>
+        )
+      },
+      // 9. Terms & Conditions Page
+      {
+        path: 'terms',
+        element: (
+          <RouteSuspense>
+            <TermsPage />
           </RouteSuspense>
         )
       }

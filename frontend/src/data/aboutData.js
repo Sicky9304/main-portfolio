@@ -7,7 +7,7 @@ export const aboutData = {
     ctaProjects: "View Projects",
     ctaProjectsHref: "/#projects",
     ctaContact: "Contact Me",
-    ctaContactHref: "/#contact",
+    ctaContactHref: "/contact",
     image: "/src/assets/hero.png"
   },
   aboutMe: {
@@ -137,7 +137,7 @@ export const aboutData = {
     title: "Let's Build Something Amazing Together",
     subtitle: "I am always open to discussing new web development projects, creative ideas, or opportunities to be part of your visions.",
     btnContact: "Contact Me",
-    btnContactHref: "/#contact",
+    btnContactHref: "/contact",
     btnResume: "Download Resume",
     btnResumeHref: "/api/profile/resume"
   }
