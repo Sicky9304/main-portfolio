@@ -28,6 +28,7 @@ const ContactPage = lazy(() => import('../pages/contact/Contact'));
 const PrivacyPolicyPage = lazy(() => import('../pages/privacy-policy/PrivacyPolicy'));
 const TermsPage = lazy(() => import('../pages/term/Terms'));
 const DataDeletionPage = lazy(() => import('../pages/data-deletion/DataDeletion'));
+const InstagramPage = lazy(() => import('../pages/instagram/InstagramPage'));
 import { LoadingScreen } from '../components/layout/LoadingScreen';
 import { ErrorPage } from '../pages/home/ErrorPage';
 
@@ -172,6 +173,15 @@ export const router = createBrowserRouter([
         element: (
           <RouteSuspense>
             <DataDeletionPage />
+          </RouteSuspense>
+        )
+      },
+      // 11. Instagram Feed & Publish Page
+      {
+        path: 'instagram',
+        element: (
+          <RouteSuspense>
+            <InstagramPage />
           </RouteSuspense>
         )
       }

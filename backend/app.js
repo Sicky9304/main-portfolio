@@ -15,6 +15,7 @@ import uploadRoutes from './routes/upload.js';
 import blogRoutes from './blog/blogs.js';
 import aiRoutes from './routes/ai.js';
 import techStackRoutes from './routes/techstack.js';
+import instagramRoutes from './routes/instagram.js';
 import Blog from './blog/Blog.js';
 import Project from './models/Project.js';
 
@@ -116,6 +117,7 @@ app.use('/api/upload',uploadRoutes);
 app.use('/api/blogs',blogRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/techstack', techStackRoutes);
+app.use('/api/instagram', instagramRoutes);
 
 app.use((req,res)=>{
  res.status(404).json({success:false,message:`Route ${req.originalUrl} not found`});
