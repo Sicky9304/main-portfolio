@@ -248,6 +248,14 @@ Located in [`frontend/api/rss.js`](file:///d:/Google%20Antigravity/portfolio/fro
 *   Served at `https://www.sickykumar.in/api/rss` — always live, zero redeploys needed when new blogs are published.
 *   **Required**: `MONGODB_URI` must be set in **Vercel Project Settings → Environment Variables** (same value as `backend/.env`).
 
+### Instagram Feed & Creator Studio (`/instagram`)
+A full-featured integration connecting to Instagram APIs to serve public feeds and allow post publishing:
+*   **Interactive Sound Autoplay on Hover**: Videos/Reels autoplay with audio unmuted on hover (`muted={!isHovered}`). The frontend implements catch handlers to fall back to muted autoplay if restricted by browser security policies.
+*   **Infinite Scrolling (IntersectionObserver)**: The feed utilizes a modern scroll sentinel observed via the browser's `IntersectionObserver` API to paginate next pages automatically.
+*   **Session Caching**: Post lists and cursors are cached at the module level in React to eliminate redundant API calls during routing, fetching fresh lists only when the user manually refreshes the feed or reloads the browser.
+*   **Creator Studio Publishing**: Supports creating and posting images, reels, carousels, and stories. Story posts automatically omit caption parameters to satisfy Meta API requirements.
+*   **Secured Authentication**: Configures specific callback and deauthorization endpoints (`/auth/instagram/callback` and `/auth/instagram/deauthorize`) for compliant Meta OAuth integration.
+
 ### System Architecture Page & SPA Routing Engine
 *   **Architecture Page**: An interactive, glassmorphic route (`/architecture`) served dynamically. It pulls the updated [`AGENTS.md`](file:///d:/Google%20Antigravity/portfolio/.agents/AGENTS.md) content via `GET /api/profile/architecture` and displays the system design, features, and file structure using the `<MarkdownRenderer />` component.
 *   **Footer Links**: Organized into a clean, space-saving **2-column responsive grid** in [`Footer.jsx`](file:///d:/Google%20Antigravity/portfolio/frontend/src/components/layout/Footer.jsx). The "Architecture" link is conditionally rendered so that it only appears in the portfolio section (main landing page) and is hidden when in the blog section.

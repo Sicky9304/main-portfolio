@@ -79,18 +79,11 @@ const PostCard = memo(({ post, index }) => {
   useEffect(() => {
     if (videoRef.current) {
       if (isHovered) {
-        // Try unmuted play first
-        videoRef.current.muted = false;
         videoRef.current.play().catch(err => {
-          console.warn("Unmuted video playback failed, playing muted:", err);
-          if (videoRef.current) {
-            videoRef.current.muted = true;
-            videoRef.current.play().catch(e => console.error("Muted playback failed:", e));
-          }
+          console.warn("Video playback failed:", err);
         });
       } else {
         videoRef.current.pause();
-        videoRef.current.muted = true;
         videoRef.current.currentTime = 0;
       }
     }
@@ -112,7 +105,7 @@ const PostCard = memo(({ post, index }) => {
             src={post.mediaUrl}
             poster={post.thumbnailUrl}
             className="w-full h-full object-cover transition-transform duration-500"
-            muted
+            muted={!isHovered}
             loop
             playsInline
             style={{ transform: isHovered ? 'scale(1.06)' : 'scale(1)' }}
@@ -243,21 +236,23 @@ export default function InstagramPage() {
       const data = await res.json();
       if (!data.success) throw new Error(data.message);
       
-      const updatedPosts = [...posts, ...(data.data || [])];
+      const newItems = data.data || [];
       const updatedCursor = data.paging?.cursors?.after || null;
       
-      setPosts(updatedPosts);
-      setNextCursor(updatedCursor);
+      setPosts(prev => {
+        const updatedPosts = [...prev, ...newItems];
+        clientPostsCache = updatedPosts;
+        return updatedPosts;
+      });
       
-      // Update cache
-      clientPostsCache = updatedPosts;
+      setNextCursor(updatedCursor);
       clientNextCursor = updatedCursor;
     } catch (err) {
       console.error("Failed to load more posts:", err);
     } finally {
       setLoadingMore(false);
     }
-  }, [nextCursor, loadingMore, posts]);
+  }, [nextCursor, loadingMore]);
 
   const sentinelRef = useRef(null);
 
