@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
+import axios from 'axios';
 
 import errorHandler from './middleware/errorHandler.js';
 
@@ -16,6 +17,7 @@ import blogRoutes from './blog/blogs.js';
 import aiRoutes from './routes/ai.js';
 import techStackRoutes from './routes/techstack.js';
 import instagramRoutes from './routes/instagram.js';
+import authInstagramRoutes from './routes/authInstagram.js';
 import Blog from './blog/Blog.js';
 import Project from './models/Project.js';
 
@@ -107,6 +109,8 @@ app.get('/sitemap.xml', async (req, res) => {
     res.status(500).send('Error generating sitemap');
   }
 });
+
+app.use('/auth', authInstagramRoutes);
 
 app.use('/api/projects',projectRoutes);
 app.use('/api/contact',contactLimiter,contactRoutes);

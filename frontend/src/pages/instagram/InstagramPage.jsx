@@ -1,12 +1,11 @@
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Heart, MessageCircle, ExternalLink, Image, Video,
-  Layers, Clock, RefreshCw, Lock, CheckCircle,
-  AlertCircle, X, Users, Eye
+  ExternalLink, Image, Video,
+  Layers, Clock, RefreshCw, Lock, X, Users
 } from 'lucide-react';
 import { RevealOnScroll } from '../../components/ui/Animations';
-import { PublishForm, InsightsBoard } from './CreatorStudio';
+import { PublishForm } from './CreatorStudio';
 
 // ============================================================
 // CONSTANTS & HELPERS
@@ -18,6 +17,11 @@ const getApiBase = () => {
 };
 const API_BASE = getApiBase();
 const ADMIN_PASSCODE = import.meta.env.VITE_ADMIN_PASSCODE || 'Sicky9304@';
+
+// Session-persistent cache variables
+let clientPostsCache = null;
+let clientProfileCache = null;
+let clientNextCursor = null;
 
 function timeAgo(timestamp) {
   const diff = (Date.now() - new Date(timestamp)) / 1000;
@@ -70,18 +74,50 @@ const SkeletonCard = memo(() => (
 const PostCard = memo(({ post, index }) => {
   const [imgError, setImgError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      if (isHovered) {
+        // Try unmuted play first
+        videoRef.current.muted = false;
+        videoRef.current.play().catch(err => {
+          console.warn("Unmuted video playback failed, playing muted:", err);
+          if (videoRef.current) {
+            videoRef.current.muted = true;
+            videoRef.current.play().catch(e => console.error("Muted playback failed:", e));
+          }
+        });
+      } else {
+        videoRef.current.pause();
+        videoRef.current.muted = true;
+        videoRef.current.currentTime = 0;
+      }
+    }
+  }, [isHovered]);
 
   return (
     <motion.article
       initial={{ opacity: 0, y: 24, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.4, delay: index * 0.06 }}
+      transition={{ duration: 0.4, delay: index * 0.04 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       className="glass rounded-[20px] overflow-hidden border border-transparent hover:border-primary/20 transition-all duration-300 group"
     >
       <div className="relative w-full aspect-square overflow-hidden bg-white/5">
-        {!imgError ? (
+        {post.mediaType === 'VIDEO' ? (
+          <video
+            ref={videoRef}
+            src={post.mediaUrl}
+            poster={post.thumbnailUrl}
+            className="w-full h-full object-cover transition-transform duration-500"
+            muted
+            loop
+            playsInline
+            style={{ transform: isHovered ? 'scale(1.06)' : 'scale(1)' }}
+          />
+        ) : !imgError ? (
           <motion.img
             src={post.mediaUrl}
             alt={post.caption || 'Instagram Post'}
@@ -98,26 +134,6 @@ const PostCard = memo(({ post, index }) => {
           </div>
         )}
 
-        <AnimatePresence>
-          {isHovered && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/50 flex items-center justify-center gap-4"
-            >
-              <div className="flex items-center gap-1.5 text-white text-sm font-semibold">
-                <Heart size={16} className="fill-white" />
-                {post.likeCount.toLocaleString()}
-              </div>
-              <div className="flex items-center gap-1.5 text-white text-sm font-semibold">
-                <MessageCircle size={16} className="fill-white" />
-                {post.commentsCount.toLocaleString()}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         <span className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/50 text-white text-[10px] font-semibold backdrop-blur-sm">
           {post.mediaType === 'VIDEO' ? <Video size={11} /> : post.mediaType === 'CAROUSEL_ALBUM' ? <Layers size={11} /> : <Image size={11} />}
           {post.mediaType === 'CAROUSEL_ALBUM' ? 'Album' : post.mediaType === 'VIDEO' ? 'Video' : 'Photo'}
@@ -131,16 +147,6 @@ const PostCard = memo(({ post, index }) => {
           </p>
         )}
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
-              <Heart size={12} className="text-rose-400" />
-              {post.likeCount}
-            </span>
-            <span className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
-              <MessageCircle size={12} className="text-primary" />
-              {post.commentsCount}
-            </span>
-          </div>
           <span className="flex items-center gap-1 text-[10px] text-slate-400 dark:text-slate-600">
             <Clock size={10} />
             {timeAgo(post.timestamp)}
@@ -167,28 +173,59 @@ export default function InstagramPage() {
   const [posts, setPosts] = useState([]);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [nextCursor, setNextCursor] = useState(null);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Admin access gate states
   const [showAdminGate, setShowAdminGate] = useState(false);
   const [passcode, setPasscode] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [passcodeError, setPasscodeError] = useState('');
 
   const fetchPosts = useCallback(async (isRefresh = false) => {
-    if (isRefresh) setRefreshing(true);
-    else setLoading(true);
+    // If not a manual refresh and we have cached data, use it directly
+    if (!isRefresh && clientPostsCache) {
+      setPosts(clientPostsCache);
+      setProfile(clientProfileCache);
+      setNextCursor(clientNextCursor);
+      setLoading(false);
+      return;
+    }
+
+    if (isRefresh) {
+      setRefreshing(true);
+      // Invalidate cache on manual refresh
+      clientPostsCache = null;
+      clientProfileCache = null;
+      clientNextCursor = null;
+    } else {
+      setLoading(true);
+    }
     setError(null);
 
     try {
-      const res = await fetch(`${API_BASE}/instagram/posts`);
+      const res = await fetch(`${API_BASE}/instagram/posts?limit=15`);
       const data = await res.json();
       if (!data.success) throw new Error(data.message);
-      setPosts(data.data || []);
+      
+      const newPosts = data.data || [];
+      const newCursor = data.paging?.cursors?.after || null;
+      
+      setPosts(newPosts);
+      setNextCursor(newCursor);
+
+      // Save to cache
+      clientPostsCache = newPosts;
+      clientNextCursor = newCursor;
 
       const profRes = await fetch(`${API_BASE}/instagram/profile`);
       const profData = await profRes.json();
-      if (profData.success) setProfile(profData.data);
+      if (profData.success) {
+        setProfile(profData.data);
+        clientProfileCache = profData.data;
+      }
     } catch (err) {
       setError(err.message || 'Failed to load Instagram posts.');
     } finally {
@@ -197,9 +234,61 @@ export default function InstagramPage() {
     }
   }, []);
 
+  const loadMorePosts = useCallback(async () => {
+    if (!nextCursor || loadingMore) return;
+    setLoadingMore(true);
+
+    try {
+      const res = await fetch(`${API_BASE}/instagram/posts?limit=15&after=${nextCursor}`);
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message);
+      
+      const updatedPosts = [...posts, ...(data.data || [])];
+      const updatedCursor = data.paging?.cursors?.after || null;
+      
+      setPosts(updatedPosts);
+      setNextCursor(updatedCursor);
+      
+      // Update cache
+      clientPostsCache = updatedPosts;
+      clientNextCursor = updatedCursor;
+    } catch (err) {
+      console.error("Failed to load more posts:", err);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [nextCursor, loadingMore, posts]);
+
+  const sentinelRef = useRef(null);
+
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
+
+  // Observer to trigger infinite scrolling
+  useEffect(() => {
+    if (loading || !nextCursor) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loadingMore) {
+          loadMorePosts();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentSentinel = sentinelRef.current;
+    if (currentSentinel) {
+      observer.observe(currentSentinel);
+    }
+
+    return () => {
+      if (currentSentinel) {
+        observer.unobserve(currentSentinel);
+      }
+    };
+  }, [loading, nextCursor, loadingMore, loadMorePosts]);
 
   const handlePasscode = () => {
     if (passcode === ADMIN_PASSCODE) {
@@ -234,8 +323,10 @@ export default function InstagramPage() {
                 </div>
               </div>
               <div className="text-right text-xs text-slate-400 space-y-1">
-                <p className="flex items-center gap-1 justify-end"><Users size={12} /> {profile.followers_count} Followers</p>
-                <p>📸 {profile.media_count} Posts</p>
+                {profile.followers_count > 0 && (
+                  <p className="flex items-center gap-1 justify-end"><Users size={12} /> {profile.followers_count} Followers</p>
+                )}
+                {profile.media_count > 0 && <p>📸 {profile.media_count} Posts</p>}
               </div>
             </div>
           </RevealOnScroll>
@@ -261,7 +352,7 @@ export default function InstagramPage() {
               type="button"
               onClick={() => fetchPosts(true)}
               disabled={refreshing}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass border border-white/10 text-xs font-semibold text-slate-300"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass border border-white/10 text-xs font-semibold text-slate-300 hover:border-primary/20 transition-all duration-200"
             >
               <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
               {refreshing ? 'Refreshing…' : 'Refresh Feed'}
@@ -288,21 +379,45 @@ export default function InstagramPage() {
           </div>
         </motion.div>
 
-        {/* Admin Console & Publish */}
-        {isAdmin && <InsightsBoard />}
-        {isAdmin && <PublishForm onSuccess={() => fetchPosts(true)} />}
+        {/* Creator Studio Form */}
+        {isAdmin && <PublishForm onSuccess={() => fetchPosts(true)} passcode={passcode} />}
 
         {/* Main Grid */}
-        {!error && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {loading
-              ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
-              : posts.map((post, i) => <PostCard key={post.id} post={post} index={i} />)
-            }
+        {!error ? (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              {loading
+                ? Array.from({ length: 9 }).map((_, i) => <SkeletonCard key={i} />)
+                : posts.map((post, i) => <PostCard key={post.id} post={post} index={i} />)
+              }
+            </div>
+
+            {/* Infinite Scroll Loading Sentinel / Status */}
+            {nextCursor && !loading ? (
+              <div ref={sentinelRef} className="flex justify-center py-8">
+                {loadingMore && (
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+                    <RefreshCw size={14} className="animate-spin text-primary" />
+                    Loading More...
+                  </div>
+                )}
+              </div>
+            ) : !loading && posts.length > 0 ? (
+              <div className="flex justify-center py-8">
+                <p className="text-xs font-semibold text-slate-500/80 dark:text-slate-450/60">
+                  You've caught up with all posts!
+                </p>
+              </div>
+            ) : null}
+          </>
+        ) : (
+          <div className="text-center py-12 glass rounded-2xl max-w-md mx-auto border border-red-500/20">
+            <p className="text-red-400 text-sm font-semibold mb-2">Error Loading Feed</p>
+            <p className="text-slate-400 text-xs px-4">{error}</p>
           </div>
         )}
 
-        {/* Passcode Gate */}
+        {/* Passcode Gate Dialog */}
         <AnimatePresence>
           {showAdminGate && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">

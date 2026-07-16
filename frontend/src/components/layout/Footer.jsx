@@ -29,14 +29,20 @@ export const Footer = () => {
 
   const isBlogPage = currentPath.startsWith('/blog');
 
-  const footerLinks = [
-    { label: 'About', href: '#about' },
-    { label: 'Skills', href: '#skills' },
-    { label: 'Projects', href: '#projects' },
-    { label: 'Blog', href: '/blog' },
-    { label: 'Services', href: '#services' },
+  const pageLinks = [
+    { label: 'About Me', href: '/about' },
+    { label: 'Education', href: '/education' },
+    { label: 'Project Catalog', href: '/projects' },
+    { label: 'Blog Catalog', href: '/blog' },
+    { label: 'Instagram Feed', href: '/instagram' },
+    { label: 'System Design', href: '/architecture' },
     { label: 'Contact', href: '/contact' },
-    ...(!isBlogPage ? [{ label: 'Architecture', href: '/architecture' }] : []),
+  ];
+
+  const legalLinks = [
+    { label: 'Terms of Service', href: '/terms' },
+    { label: 'Privacy Policy', href: '/privacy-policy' },
+    { label: 'Data Deletion', href: '/data-deletion' },
   ];
 
   const socialLinks = [
@@ -89,7 +95,7 @@ export const Footer = () => {
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 pt-20 pb-8">
           <RevealOnScroll>
-            <div className="grid md:grid-cols-3 gap-12 mb-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 mb-16">
               {/* Brand */}
               <div className="space-y-4">
                 <h3 className="text-2xl font-bold" style={{ fontFamily: 'Satoshi, sans-serif' }}>
@@ -101,13 +107,33 @@ export const Footer = () => {
                 </p>
               </div>
 
-              {/* Quick Links */}
+              {/* Pages Links */}
               <div>
                 <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-widest mb-4">
-                  Quick Links
+                  Pages
                 </h4>
-                <ul className="grid grid-cols-2 gap-x-4 gap-y-2.5">
-                  {footerLinks.map((link) => (
+                <ul className="space-y-2.5">
+                  {pageLinks.map((link) => (
+                    <li key={link.label}>
+                      <a
+                        href={link.href}
+                        onClick={(e) => scrollToSection(e, link.href)}
+                        className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary-light transition-colors"
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Legal Links */}
+              <div>
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-widest mb-4">
+                  Legal
+                </h4>
+                <ul className="space-y-2.5">
+                  {legalLinks.map((link) => (
                     <li key={link.label}>
                       <a
                         href={link.href}

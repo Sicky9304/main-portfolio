@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { label: 'Blog', href: '/blog' },
   { label: 'Education', href: '/education' },
   { label: 'Projects', href: '/projects' },
+  { label: 'Instagram Feed', href: '/instagram' },
   { label: 'Contact', href: '/contact' },
 ];
 
