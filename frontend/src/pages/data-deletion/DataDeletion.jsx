@@ -138,30 +138,29 @@ export default function DataDeletion() {
                 </span>
               </div>
               {/* Steps */}
-              <div className="flex flex-col sm:flex-row gap-0">
+              <div className="relative flex flex-col sm:flex-row gap-6 sm:gap-0 mt-2">
+                {/* Desktop connector line behind circles */}
+                <div className="hidden sm:block absolute top-[18px] left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-accent/30 via-secondary/40 to-accent/30 z-0" />
+
                 {[
                   { step: '01', label: 'Request Received', time: 'Day 0', desc: 'We log your deletion request.' },
                   { step: '02', label: 'Acknowledgement', time: 'Within 2 Days', desc: 'Confirmation email is sent to you.' },
                   { step: '03', label: 'Verification', time: 'Within 5 Days', desc: 'We verify your identity & locate data.' },
                   { step: '04', label: 'Data Removed', time: 'Within 30 Days', desc: 'All personal records are permanently deleted.' },
-                ].map((item, i, arr) => (
-                  <div key={i} className="flex sm:flex-col items-start sm:items-center flex-1 gap-3 sm:gap-0 group">
-                    {/* Circle + connector */}
-                    <div className="flex sm:flex-col items-center">
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-accent to-secondary flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-md shadow-accent/20">
-                        {item.step}
-                      </div>
-                      {i < arr.length - 1 && (
-                        <div className="sm:hidden w-px h-8 bg-gradient-to-b from-accent/40 to-transparent ml-4" />
-                      )}
-                      {i < arr.length - 1 && (
-                        <div className="hidden sm:block h-px flex-1 w-full bg-gradient-to-r from-accent/40 to-transparent mt-[-18px] mx-1" />
-                      )}
+                ].map((item, i) => (
+                  <div key={i} className="relative z-10 flex sm:flex-col items-center sm:items-center flex-1 gap-4 sm:gap-0">
+                    {/* Mobile vertical connector */}
+                    {i < 3 && (
+                      <div className="sm:hidden absolute left-[18px] top-9 w-0.5 h-full bg-gradient-to-b from-accent/40 to-transparent" />
+                    )}
+                    {/* Numbered circle */}
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-accent to-secondary flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-md shadow-accent/20 z-10">
+                      {item.step}
                     </div>
                     {/* Text */}
-                    <div className="sm:text-center sm:mt-3 pb-4 sm:pb-0 sm:px-1">
+                    <div className="sm:text-center sm:mt-3 sm:px-2">
                       <p className="text-xs font-bold text-slate-900 dark:text-white">{item.label}</p>
-                      <span className="inline-block my-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-secondary/10 text-secondary border border-secondary/20">
+                      <span className="inline-block mt-1 mb-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-secondary/10 text-secondary border border-secondary/20">
                         {item.time}
                       </span>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">{item.desc}</p>
