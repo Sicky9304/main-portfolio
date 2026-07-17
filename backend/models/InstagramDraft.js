@@ -18,6 +18,29 @@ const instagramDraftSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    scheduledFor: {
+      type: Date,
+    },
+    status: {
+      type: String,
+      enum: ['draft', 'scheduled', 'published', 'failed'],
+      default: 'draft',
+    },
+    errorMessage: {
+      type: String,
+    },
+    userTags: {
+      type: [mongoose.Schema.Types.Mixed],
+      default: [],
+    },
+    collaborators: {
+      type: [String],
+      default: [],
+    },
+    location: {
+      type: String,
+      trim: true,
+    },
   },
   {
     timestamps: true,

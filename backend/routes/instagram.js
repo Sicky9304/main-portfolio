@@ -2,6 +2,7 @@ import { Router } from 'express';
 import axios from 'axios';
 import adminAuth from '../middleware/adminAuth.js';
 import InstagramDraft from '../models/InstagramDraft.js';
+import { publishToInstagram } from '../utils/instagramPublisher.js';
 
 const router = Router();
 const IG_BASE_URL = 'https://graph.instagram.com';
@@ -38,7 +39,7 @@ router.get('/posts', async (req, res) => {
     }
 
     // Only query fields supported by the Instagram Basic Display API
-    const fields = 'id,caption,media_type,media_url,thumbnail_url,permalink,timestamp';
+    const fields = 'id,caption,media_type,media_url,thumbnail_url,permalink,timestamp,location,children{media_url,media_type,thumbnail_url}';
     const params = {
       fields,
       limit,
@@ -64,6 +65,8 @@ router.get('/posts', async (req, res) => {
       thumbnailUrl: post.thumbnail_url || post.media_url || null,
       permalink: post.permalink,
       timestamp: post.timestamp,
+      location: post.location?.name || '',
+      carouselMedia: post.children?.data?.map(child => child.media_url || child.thumbnail_url) || []
     }));
 
     // Cache the first page response
@@ -118,124 +121,103 @@ router.get('/profile', async (req, res) => {
   }
 });
 
-// POST /api/instagram/publish (Secure Admin Only)
-router.post('/publish', adminAuth, async (req, res) => {
+// GET /api/instagram/suggestions (Secure Admin Only)
+router.get('/suggestions', adminAuth, async (req, res) => {
   try {
-    const { imageUrl, videoUrl, mediaUrls, caption, postType = 'IMAGE' } = req.body;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const userId = process.env.INSTAGRAM_USER_ID;
 
-    if (!accessToken || !userId) {
-      return res.status(500).json({ success: false, message: 'Instagram credentials not configured.' });
-    }
+    const tags = new Set(['sickykumar', 'reactjs', 'nextjs', 'github', 'googledevs']);
+    const locations = new Set(['Mumbai, India', 'Bengaluru, India', 'Developer Desk 💻', 'Home 🏠', 'Road Trip 🚗']);
 
-    if (postType !== 'STORY' && (!caption || caption.trim().length === 0)) {
-      return res.status(400).json({ success: false, message: 'A caption is required.' });
-    }
-
-    let containerId = null;
-
-    if (postType === 'CAROUSEL') {
-      if (!mediaUrls || !Array.isArray(mediaUrls) || mediaUrls.length < 2) {
-        return res.status(400).json({ success: false, message: 'Carousel requires at least 2 public media URLs.' });
-      }
-
-      // Step 1: Create individual item containers
-      const itemContainerIds = [];
-      for (const url of mediaUrls) {
-        const itemRes = await axios.post(`${IG_BASE_URL}/${userId}/media`, null, {
+    if (accessToken && userId) {
+      try {
+        const response = await axios.get(`${IG_BASE_URL}/${userId}/media`, {
           params: {
-            image_url: url,
-            is_carousel_item: true,
-            access_token: accessToken,
+            fields: 'caption,location',
+            limit: 30,
+            access_token: accessToken
           },
+          timeout: 5000
         });
-        if (itemRes.data?.id) {
-          itemContainerIds.push(itemRes.data.id);
-        }
-      }
-
-      // Step 2: Create the main Carousel Container linking those items
-      const carouselRes = await axios.post(`${IG_BASE_URL}/${userId}/media`, null, {
-        params: {
-          media_type: 'CAROUSEL',
-          children: itemContainerIds.join(','),
-          caption: caption.trim(),
-          access_token: accessToken,
-        },
-      });
-      containerId = carouselRes.data?.id;
-
-    } else {
-      const mediaUrl = postType === 'REELS' ? videoUrl : imageUrl;
-      if (!mediaUrl || !mediaUrl.startsWith('http')) {
-        return res.status(400).json({ success: false, message: 'A valid public media URL is required.' });
-      }
-
-      const params = {
-        access_token: accessToken,
-      };
-
-      if (postType !== 'STORY') {
-        params.caption = caption.trim();
-      }
-
-      if (postType === 'REELS') {
-        params.media_type = 'REELS';
-        params.video_url = mediaUrl;
-      } else if (postType === 'STORY') {
-        params.media_type = 'STORIES';
-        const isVideo = mediaUrl.toLowerCase().match(/\.(mp4|mov|avi|wmv|flv|mkv|webm|m4v|3gp|qt)/) || videoUrl;
-        if (isVideo) {
-          params.video_url = mediaUrl;
-        } else {
-          params.image_url = mediaUrl;
-        }
-      } else {
-        params.image_url = mediaUrl;
-      }
-
-      const containerResponse = await axios.post(`${IG_BASE_URL}/${userId}/media`, null, { params, timeout: 20000 });
-      containerId = containerResponse.data?.id;
-    }
-
-    if (!containerId) {
-      return res.status(500).json({ success: false, message: 'Failed to create Instagram media container.' });
-    }
-
-    // Wait for container validation (specifically for reels and video stories)
-    const mediaUrl = postType === 'REELS' ? videoUrl : imageUrl;
-    const isVideoStory = postType === 'STORY' && (mediaUrl?.toLowerCase().match(/\.(mp4|mov|avi|wmv|flv|mkv|webm|m4v|3gp|qt)/) || videoUrl);
-    if (postType === 'REELS' || isVideoStory) {
-      let isReady = false;
-      let attempts = 0;
-      while (!isReady && attempts < 12) {
-        await new Promise((resolve) => setTimeout(resolve, 5000));
-        attempts++;
-        try {
-          const statusRes = await axios.get(`${IG_BASE_URL}/${containerId}`, {
-            params: {
-              fields: 'status_code',
-              access_token: accessToken,
-            },
-          });
-          if (statusRes.data?.status_code === 'FINISHED') isReady = true;
-          if (statusRes.data?.status_code === 'ERROR') {
-            return res.status(500).json({ success: false, message: 'Instagram failed to process video.' });
+        const posts = response.data?.data || [];
+        posts.forEach(post => {
+          if (post.caption) {
+            const matches = post.caption.match(/@([a-zA-Z0-9_\.]+)/g);
+            if (matches) {
+              matches.forEach(m => tags.add(m.replace('@', '').toLowerCase()));
+            }
           }
-        } catch (e) {}
+          if (post.location && post.location.name) {
+            locations.add(post.location.name);
+          }
+        });
+      } catch (err) {
+        console.error('[Suggestions] Failed to fetch live suggestions from Instagram API:', err.message);
       }
-    } else {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
     }
 
-    // Step 2: Publish the container
-    const publishResponse = await axios.post(`${IG_BASE_URL}/${userId}/media_publish`, null, {
-      params: {
-        creation_id: containerId,
-        access_token: accessToken,
-      },
-      timeout: 15000,
+    return res.json({
+      success: true,
+      tags: Array.from(tags),
+      locations: Array.from(locations)
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Failed to fetch suggestions.' });
+  }
+});
+
+// GET /api/instagram/search-users (Secure Admin Only)
+router.get('/search-users', adminAuth, async (req, res) => {
+  try {
+    const query = (req.query.q || '').trim();
+    if (!query || query.length < 2) {
+      return res.json({ success: true, users: [] });
+    }
+
+    const searchUrl = `https://search.yahoo.com/search?q=site:instagram.com+${encodeURIComponent(query)}`;
+    const response = await fetch(searchUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    });
+
+    const html = await response.text();
+    console.log('[Search] Query:', query, 'HTML Length:', html.length);
+
+    const regex = /instagram\.com\/([a-zA-Z0-9_\.]+)/gi;
+    const users = new Set();
+    const blacklist = ['p', 'reels', 'tv', 'stories', 'explore', 'developer', 'about', 'legal', 'accounts', 'terms', 'privacy', 'ar', 'help', 'reel'];
+
+    let match;
+    while ((match = regex.exec(html)) !== null) {
+      const user = match[1].toLowerCase().split('/')[0];
+      if (user && !blacklist.includes(user) && !user.includes('.')) {
+        users.add(user);
+      }
+    }
+
+    console.log('[Search] Found users count:', users.size);
+    return res.json({ success: true, users: Array.from(users).slice(0, 8) });
+  } catch (error) {
+    console.error('Failed to search Instagram users:', error.message);
+    return res.status(500).json({ success: false, message: 'Failed to search users.' });
+  }
+});
+
+// POST /api/instagram/publish (Secure Admin Only)
+router.post('/publish', adminAuth, async (req, res) => {
+  try {
+    const { imageUrl, videoUrl, mediaUrls, caption, postType = 'IMAGE', userTags, collaborators } = req.body;
+    
+    const result = await publishToInstagram({
+      imageUrl,
+      videoUrl,
+      mediaUrls,
+      caption,
+      postType,
+      userTags,
+      collaborators
     });
 
     // Invalidate Cache
@@ -245,14 +227,14 @@ router.post('/publish', adminAuth, async (req, res) => {
     return res.json({
       success: true,
       message: `Successfully published ${postType} to Instagram! 🎉`,
-      postId: publishResponse.data?.id,
+      postId: result?.id,
     });
 
   } catch (error) {
     console.error("Instagram publish failed:", error.response?.data || error.message);
     return res.status(500).json({
       success: false,
-      message: error.response?.data?.error?.message || 'Instagram API publish returned an error.',
+      message: error.response?.data?.error?.message || error.message || 'Instagram API publish returned an error.',
     });
   }
 });
@@ -270,18 +252,24 @@ router.get('/drafts', adminAuth, async (req, res) => {
 // POST /api/instagram/drafts (Secure Admin Only)
 router.post('/drafts', adminAuth, async (req, res) => {
   try {
-    const { postType, mediaUrl, mediaUrls, caption } = req.body;
-    if (!caption || caption.trim().length === 0) {
+    const { postType, mediaUrl, mediaUrls, caption, scheduledFor, userTags, collaborators, location } = req.body;
+    if (postType !== 'STORY' && (!caption || caption.trim().length === 0)) {
       return res.status(400).json({ success: false, message: 'Caption is required.' });
     }
+    const status = scheduledFor ? 'scheduled' : 'draft';
     const newDraft = new InstagramDraft({
       postType,
       mediaUrl,
       mediaUrls,
-      caption: caption.trim()
+      caption: caption ? caption.trim() : '',
+      scheduledFor: scheduledFor ? new Date(scheduledFor) : undefined,
+      status,
+      userTags,
+      collaborators,
+      location
     });
     await newDraft.save();
-    return res.json({ success: true, message: 'Draft saved successfully! ✓', data: newDraft });
+    return res.json({ success: true, message: scheduledFor ? 'Post scheduled successfully! ⏰' : 'Draft saved successfully! ✓', data: newDraft });
   } catch (error) {
     return res.status(500).json({ success: false, message: 'Failed to save draft.' });
   }

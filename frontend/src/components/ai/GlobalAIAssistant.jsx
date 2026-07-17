@@ -123,11 +123,19 @@ export const GlobalAIAssistant = () => {
     }
   };
 
+  const handleSuggestionClick = (sug) => {
+    if (sug === "Write an Instagram caption...") {
+      setInputValue("Write an Instagram caption about ");
+    } else {
+      handleSendMessage(sug);
+    }
+  };
+
   const suggestions = [
+    "Write an Instagram caption...",
     "What is Sicky's tech stack?",
     "Recommend a MERN project",
     "What services does Sicky offer?",
-    "How can I contact Sicky?"
   ];
 
   return (
@@ -228,7 +236,7 @@ export const GlobalAIAssistant = () => {
                     {suggestions.map((sug, sIdx) => (
                       <button
                         key={sIdx}
-                        onClick={() => handleSendMessage(sug)}
+                        onClick={() => handleSuggestionClick(sug)}
                         disabled={isTyping}
                         className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-900 hover:border-primary/30 text-[9px] text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-all cursor-pointer disabled:opacity-40 whitespace-nowrap"
                       >

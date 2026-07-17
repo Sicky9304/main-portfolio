@@ -1,18 +1,21 @@
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Upload, X, Loader2, Send, Hash, ImagePlus, CheckCircle, FileText, Trash2, Globe
+  Upload, X, Loader2, Send, Hash, ImagePlus, CheckCircle, FileText, Trash2, Globe, Sparkles
 } from 'lucide-react';
 import { RevealOnScroll } from '../../components/ui/Animations';
 
 const getApiBase = () => {
+  if (import.meta.env.DEV) {
+    return '/api';
+  }
   const url = import.meta.env.VITE_API_URL || '';
   if (url.endsWith('/api')) return url;
   return url ? `${url}/api` : '/api';
 };
 const API_BASE = getApiBase();
 
-export const PublishForm = memo(({ onSuccess, passcode }) => {
+export const PublishForm = memo(({ onSuccess, passcode, profile }) => {
   const [activeTab, setActiveTab] = useState('CREATE'); // 'CREATE' | 'DRAFTS'
   const [postType, setPostType] = useState('IMAGE'); // 'IMAGE' | 'REELS' | 'CAROUSEL'
   const [imageUrl, setImageUrl] = useState('');
@@ -31,6 +34,190 @@ export const PublishForm = memo(({ onSuccess, passcode }) => {
   // AI Hashtag State
   const [aiTopic, setAiTopic] = useState('');
   const [generatingTags, setGeneratingTags] = useState(false);
+  const [generatingCaption, setGeneratingCaption] = useState(false);
+
+  // Post Scheduling State
+  const [isScheduling, setIsScheduling] = useState(false);
+  const [scheduledDate, setScheduledDate] = useState('');
+  const [imageFit, setImageFit] = useState('cover'); // 'cover' | 'contain'
+
+  // Tagging & Collaborators State
+  const [tagInput, setTagInput] = useState('');
+  const [collaboratorInput, setCollaboratorInput] = useState('');
+  const [locationInput, setLocationInput] = useState('');
+
+  // Auto-Suggestions Trays
+  const [showTagSuggestions, setShowTagSuggestions] = useState(false);
+  const [showCollabSuggestions, setShowCollabSuggestions] = useState(false);
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
+
+  // Dynamic user data suggestions with localStorage backup
+  const [suggestedTags, setSuggestedTags] = useState(() => {
+    const saved = localStorage.getItem('ig_suggested_tags');
+    const defaults = ['sickykumar', 'reactjs', 'nextjs', 'github', 'googledevs'];
+    return saved ? JSON.parse(saved) : defaults;
+  });
+
+  const [suggestedLocations, setSuggestedLocations] = useState(() => {
+    const saved = localStorage.getItem('ig_suggested_locations');
+    const defaults = ['Mumbai, India', 'Bengaluru, India', 'Developer Desk 💻', 'Home 🏠', 'Road Trip 🚗'];
+    return saved ? JSON.parse(saved) : defaults;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('ig_suggested_tags', JSON.stringify(suggestedTags));
+  }, [suggestedTags]);
+
+  useEffect(() => {
+    localStorage.setItem('ig_suggested_locations', JSON.stringify(suggestedLocations));
+  }, [suggestedLocations]);
+
+  // Live Map search suggestions from OpenStreetMap Nominatim
+  const [mapLocations, setMapLocations] = useState([]);
+  const [searchingMap, setSearchingMap] = useState(false);
+
+  useEffect(() => {
+    const clean = locationInput.trim();
+    if (clean.length < 3) {
+      setMapLocations([]);
+      return;
+    }
+
+    setSearchingMap(true);
+    const delay = setTimeout(async () => {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(clean)}&limit=5`, {
+          headers: { 'User-Agent': 'SickyMernPortfolio/1.0' }
+        });
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          const formatted = data.map(item => {
+            const parts = item.display_name.split(',');
+            if (parts.length > 2) {
+              return parts.slice(0, 2).join(',').trim();
+            }
+            return item.display_name;
+          });
+          setMapLocations(Array.from(new Set(formatted)));
+        }
+      } catch (err) {
+        console.error("OSM Nominatim fetch error:", err);
+      } finally {
+        setSearchingMap(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(delay);
+  }, [locationInput]);
+
+  useEffect(() => {
+    if (!passcode) return;
+    const fetchSuggestions = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/instagram/suggestions`, {
+          headers: { 'x-admin-token': passcode }
+        });
+        const data = await res.json();
+        if (data.success) {
+          // Merge fetched API suggestions with local suggestions to avoid duplicates
+          if (data.tags?.length > 0) {
+            setSuggestedTags(prev => Array.from(new Set([...prev, ...data.tags])));
+          }
+          if (data.locations?.length > 0) {
+            setSuggestedLocations(prev => Array.from(new Set([...prev, ...data.locations])));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load user autocomplete suggestions:", err);
+      }
+    };
+    fetchSuggestions();
+  }, [passcode]);
+
+  // Refs for tracking clicks outside autocomplete containers
+  const locationRef = useRef(null);
+  const tagRef = useRef(null);
+  const collabRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (locationRef.current && !locationRef.current.contains(event.target)) {
+        setShowLocationSuggestions(false);
+      }
+      if (tagRef.current && !tagRef.current.contains(event.target)) {
+        setShowTagSuggestions(false);
+      }
+      if (collabRef.current && !collabRef.current.contains(event.target)) {
+        setShowCollabSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Suggestions search & auto-fill helpers
+  const getActiveSearchTerm = (input) => {
+    if (!input) return '';
+    const parts = input.split(',');
+    const lastPart = parts[parts.length - 1].trim();
+    return lastPart.replace(/^@/, '').toLowerCase();
+  };
+
+  const tagSuggestionsPool = suggestedTags;
+  const activeTagSearch = getActiveSearchTerm(tagInput);
+  const filteredTagSuggestions = activeTagSearch 
+    ? tagSuggestionsPool.filter(acc => acc.toLowerCase().includes(activeTagSearch))
+    : tagSuggestionsPool;
+
+  const handleSelectTag = (acc) => {
+    const parts = tagInput.split(',').map(x => x.trim()).filter(Boolean);
+    if (parts.length > 0) {
+      parts[parts.length - 1] = acc;
+    } else {
+      parts.push(acc);
+    }
+    setTagInput(parts.join(', ') + ', ');
+  };
+
+  const activeCollabSearch = getActiveSearchTerm(collaboratorInput);
+  const filteredCollabSuggestions = activeCollabSearch 
+    ? tagSuggestionsPool.filter(acc => acc.toLowerCase().includes(activeCollabSearch))
+    : tagSuggestionsPool;
+
+  const handleSelectCollab = (acc) => {
+    const parts = collaboratorInput.split(',').map(x => x.trim()).filter(Boolean);
+    if (parts.length > 0) {
+      parts[parts.length - 1] = acc;
+    } else {
+      parts.push(acc);
+    }
+    setCollaboratorInput(parts.join(', ') + ', ');
+  };
+
+  const locSuggestionsPool = suggestedLocations;
+  const filteredLocSuggestions = locationInput.trim()
+    ? locSuggestionsPool.filter(loc => loc.toLowerCase().includes(locationInput.toLowerCase()))
+    : locSuggestionsPool;
+
+  const triggerAutoCaption = async (mediaUrl, type) => {
+    if (postType === 'STORY') return;
+    setGeneratingCaption(true);
+    try {
+      const res = await fetch(`${API_BASE}/ai/auto-caption`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mediaUrl, postType: type })
+      });
+      const data = await res.json();
+      if (data.success && data.text) {
+        setCaption(data.text);
+      }
+    } catch (err) {
+      console.error("AI auto-captioning error:", err);
+    } finally {
+      setGeneratingCaption(false);
+    }
+  };
 
   const fetchDrafts = useCallback(async () => {
     setLoadingDrafts(true);
@@ -55,17 +242,35 @@ export const PublishForm = memo(({ onSuccess, passcode }) => {
     }
   }, [activeTab, fetchDrafts]);
 
-  const generateAIHashtags = () => {
+  const generateAICaptionAndHashtags = async () => {
     if (!aiTopic.trim()) return;
     setGeneratingTags(true);
-    setTimeout(() => {
-      const basicTags = aiTopic.toLowerCase().split(' ').map(word => `#${word.replace(/[^a-z0-9]/g, '')}`).join(' ');
-      const devTags = ` #webdevelopment #mernstack #coding #sickykumar #developer #techtools`;
-      setCaption(prev => `${prev}\n\n${basicTags}${devTags}`);
+    setStatus(null);
+    try {
+      const mediaUrl = postType === 'REELS' ? videoUrl : imageUrl;
+      const res = await fetch(`${API_BASE}/ai/auto-caption`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mediaUrl,
+          postType,
+          topic: aiTopic
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.text) {
+        setCaption(data.text);
+        setAiTopic('');
+        setStatus({ type: 'success', msg: 'AI caption & hashtags generated successfully! ✨' });
+      } else {
+        throw new Error(data.message || 'Failed to generate');
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus({ type: 'error', msg: 'AI generation failed: ' + err.message });
+    } finally {
       setGeneratingTags(false);
-      setAiTopic('');
-      setStatus({ type: 'success', msg: 'AI tags appended to caption!' });
-    }, 800);
+    }
   };
 
   const handleFileUpload = async (e) => {
@@ -98,6 +303,7 @@ export const PublishForm = memo(({ onSuccess, passcode }) => {
         setCarouselUrls(prev => [...prev, ...uploadedUrls]);
         if (uploadedUrls.length > 0) {
           setPreview(uploadedUrls[0]);
+          triggerAutoCaption(uploadedUrls[0], 'CAROUSEL');
         }
         setStatus({ type: 'success', msg: `${uploadedUrls.length} image(s) uploaded ✓` });
       } else {
@@ -120,8 +326,10 @@ export const PublishForm = memo(({ onSuccess, passcode }) => {
 
         if (postType === 'REELS') {
           setVideoUrl(data.url);
+          triggerAutoCaption(data.url, 'REELS');
         } else {
           setImageUrl(data.url);
+          triggerAutoCaption(data.url, 'IMAGE');
         }
         setPreview(data.url);
         setStatus({ type: 'success', msg: 'Media uploaded successfully ✓' });
@@ -145,6 +353,16 @@ export const PublishForm = memo(({ onSuccess, passcode }) => {
       return setStatus({ type: 'error', msg: 'Caption cannot be empty.' });
     }
 
+    const userTags = tagInput ? tagInput.split(',').map(username => ({
+      username: username.trim(),
+      x: 0.5,
+      y: 0.5
+    })).filter(t => t.username.length > 0) : undefined;
+
+    const collaborators = collaboratorInput ? collaboratorInput.split(',').map(u => u.trim()).filter(u => u.length > 0) : undefined;
+    const location = locationInput ? locationInput.trim() : undefined;
+
+    const isScheduledPost = actionType === 'DRAFT' && isScheduling && scheduledDate;
     setSubmitting(true);
     setStatus(null);
 
@@ -157,12 +375,16 @@ export const PublishForm = memo(({ onSuccess, passcode }) => {
           'x-admin-token': passcode
         },
         body: JSON.stringify({
-          imageUrl: postType === 'IMAGE' ? mediaUrl : undefined,
-          videoUrl: postType === 'REELS' ? mediaUrl : undefined,
+          imageUrl: postType === 'IMAGE' || (postType === 'STORY' && !videoUrl) ? mediaUrl : undefined,
+          videoUrl: postType === 'REELS' || (postType === 'STORY' && videoUrl) ? mediaUrl : undefined,
           mediaUrls: postType === 'CAROUSEL' ? carouselUrls : undefined,
           mediaUrl: postType !== 'CAROUSEL' ? mediaUrl : undefined,
           caption,
-          postType
+          postType,
+          scheduledFor: isScheduledPost ? scheduledDate : undefined,
+          userTags,
+          collaborators,
+          location
         }),
       });
 
@@ -175,6 +397,11 @@ export const PublishForm = memo(({ onSuccess, passcode }) => {
       setCarouselUrls([]);
       setCaption('');
       setPreview(null);
+      setIsScheduling(false);
+      setScheduledDate('');
+      setTagInput('');
+      setCollaboratorInput('');
+      setLocationInput('');
       if (actionType === 'PUBLISH') {
         onSuccess?.();
       }
@@ -238,7 +465,7 @@ export const PublishForm = memo(({ onSuccess, passcode }) => {
 
   return (
     <RevealOnScroll direction="up">
-      <div className="glass rounded-[28px] p-6 border border-primary/15 relative overflow-hidden mb-8 max-w-4xl mx-auto">
+      <div className="glass rounded-[28px] p-6 border border-primary/15 relative overflow-hidden mb-8 max-w-6xl w-full mx-auto">
         <div className="blob blob-primary w-[150px] h-[150px] -top-10 -right-10 opacity-10 pointer-events-none" />
 
         <div className="relative z-10 space-y-6">
@@ -274,189 +501,490 @@ export const PublishForm = memo(({ onSuccess, passcode }) => {
                 exit={{ opacity: 0, y: -10 }}
                 className="space-y-6"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
-                  <div>
-                    <p className="text-sm font-bold text-slate-900 dark:text-white">Publish Creator Studio</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Post directly to Instagram Feed, Reels or Carousel</p>
-                  </div>
-
-                  {/* Post Type Selector */}
-                  <div className="flex bg-white/5 p-1 rounded-xl border border-white/10 flex-wrap">
-                    {['IMAGE', 'REELS', 'CAROUSEL', 'STORY'].map((type) => (
+                {/* Native Instagram-Style Post Composer Frame */}
+                <div className="glass rounded-[28px] border border-slate-200 dark:border-white/15 overflow-hidden shadow-2xl flex flex-col">
+                  
+                  {/* Top Header Bar */}
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5 select-none">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImageUrl('');
+                        setVideoUrl('');
+                        setCarouselUrls([]);
+                        setCaption('');
+                        setPreview(null);
+                        setTagInput('');
+                        setCollaboratorInput('');
+                        setLocationInput('');
+                        setIsScheduling(false);
+                        setStatus(null);
+                      }}
+                      className="text-sm font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <span className="text-sm font-bold text-slate-850 dark:text-white uppercase tracking-wider">Create new post</span>
+                    <div className="flex items-center gap-3">
                       <button
-                        key={type}
                         type="button"
-                        onClick={() => {
-                          setPostType(type);
-                          setImageUrl('');
-                          setVideoUrl('');
-                          setCarouselUrls([]);
-                          setPreview(null);
-                          setStatus(null);
-                        }}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                          postType === type
-                            ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-md'
-                            : 'text-slate-400 hover:text-white'
-                        }`}
+                        onClick={() => handleAction('DRAFT')}
+                        disabled={submitting || uploading || (isScheduling && !scheduledDate)}
+                        className="text-sm font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white disabled:opacity-40 transition-colors cursor-pointer"
                       >
-                        {type === 'IMAGE' ? 'Image' : type === 'REELS' ? 'Reel' : type === 'CAROUSEL' ? 'Carousel' : 'Story'}
+                        {isScheduling ? 'Schedule' : 'Save Draft'}
                       </button>
-                    ))}
+                      <button
+                        type="button"
+                        onClick={() => handleAction('PUBLISH')}
+                        disabled={submitting || uploading}
+                        className="text-sm font-bold text-blue-600 hover:text-blue-500 dark:text-blue-500 dark:hover:text-blue-400 disabled:opacity-40 transition-colors cursor-pointer"
+                      >
+                        {submitting ? 'Sharing...' : 'Share'}
+                      </button>
+                    </div>
                   </div>
-                </div>
 
-                <div className="grid sm:grid-cols-2 gap-5">
-                  {/* Media Box */}
-                  <div className="space-y-3">
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
-                      Media Resource {postType === 'CAROUSEL' && `(${carouselUrls.length} Added)`}
-                    </label>
-                    <label className="flex flex-col items-center justify-center w-full aspect-square rounded-[16px] border-2 border-dashed border-primary/25 hover:border-primary/50 cursor-pointer bg-primary/5 hover:bg-primary/10 transition-all duration-200 relative overflow-hidden">
+                  {/* Mode & Post Type Selection Bar */}
+                  <div className="flex items-center justify-between px-4 py-2 bg-slate-50/40 dark:bg-white/5 border-b border-slate-200 dark:border-white/10 flex-wrap gap-2">
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Post Format:</span>
+                    <div className="flex bg-slate-100 dark:bg-white/5 p-0.5 rounded-lg border border-slate-200 dark:border-white/10">
+                      {['IMAGE', 'REELS', 'CAROUSEL', 'STORY'].map((type) => (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => {
+                            setPostType(type);
+                            setImageUrl('');
+                            setVideoUrl('');
+                            setCarouselUrls([]);
+                            setPreview(null);
+                            setStatus(null);
+                          }}
+                          className={`px-3 py-1.5 rounded text-xs font-bold transition-all ${
+                            postType === type ? 'bg-primary text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
+                          }`}
+                        >
+                          {type === 'IMAGE' ? 'Post' : type === 'REELS' ? 'Reel' : type === 'CAROUSEL' ? 'Carousel' : 'Story'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Dual Column Layout */}
+                  <div className="grid grid-cols-1 md:grid-cols-12 min-h-[420px]">
+                    
+                    {/* Left Column: Visual Media Preview Frame */}
+                    <div className="md:col-span-6 bg-slate-100/40 dark:bg-black/30 flex items-center justify-center relative border-b md:border-b-0 md:border-r border-slate-200 dark:border-white/10 min-h-[300px] md:min-h-0 aspect-square md:aspect-auto">
                       {preview ? (
-                        <div className="relative w-full h-full p-2">
-                          {postType === 'REELS' ? (
-                            <video src={preview} controls className="w-full h-full object-cover rounded-[14px]" />
-                          ) : (
-                            <div className="w-full h-full">
-                              <img src={preview} alt="Preview" className="w-full h-full object-cover rounded-[14px]" />
-                              {postType === 'CAROUSEL' && (
-                                <div className="absolute bottom-4 left-4 flex gap-1.5 overflow-x-auto max-w-[80%] bg-black/60 p-1 rounded-lg">
-                                  {carouselUrls.map((url, idx) => (
-                                    <img
-                                      key={idx}
-                                      src={url}
-                                      alt="thumb"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        setPreview(url);
-                                      }}
-                                      className={`w-8 h-8 object-cover rounded border-2 cursor-pointer ${preview === url ? 'border-primary' : 'border-transparent'}`}
-                                    />
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          )}
+                        <div className="absolute inset-0 p-3 flex flex-col justify-between">
+                          <div className="w-full h-full relative overflow-hidden rounded-xl bg-slate-200 dark:bg-slate-900 flex items-center justify-center">
+                            {postType === 'REELS' ? (
+                              <video src={preview} controls className="w-full h-full object-cover" />
+                            ) : (
+                              <img src={preview} alt="Preview" className={`w-full h-full transition-all duration-300 ${imageFit === 'cover' ? 'object-cover' : 'object-contain'}`} />
+                            )}
+                            
+                            {/* Native Image Crop/Aspect toggle */}
+                            {postType !== 'REELS' && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setImageFit(prev => prev === 'cover' ? 'contain' : 'cover');
+                                }}
+                                className="absolute bottom-4 right-4 px-2.5 py-1 text-[9px] font-bold rounded-lg bg-black/80 text-white border border-white/10 z-20 cursor-pointer"
+                              >
+                                {imageFit === 'cover' ? 'Fit Entire' : 'Fill Frame'}
+                              </button>
+                            )}
+
+                            {postType === 'CAROUSEL' && (
+                              <div className="absolute bottom-4 left-4 flex gap-1 bg-black/80 p-1 rounded-lg max-w-[50%] overflow-x-auto z-20">
+                                {carouselUrls.map((url, idx) => (
+                                  <img
+                                    key={idx}
+                                    src={url}
+                                    alt="thumb"
+                                    onClick={() => setPreview(url)}
+                                    className={`w-7 h-7 object-cover rounded border cursor-pointer ${preview === url ? 'border-primary' : 'border-transparent'}`}
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          
                           <button
                             type="button"
-                            onClick={(e) => {
-                              e.preventDefault();
+                            onClick={() => {
                               setPreview(null);
                               setImageUrl('');
                               setVideoUrl('');
                               setCarouselUrls([]);
                             }}
-                            className="absolute top-4 right-4 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-white"
+                            className="absolute top-5 right-5 w-6 h-6 rounded-full bg-black/80 flex items-center justify-center text-white cursor-pointer hover:bg-black/90 z-20"
                           >
-                            <X size={14} />
+                            <X size={12} />
                           </button>
                         </div>
                       ) : uploading ? (
-                        <div className="flex flex-col items-center gap-2 text-slate-500">
-                          <Loader2 size={28} className="animate-spin text-primary" />
-                          <span className="text-xs font-medium">Uploading...</span>
+                        <div className="flex flex-col items-center gap-2 text-slate-500 py-12">
+                          <Loader2 size={24} className="animate-spin text-primary" />
+                          <span className="text-[10px] font-semibold">Uploading Media...</span>
                         </div>
                       ) : (
-                        <div className="flex flex-col items-center gap-2 text-slate-500 text-center p-4">
-                          <Upload size={28} className="text-primary/60" />
-                          <span className="text-xs font-semibold">Select Files</span>
-                          <span className="text-[10px] text-slate-400">
-                            {postType === 'IMAGE' && 'JPG, PNG, WebP'}
-                            {postType === 'REELS' && 'MP4 / MOV videos'}
-                            {postType === 'CAROUSEL' && 'Add multiple images'}
-                            {postType === 'STORY' && 'Photo or Video file'}
+                        <label className="flex flex-col items-center justify-center p-6 text-center cursor-pointer w-full h-full hover:bg-slate-100/50 dark:hover:bg-white/5 transition-all select-none">
+                          <Upload size={32} className="text-blue-500 mb-3 animate-pulse" />
+                          <span className="text-xs font-bold text-slate-800 dark:text-white mb-1">Drag photos and videos here</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400">
+                            {postType === 'IMAGE' && 'JPG, PNG, WebP format'}
+                            {postType === 'REELS' && 'Reel Video files'}
+                            {postType === 'CAROUSEL' && 'Select multiple images'}
+                            {postType === 'STORY' && 'Photo or short video'}
                           </span>
+                          <input
+                            type="file"
+                            multiple={postType === 'CAROUSEL'}
+                            accept={postType === 'REELS' ? 'video/*' : postType === 'STORY' ? 'image/*,video/*' : 'image/*'}
+                            className="hidden"
+                            onChange={handleFileUpload}
+                            disabled={uploading}
+                          />
+                        </label>
+                      )}
+                    </div>
+
+                    {/* Right Column: Native Compose Fields & Meta options */}
+                    <div className="md:col-span-6 flex flex-col bg-slate-50/30 dark:bg-white/5">
+                      
+                      {postType !== 'STORY' ? (
+                        <div className="p-4 flex flex-col flex-1 space-y-4">
+                          
+                          {/* Sicky User Header */}
+                          <div className="flex items-center gap-2 pb-2 border-b border-slate-200 dark:border-white/5">
+                            <img
+                              src={profile?.profile_picture_url || 'https://www.instagram.com/favicon.ico'}
+                              className="w-7 h-7 rounded-full object-cover border border-slate-200 dark:border-white/20"
+                              alt="avatar"
+                            />
+                            <div className="text-left">
+                              <span className="text-xs font-bold text-slate-800 dark:text-white block">@{profile?.username || 'sickykumar'}</span>
+                              {locationInput && (
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">📍 {locationInput}</span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Borderless Caption Editor */}
+                          <div className="flex flex-col flex-1 min-h-[140px]">
+                            <textarea
+                              value={caption}
+                              onChange={(e) => setCaption(e.target.value)}
+                              placeholder="Write a caption..."
+                              className="w-full bg-transparent border-none outline-none focus:outline-none focus:ring-0 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 resize-none min-h-[120px] leading-relaxed p-0"
+                              disabled={generatingCaption || generatingTags}
+                            />
+                          </div>
+
+                          {/* AI Copilot Prompt Panel */}
+                          <div className="bg-slate-100/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3 rounded-xl space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                                <Sparkles size={10} className="text-primary" />
+                                AI Caption Copilot
+                              </span>
+                              {generatingTags && (
+                                <span className="text-[8px] text-primary animate-pulse">Generating...</span>
+                              )}
+                            </div>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                value={aiTopic}
+                                onChange={(e) => setAiTopic(e.target.value)}
+                                placeholder="Topic seed (e.g. driving road trip)"
+                                className="flex-1 px-3 py-1.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none"
+                                disabled={generatingTags}
+                              />
+                              <button
+                                type="button"
+                                onClick={generateAICaptionAndHashtags}
+                                disabled={generatingTags || !aiTopic.trim()}
+                                className="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-bold flex items-center justify-center cursor-pointer disabled:opacity-40"
+                              >
+                                Write
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Advanced Native Settings */}
+                          <div className="border-t border-slate-200 dark:border-white/5 pt-3 space-y-2.5">
+                            {/* Location row */}
+                            <div className="relative" ref={locationRef}>
+                              <div className="flex items-center justify-between gap-3 bg-slate-100/30 dark:bg-white/5 px-3 py-2 rounded-xl border border-slate-200 dark:border-white/5">
+                                <span className="text-xs font-semibold text-slate-650 dark:text-slate-300">Add Location</span>
+                                <input
+                                  type="text"
+                                  value={locationInput}
+                                  onChange={(e) => setLocationInput(e.target.value)}
+                                  onFocus={() => setShowLocationSuggestions(true)}
+                                  placeholder="📍 Mumbai, India"
+                                  className="bg-transparent border-none text-right text-xs text-slate-800 dark:text-white focus:outline-none placeholder-slate-400 dark:placeholder-slate-600 max-w-[60%] p-0"
+                                />
+                              </div>
+                              
+                              <AnimatePresence>
+                                {showLocationSuggestions && (
+                                  <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="relative mt-1.5 w-full bg-white/40 dark:bg-black/20 border border-slate-200/60 dark:border-white/10 rounded-xl p-2.5 flex flex-col gap-2.5 select-none overflow-hidden"
+                                  >
+                                    {/* Map Search Section */}
+                                    {locationInput.trim().length >= 3 && (
+                                      <div className="space-y-1 text-left">
+                                        <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
+                                          <span>📍 Live Map Search</span>
+                                          {searchingMap && <span className="animate-spin h-2 w-2 border border-primary border-t-transparent rounded-full" />}
+                                        </div>
+                                        <div className="flex flex-wrap gap-1">
+                                          {mapLocations.map((loc) => (
+                                            <button
+                                              key={loc}
+                                              type="button"
+                                              onMouseDown={(e) => { e.preventDefault(); setLocationInput(loc); }}
+                                              className="px-2 py-1 rounded-lg bg-primary/10 dark:bg-primary/20 hover:bg-primary hover:text-white text-[10px] text-primary dark:text-primary-light transition-all cursor-pointer border border-primary/20 whitespace-nowrap"
+                                            >
+                                              {loc}
+                                            </button>
+                                          ))}
+                                          {mapLocations.length === 0 && !searchingMap && (
+                                            <span className="text-[9px] text-slate-500 italic p-0.5">No map matches found</span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Saved Locations Section */}
+                                    <div className="space-y-1 text-left">
+                                      <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">⭐ Saved Locations</span>
+                                      <div className="flex flex-wrap gap-1">
+                                        {filteredLocSuggestions.map((loc) => (
+                                          <button
+                                            key={loc}
+                                            type="button"
+                                            onMouseDown={(e) => { e.preventDefault(); setLocationInput(loc); }}
+                                            className="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white text-[10px] text-slate-600 dark:text-slate-300 transition-all cursor-pointer border border-slate-200/50 dark:border-slate-700/50 whitespace-nowrap"
+                                          >
+                                            {loc}
+                                          </button>
+                                        ))}
+                                        {filteredLocSuggestions.length === 0 && (
+                                          <span className="text-[10px] text-slate-500 p-1">No saved locations match</span>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    <form 
+                                      onSubmit={(e) => {
+                                        e.preventDefault();
+                                        const val = e.target.customLoc.value.trim();
+                                        if (val && !suggestedLocations.includes(val)) {
+                                          setSuggestedLocations(prev => [...prev, val]);
+                                          setLocationInput(val);
+                                          e.target.reset();
+                                        }
+                                      }} 
+                                      className="flex gap-1.5 border-t border-slate-100 dark:border-white/5 pt-2"
+                                    >
+                                      <input 
+                                        name="customLoc" 
+                                        type="text" 
+                                        placeholder="Add custom location..." 
+                                        className="flex-1 px-2.5 py-1 text-[10px] bg-slate-105 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-lg text-slate-800 dark:text-white focus:outline-none" 
+                                      />
+                                      <button type="submit" className="px-2.5 py-1 bg-primary text-white text-[10px] font-bold rounded-lg">+</button>
+                                    </form>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+
+                            {/* Tagging row */}
+                            <div className="relative" ref={tagRef}>
+                              <div className="flex items-center justify-between gap-3 bg-slate-100/30 dark:bg-white/5 px-3 py-2 rounded-xl border border-slate-200 dark:border-white/5">
+                                <span className="text-xs font-semibold text-slate-650 dark:text-slate-300">Tag People</span>
+                                <input
+                                  type="text"
+                                  value={tagInput}
+                                  onChange={(e) => setTagInput(e.target.value)}
+                                  onFocus={() => setShowTagSuggestions(true)}
+                                  placeholder="e.g. user1, user2"
+                                  className="bg-transparent border-none text-right text-xs text-slate-800 dark:text-white focus:outline-none placeholder-slate-400 dark:placeholder-slate-600 max-w-[60%] p-0"
+                                />
+                              </div>
+                              
+                              <AnimatePresence>
+                                {showTagSuggestions && (
+                                  <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="relative mt-1.5 w-full bg-white/40 dark:bg-black/20 border border-slate-200/60 dark:border-white/10 rounded-xl p-2.5 flex flex-col gap-2 select-none overflow-hidden"
+                                  >
+                                    <div className="flex flex-wrap gap-1">
+                                      {filteredTagSuggestions.map((acc) => (
+                                        <button
+                                          key={acc}
+                                          type="button"
+                                          onMouseDown={(e) => { e.preventDefault(); handleSelectTag(acc); }}
+                                          className="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white text-[10px] text-slate-600 dark:text-slate-300 transition-all cursor-pointer border border-slate-200/50 dark:border-slate-700/50 whitespace-nowrap"
+                                        >
+                                          @{acc}
+                                        </button>
+                                      ))}
+                                      {filteredTagSuggestions.length === 0 && (
+                                        <span className="text-[10px] text-slate-500 p-1">No matching users</span>
+                                      )}
+                                    </div>
+                                    <form 
+                                      onSubmit={(e) => {
+                                        e.preventDefault();
+                                        const val = e.target.customTag.value.trim().replace('@', '');
+                                        if (val && !suggestedTags.includes(val)) {
+                                          setSuggestedTags(prev => [...prev, val]);
+                                          handleSelectTag(val);
+                                          e.target.reset();
+                                        }
+                                      }} 
+                                      className="flex gap-1.5 border-t border-slate-100 dark:border-white/5 pt-2"
+                                    >
+                                      <input 
+                                        name="customTag" 
+                                        type="text" 
+                                        placeholder="Add custom username..." 
+                                        className="flex-1 px-2.5 py-1 text-[10px] bg-slate-105 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-lg text-slate-800 dark:text-white focus:outline-none" 
+                                      />
+                                      <button type="submit" className="px-2.5 py-1 bg-primary text-white text-[10px] font-bold rounded-lg">+</button>
+                                    </form>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+
+                            {/* Collaborator row */}
+                            <div className="relative" ref={collabRef}>
+                              <div className="flex items-center justify-between gap-3 bg-slate-100/30 dark:bg-white/5 px-3 py-2 rounded-xl border border-slate-200 dark:border-white/5">
+                                <span className="text-xs font-semibold text-slate-650 dark:text-slate-300">Collaborator</span>
+                                <input
+                                  type="text"
+                                  value={collaboratorInput}
+                                  onChange={(e) => setCollaboratorInput(e.target.value)}
+                                  onFocus={() => setShowCollabSuggestions(true)}
+                                  placeholder="e.g. partner_account"
+                                  className="bg-transparent border-none text-right text-xs text-slate-800 dark:text-white focus:outline-none placeholder-slate-400 dark:placeholder-slate-600 max-w-[60%] p-0"
+                                />
+                              </div>
+                              
+                              <AnimatePresence>
+                                {showCollabSuggestions && (
+                                  <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="relative mt-1.5 w-full bg-white/40 dark:bg-black/20 border border-slate-200/60 dark:border-white/10 rounded-xl p-2.5 flex flex-col gap-2 select-none overflow-hidden"
+                                  >
+                                    <div className="flex flex-wrap gap-1">
+                                      {filteredCollabSuggestions.map((acc) => (
+                                        <button
+                                          key={acc}
+                                          type="button"
+                                          onMouseDown={(e) => { e.preventDefault(); handleSelectCollab(acc); }}
+                                          className="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white text-[10px] text-slate-600 dark:text-slate-300 transition-all cursor-pointer border border-slate-200/50 dark:border-slate-700/50 whitespace-nowrap"
+                                        >
+                                          @{acc}
+                                        </button>
+                                      ))}
+                                      {filteredCollabSuggestions.length === 0 && (
+                                        <span className="text-[10px] text-slate-500 p-1">No matching users</span>
+                                      )}
+                                    </div>
+                                    <form 
+                                      onSubmit={(e) => {
+                                        e.preventDefault();
+                                        const val = e.target.customCollab.value.trim().replace('@', '');
+                                        if (val && !suggestedTags.includes(val)) {
+                                          setSuggestedTags(prev => [...prev, val]);
+                                          handleSelectCollab(val);
+                                          e.target.reset();
+                                        }
+                                      }} 
+                                      className="flex gap-1.5 border-t border-slate-100 dark:border-white/5 pt-2"
+                                    >
+                                      <input 
+                                        name="customCollab" 
+                                        type="text" 
+                                        placeholder="Add custom username..." 
+                                        className="flex-1 px-2.5 py-1 text-[10px] bg-slate-105 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-lg text-slate-800 dark:text-white focus:outline-none" 
+                                      />
+                                      <button type="submit" className="px-2.5 py-1 bg-primary text-white text-[10px] font-bold rounded-lg">+</button>
+                                    </form>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+
+                            {/* Schedule Setting */}
+                            <div className="bg-slate-100/30 dark:bg-white/5 p-3 rounded-xl border border-slate-200 dark:border-white/5 space-y-2">
+                              <label className="flex items-center justify-between cursor-pointer select-none">
+                                <span className="text-xs font-semibold text-slate-650 dark:text-slate-300">Schedule Post</span>
+                                <input
+                                  type="checkbox"
+                                  checked={isScheduling}
+                                  onChange={(e) => setIsScheduling(e.target.checked)}
+                                  className="rounded border-slate-350 dark:border-white/20 bg-white dark:bg-white/5 text-primary focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5 cursor-pointer"
+                                />
+                              </label>
+
+                              {isScheduling && (
+                                <motion.div
+                                  initial={{ opacity: 0, height: 0 }}
+                                  animate={{ opacity: 1, height: 'auto' }}
+                                  exit={{ opacity: 0, height: 0 }}
+                                  className="space-y-1 pt-1.5"
+                                >
+                                  <input
+                                    type="datetime-local"
+                                    value={scheduledDate}
+                                    onChange={(e) => setScheduledDate(e.target.value)}
+                                    required={isScheduling}
+                                    className="w-full px-2.5 py-1.5 text-[9px] rounded-lg bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300 focus:outline-none"
+                                  />
+                                </motion.div>
+                              )}
+                            </div>
+
+                          </div>
+
+                        </div>
+                      ) : (
+                        <div className="p-8 flex flex-col items-center justify-center text-center space-y-3 flex-1">
+                          <Globe size={32} className="text-primary/60" />
+                          <p className="text-xs font-bold text-slate-850 dark:text-white">Instagram Story Mode</p>
+                          <p className="text-[9px] text-slate-500 dark:text-slate-400 leading-relaxed max-w-[200px]">
+                            Stories are shared without captions, tags, or locations directly via the API. Upload your media and hit "Share" to post.
+                          </p>
                         </div>
                       )}
-                      <input
-                        type="file"
-                        multiple={postType === 'CAROUSEL'}
-                        accept={postType === 'REELS' ? 'video/*' : postType === 'STORY' ? 'image/*,video/*' : 'image/*'}
-                        className="hidden"
-                        onChange={handleFileUpload}
-                        disabled={uploading}
-                      />
-                    </label>
+
+                    </div>
+
                   </div>
 
-                  {/* Caption & AI Generator */}
-                  {postType !== 'STORY' ? (
-                    <div className="flex flex-col space-y-4">
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                          AI Hashtag Generator
-                        </label>
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={aiTopic}
-                            onChange={(e) => setAiTopic(e.target.value)}
-                            placeholder="e.g. Nextjs portfolio website"
-                            className="flex-1 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-300 focus:outline-none focus:border-primary/40"
-                          />
-                          <button
-                            type="button"
-                            onClick={generateAIHashtags}
-                            disabled={generatingTags || !aiTopic.trim()}
-                            className="px-4 py-2 rounded-xl bg-primary/10 border border-primary/25 hover:bg-primary/20 text-xs font-semibold text-primary flex items-center gap-1.5 disabled:opacity-50"
-                          >
-                            <Hash size={13} />
-                            Generate
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="flex-1 flex flex-col">
-                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                          Caption
-                        </label>
-                        <textarea
-                          value={caption}
-                          onChange={(e) => setCaption(e.target.value)}
-                          maxLength={2200}
-                          rows={6}
-                          placeholder="Write your caption..."
-                          className="flex-1 w-full px-4 py-3 rounded-[14px] bg-white/5 border border-white/10 focus:border-primary/40 focus:outline-none text-sm text-slate-700 dark:text-slate-300 placeholder-slate-400 resize-none leading-relaxed"
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center p-8 bg-white/5 border border-white/10 rounded-2xl text-center space-y-2">
-                      <Globe size={32} className="text-primary/60" />
-                      <p className="text-xs font-bold text-slate-300">Instagram Story Post Mode</p>
-                      <p className="text-[10px] text-slate-500 leading-relaxed max-w-[240px]">
-                        Captions and hashtags are not supported on Stories via the Meta API. Upload a photo or video to post directly.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {status && (
-                  <div className={`flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-semibold ${status.type === 'success' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
-                    <CheckCircle size={14} className={status.type === 'success' ? 'text-green-400' : 'text-red-400'} />
-                    {status.msg}
-                  </div>
-                )}
-
-                <div className="flex gap-4">
-                  <button
-                    type="button"
-                    onClick={() => handleAction('PUBLISH')}
-                    disabled={submitting || uploading}
-                    className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-semibold text-sm shadow-lg disabled:opacity-50"
-                  >
-                    {submitting ? <Loader2 size={16} className="animate-spin" /> : <Globe size={16} />}
-                    Publish to Instagram
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleAction('DRAFT')}
-                    disabled={submitting || uploading}
-                    className="px-6 py-3 rounded-xl bg-white/5 text-xs text-slate-300 border border-white/10 hover:bg-white/10 transition-all font-semibold"
-                  >
-                    Save to Drafts
-                  </button>
                 </div>
               </motion.div>
             ) : (
@@ -490,22 +1018,41 @@ export const PublishForm = memo(({ onSuccess, passcode }) => {
                           </span>
                         </div>
                         <div className="flex-1 flex flex-col justify-between overflow-hidden">
-                          <div className="space-y-1">
-                            <p className="text-xs text-slate-300 line-clamp-3 leading-relaxed">
-                              {draft.caption}
+                          <div className="space-y-1.5">
+                            <p className="text-xs text-slate-350 line-clamp-2 leading-relaxed">
+                              {draft.caption || '(No caption)'}
                             </p>
-                            <span className="text-[9px] text-slate-500">
-                              Saved {new Date(draft.createdAt).toLocaleDateString()}
-                            </span>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[9px] text-slate-550">
+                                Created {new Date(draft.createdAt).toLocaleDateString()}
+                              </span>
+                              {draft.status === 'scheduled' && (
+                                <span className="text-[9.5px] font-semibold text-amber-450 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded w-fit">
+                                  ⏰ Scheduled: {new Date(draft.scheduledFor).toLocaleString()}
+                                </span>
+                              )}
+                              {draft.status === 'failed' && (
+                                <span className="text-[9.5px] font-semibold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded w-fit" title={draft.errorMessage}>
+                                  ⚠ Failed: {draft.errorMessage || 'Unknown error'}
+                                </span>
+                              )}
+                              {draft.status === 'published' && (
+                                <span className="text-[9.5px] font-semibold text-green-450 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded w-fit">
+                                  ✓ Published
+                                </span>
+                              )}
+                            </div>
                           </div>
                           <div className="flex gap-2 mt-3">
-                            <button
-                              onClick={() => publishDraft(draft)}
-                              className="flex-1 py-1.5 rounded-lg bg-primary text-white text-[10px] font-bold flex items-center justify-center gap-1"
-                            >
-                              <Send size={10} />
-                              Publish
-                            </button>
+                            {draft.status !== 'published' && (
+                              <button
+                                onClick={() => publishDraft(draft)}
+                                className="flex-1 py-1.5 rounded-lg bg-primary text-white text-[10px] font-bold flex items-center justify-center gap-1"
+                              >
+                                <Send size={10} />
+                                {draft.status === 'scheduled' ? 'Publish Now' : 'Publish'}
+                              </button>
+                            )}
                             <button
                               onClick={() => deleteDraft(draft._id)}
                               className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20"

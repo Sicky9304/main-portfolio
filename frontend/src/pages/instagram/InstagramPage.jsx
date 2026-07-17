@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ExternalLink, Image, Video,
-  Layers, Clock, RefreshCw, Lock, X, Users
+  Layers, Clock, RefreshCw, Lock, X, Users,
+  ChevronLeft, ChevronRight, MapPin
 } from 'lucide-react';
 import { RevealOnScroll } from '../../components/ui/Animations';
 import { PublishForm } from './CreatorStudio';
@@ -11,12 +12,15 @@ import { PublishForm } from './CreatorStudio';
 // CONSTANTS & HELPERS
 // ============================================================
 const getApiBase = () => {
+  if (import.meta.env.DEV) {
+    return '/api';
+  }
   const url = import.meta.env.VITE_API_URL || '';
   if (url.endsWith('/api')) return url;
   return url ? `${url}/api` : '/api';
 };
 const API_BASE = getApiBase();
-const ADMIN_PASSCODE = import.meta.env.VITE_ADMIN_PASSCODE || 'Sicky9304@';
+const ADMIN_PASSCODE = import.meta.env.VITE_ADMIN_PASSCODE || 'Sicky9304@@';
 
 // Session-persistent cache variables
 let clientPostsCache = null;
@@ -74,6 +78,7 @@ const SkeletonCard = memo(() => (
 const PostCard = memo(({ post, index }) => {
   const [imgError, setImgError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [activeSlide, setActiveSlide] = useState(0);
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -110,6 +115,49 @@ const PostCard = memo(({ post, index }) => {
             playsInline
             style={{ transform: isHovered ? 'scale(1.06)' : 'scale(1)' }}
           />
+        ) : post.mediaType === 'CAROUSEL_ALBUM' && post.carouselMedia?.length > 0 ? (
+          <div className="relative w-full h-full">
+            <motion.img
+              key={activeSlide}
+              src={post.carouselMedia[activeSlide]}
+              alt={post.caption || 'Instagram Carousel'}
+              loading="lazy"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1, scale: isHovered ? 1.06 : 1 }}
+              transition={{ duration: 0.3 }}
+              className="w-full h-full object-cover"
+            />
+            
+            {/* Arrows */}
+            {activeSlide > 0 && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); e.preventDefault(); setActiveSlide(prev => prev - 1); }}
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center text-white transition-all z-20"
+              >
+                <ChevronLeft size={16} />
+              </button>
+            )}
+            {activeSlide < post.carouselMedia.length - 1 && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); e.preventDefault(); setActiveSlide(prev => prev + 1); }}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center text-white transition-all z-20"
+              >
+                <ChevronRight size={16} />
+              </button>
+            )}
+
+            {/* Indicators */}
+            <div className="absolute bottom-2.5 left-0 right-0 mx-auto flex justify-center gap-1.5 z-20">
+              {post.carouselMedia.map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`w-1.5 h-1.5 rounded-full transition-all ${idx === activeSlide ? 'bg-primary w-3.5' : 'bg-white/40'}`}
+                />
+              ))}
+            </div>
+          </div>
         ) : !imgError ? (
           <motion.img
             src={post.mediaUrl}
@@ -144,6 +192,12 @@ const PostCard = memo(({ post, index }) => {
             <Clock size={10} />
             {timeAgo(post.timestamp)}
           </span>
+          {post.location && (
+            <span className="flex items-center gap-0.5 text-[10px] font-bold text-primary/80 truncate max-w-[60%]">
+              <MapPin size={10} className="text-secondary" />
+              {post.location}
+            </span>
+          )}
         </div>
         <a
           href={post.permalink}
@@ -176,6 +230,7 @@ export default function InstagramPage() {
   const [passcode, setPasscode] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [passcodeError, setPasscodeError] = useState('');
+  const [activeFilter, setActiveFilter] = useState('ALL'); // 'ALL' | 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM'
 
   const fetchPosts = useCallback(async (isRefresh = false) => {
     // If not a manual refresh and we have cached data, use it directly
@@ -342,32 +397,32 @@ export default function InstagramPage() {
             Latest posts &amp; reels directly connected with Instagram Live API.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
+          <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
             <button
               type="button"
               onClick={() => fetchPosts(true)}
               disabled={refreshing}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass border border-white/10 text-xs font-semibold text-slate-300 hover:border-primary/20 transition-all duration-200"
+              className="flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-sm font-bold text-white shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/35 hover:-translate-y-0.5 active:translate-y-0 active:scale-98 transition-all duration-200 cursor-pointer min-w-[200px] border border-white/10"
             >
-              <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+              <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
               {refreshing ? 'Refreshing…' : 'Refresh Feed'}
             </button>
             {!isAdmin ? (
               <button
                 type="button"
                 onClick={() => setShowAdminGate(true)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass border border-white/10 text-xs font-semibold text-slate-300 hover:border-primary/30 transition-all"
+                className="flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/35 hover:-translate-y-0.5 active:translate-y-0 active:scale-98 transition-all duration-200 cursor-pointer min-w-[200px] border border-white/10"
               >
-                <Lock size={14} />
+                <Lock size={16} />
                 Access Creator Studio
               </button>
             ) : (
               <button
                 type="button"
                 onClick={() => setIsAdmin(false)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-xs font-semibold text-red-400 hover:bg-red-500/20 transition-all"
+                className="flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-rose-500 to-red-650 hover:from-rose-600 hover:to-red-700 text-sm font-bold text-white shadow-lg shadow-red-500/20 hover:shadow-red-500/35 hover:-translate-y-0.5 active:translate-y-0 active:scale-98 transition-all duration-200 cursor-pointer min-w-[200px] border border-white/10"
               >
-                <X size={14} />
+                <X size={16} />
                 Exit Creator Studio
               </button>
             )}
@@ -375,7 +430,29 @@ export default function InstagramPage() {
         </motion.div>
 
         {/* Creator Studio Form */}
-        {isAdmin && <PublishForm onSuccess={() => fetchPosts(true)} passcode={passcode} />}
+        {isAdmin && <PublishForm onSuccess={() => fetchPosts(true)} passcode={passcode} profile={profile} />}
+
+        {/* Category Filters */}
+        <div className="flex justify-center gap-2 mb-10 max-w-sm mx-auto bg-white/5 p-1 rounded-2xl border border-white/10">
+          {[
+            { id: 'ALL', label: 'All' },
+            { id: 'IMAGE', label: 'Photos' },
+            { id: 'VIDEO', label: 'Videos' },
+            { id: 'CAROUSEL_ALBUM', label: 'Carousels' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveFilter(tab.id)}
+              className={`flex-1 py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
+                activeFilter === tab.id
+                  ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
         {/* Main Grid */}
         {!error ? (
@@ -383,7 +460,12 @@ export default function InstagramPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
               {loading
                 ? Array.from({ length: 9 }).map((_, i) => <SkeletonCard key={i} />)
-                : posts.map((post, i) => <PostCard key={post.id} post={post} index={i} />)
+                : posts
+                    .filter(post => {
+                      if (activeFilter === 'ALL') return true;
+                      return post.mediaType === activeFilter;
+                    })
+                    .map((post, i) => <PostCard key={post.id} post={post} index={i} />)
               }
             </div>
 
@@ -415,22 +497,60 @@ export default function InstagramPage() {
         {/* Passcode Gate Dialog */}
         <AnimatePresence>
           {showAdminGate && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-              <div className="glass rounded-[24px] p-6 w-full max-w-sm border border-primary/20">
-                <h3 className="text-sm font-bold text-white text-center mb-4">Passcode Required</h3>
-                <input
-                  type="password"
-                  value={passcode}
-                  onChange={(e) => setPasscode(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white mb-3"
-                  placeholder="Enter Admin passcode"
-                />
-                {passcodeError && <p className="text-xs text-red-500 mb-3">{passcodeError}</p>}
-                <div className="flex gap-2">
-                  <button onClick={handlePasscode} className="flex-1 py-2 rounded-xl bg-primary text-xs font-bold text-white">Verify</button>
-                  <button onClick={() => setShowAdminGate(false)} className="flex-1 py-2 rounded-xl bg-white/5 text-xs text-slate-300 border border-white/10">Cancel</button>
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md">
+              <motion.div
+                initial={{ scale: 0.92, opacity: 0, y: 15 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.92, opacity: 0, y: 15 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                className="bg-gradient-to-b from-slate-900 via-indigo-950/95 to-slate-950 rounded-[32px] p-8 w-full max-w-md border-2 border-primary/45 shadow-[0_25px_60px_-15px_rgba(99,102,241,0.5)] relative overflow-hidden text-center"
+              >
+                <div className="blob blob-primary w-[120px] h-[120px] -top-12 -left-12 opacity-20 pointer-events-none" />
+                
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className="mb-5 w-16 h-16 rounded-2xl bg-gradient-to-tr from-primary to-secondary border-2 border-white/20 flex items-center justify-center text-white shadow-lg shadow-primary/30">
+                    <Lock size={26} className="animate-pulse" />
+                  </div>
+                  
+                  <h3 className="text-2xl font-extrabold text-white mb-2 tracking-wide">Creator Studio Access</h3>
+                  <p className="text-xs text-slate-200 dark:text-slate-200 font-semibold mb-6 leading-relaxed">
+                    Please enter your administrative security passcode to unlock creation and publishing modules.
+                  </p>
+                  
+                  <input
+                    type="password"
+                    value={passcode}
+                    onChange={(e) => setPasscode(e.target.value)}
+                    className="w-full px-4 py-4 rounded-2xl bg-black/60 border border-indigo-500/30 text-sm text-white mb-5 focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20 transition-all text-center tracking-widest placeholder-slate-600 font-bold shadow-inner"
+                    placeholder="••••••••"
+                  />
+                  
+                  {passcodeError && (
+                    <motion.p 
+                      initial={{ opacity: 0, y: -5 }} 
+                      animate={{ opacity: 1, y: 0 }} 
+                      className="text-xs text-red-400 font-bold mb-5 bg-red-500/10 px-3 py-2 rounded-xl border border-red-500/20 w-full"
+                    >
+                      ⚠️ {passcodeError}
+                    </motion.p>
+                  )}
+                  
+                  <div className="flex gap-3 w-full">
+                    <button 
+                      onClick={handlePasscode} 
+                      className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-primary to-secondary hover:from-primary/95 hover:to-secondary/95 text-xs font-bold text-white shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-150 cursor-pointer"
+                    >
+                      Verify
+                    </button>
+                    <button 
+                      onClick={() => { setShowAdminGate(false); setPasscodeError(''); }} 
+                      className="flex-1 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 text-xs font-bold text-white border border-white/15 hover:border-white/25 transition-all cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
           )}
         </AnimatePresence>

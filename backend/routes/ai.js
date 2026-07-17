@@ -64,7 +64,8 @@ Your goals:
 2. Pitch my development services with enthusiasm and confidence.
 3. Recommend specific projects of mine based on their needs.
 4. Encourage them to hire me, use the Contact form, or email me directly at sickykumar01@gmail.com.
-5. Format your responses in clean markdown, keeping answers engaging and concise.`;
+5. If the user asks you to write, optimize, or generate an Instagram caption or social media post, write a highly creative, descriptive, warm, and engaging storytelling caption based on their topic. Append exactly 5 trending hashtags at the very end. Never use robotic phrases like "little human" for family/personal topics.
+6. Format your responses in clean markdown, keeping answers engaging and concise.`;
       } else {
         systemInstruction = `You are Sicky Kumar, the author of the blog. Speak in the first person ("I", "my"). You are helping the reader understand my blog post: "${context.title || ''}". Here is the article content:
 
@@ -241,6 +242,98 @@ Directly return the Markdown text itself. Do NOT prepend greetings, intros like 
     const data = await response.json();
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     res.json({ success: true, text });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * POST /api/ai/auto-caption
+ * Multimodal auto-caption generator based on uploaded photo or video context using Gemini 2.5 Flash
+ */
+router.post('/auto-caption', async (req, res, next) => {
+  try {
+    const { mediaUrl, postType = 'IMAGE', topic } = req.body;
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+      return res.json({
+        success: true,
+        text: topic
+          ? `Excited to share this update about ${topic}! 💻✨\n\n#mern #webdev #coding #javascript #developer`
+          : "Sharing some insights on web development and MERN stack today! 💻✨\n\n#mern #webdev #coding #javascript #developer"
+      });
+    }
+
+    const systemInstruction = `You are Sicky Kumar, a professional developer and creator.
+Write a highly engaging, creative, and 100% natural, warm caption for his Instagram post.
+IMPORTANT: Analyze the image/media context carefully.
+- Only use programming/developer jargon (like "bugs", "algorithms", "systems") if the image/media contains computers, screens, keyboards, or code.
+- For personal, family, outdoor, or travel photos, write a warm, natural, human-like lifestyle caption.
+- CRITICAL: Never use robotic, cold, or internet-meme-like phrases to describe people, such as "little human", "human companion", "co-pilot", "tiny human", or "specimen". Instead, describe relationships warmly and naturally (e.g., "my sister", "family time", "kid", "sibling", or just focus on the warm moment together).
+Include exactly 5 trending hashtags at the very end of the caption matching the post's tone (e.g. #FamilyTime, #RoadTrip, #DeveloperLife, #Sisters, #Moments).
+Directly return the caption and hashtags. Do NOT prepend greetings, intros, or chat-like explanations.`;
+
+    let userPrompt = `Create a detailed, awesome, descriptive, and slightly longer storytelling Instagram caption for a post of type ${postType}.`;
+    if (topic) {
+      userPrompt += ` Expand and elaborate on this input topic: "${topic}". Use it as the central theme and expand it into a creative, engaging, and awesome storytelling paragraph that feels authentic and complete.`;
+    }
+
+    let parts = [{ text: userPrompt }];
+
+    // If it's a photo and we have a valid URL, try fetching it to send as multimodal inlineData
+    const isImage = postType === 'IMAGE' || postType === 'CAROUSEL' || (postType === 'STORY' && !mediaUrl?.toLowerCase().match(/\.(mp4|mov|avi|wmv|flv|mkv|webm|m4v|3gp|qt)/));
+    if (isImage && mediaUrl && mediaUrl.startsWith('http')) {
+      try {
+        const imgRes = await fetch(mediaUrl);
+        const buffer = await imgRes.arrayBuffer();
+        const base64 = Buffer.from(buffer).toString('base64');
+        const mimeType = imgRes.headers.get('content-type') || 'image/jpeg';
+        
+        parts.push({
+          inlineData: {
+            mimeType,
+            data: base64
+          }
+        });
+      } catch (err) {
+        console.warn('Failed to fetch image for multimodal caption, falling back to text prompt:', err.message);
+        parts.push({ text: `The media is an image at URL: ${mediaUrl}` });
+      }
+    } else if (mediaUrl) {
+      parts.push({ text: `The media is a video/reel/story at URL: ${mediaUrl}` });
+    }
+
+    const response = await fetchWithRetry(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            role: 'user',
+            parts
+          }],
+          systemInstruction: {
+            parts: [{ text: systemInstruction }]
+          },
+          generationConfig: {
+            temperature: 0.8,
+            maxOutputTokens: 1000,
+          }
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Gemini API error status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    res.json({ success: true, text: text.trim() });
   } catch (error) {
     next(error);
   }
