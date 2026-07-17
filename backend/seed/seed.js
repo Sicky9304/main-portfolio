@@ -12,6 +12,36 @@ import Blog from '../blog/Blog.js';
 
 const PROJECTS = [
   {
+    title: 'Instagram Creator Studio',
+    slug: 'instagram-creator-studio',
+    tagline: 'Meta Graph API Instagram Feed, Reels, Scheduler & Creator Studio Hub',
+    description:
+      'A fully integrated Instagram management console that enables creators to browse live posts and reels via Meta Graph APIs, compose/publish single or carousel posts, write AI-assisted captions with Gemini 2.5, perform global OpenStreetMap geolocation lookup, and schedule posts using a background Node.js draft-publish automation scheduler.',
+    problem:
+      'Managing content publishing, tag/collaborator searching, and scheduling requires toggling across multiple tools. Third-party Instagram schedulers are expensive and lack custom portfolio feed integrations.',
+    features: [
+      'Meta Graph API live feed synchronization (photos, videos, reels, carousels)',
+      'Instagram Creator Studio publishing board with WebP canvas compression',
+      'AI Caption Copilot powered by Google Gemini 2.5 Flash',
+      'Global Location search via OpenStreetMap Nominatim API proxy',
+      'Secure passcode validation and local session cache persistence',
+      'Background draft publishing scheduler using cron automation tasks',
+    ],
+    tech: ['React.js', 'Node.js', 'Express.js', 'Meta Graph API', 'Gemini 2.5', 'MongoDB', 'Framer Motion'],
+    github: 'https://github.com/Sicky9304/main-portfolio.git',
+    demo: '/instagram',
+    color: 'from-pink-500 via-purple-600 to-indigo-700',
+    emoji: '📸',
+    status: 'Completed',
+    order: 0,
+    featured: true,
+    thumbnail: '/images/blogs/instagram_studio.png',
+    challenges: '### Technical Challenges\n- **Cross-Domain Fetch blocks**: Bypassing Yahoo/DuckDuckGo scraper limitations on server-side username queries and handling CORS restrictions.\n- **Authentication State**: Keeping the user logged into the Creator Studio securely across browser tabs.\n\n### Solutions\n- Integrated a standard Chrome User-Agent header proxying Yahoo Search to bypass rate limits.\n- Built a client-side click-outside React ref focus listener and localStorage token cache.',
+    architecture: '### App System Architecture\n```mermaid\ngraph TD\n  Client[React App] -->|Axios-fetch| API[Express API]\n  API -->|OSM Nominatim| GeoAPI[Map Places API]\n  API -->|Meta Graph SDK| Meta[Instagram API]\n  API -->|Scheduler| DB[(MongoDB Atlas)]\n```',
+    results: '### Key Results\n- **100% automated draft content scheduling** verified.\n- **Zero-lag real-world global geolocation matching** on the map.',
+    codeSnippet: '// Geolocation search query proxy\nconst searchUrl = `https://nominatim.openstreetmap.org/search?q=${query}`;\nconst res = await fetch(searchUrl);\nreturn res.json();',
+  },
+  {
     title: 'AI-Powered Food App',
     slug: 'ai-food-app',
     tagline: 'MERN food delivery platform with Stripe checkout & on-demand AI review analysis',

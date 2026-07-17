@@ -12,6 +12,29 @@ import { TiltCard } from '../../components/ui/TiltCard';
 // Fallback data (same as homepage fallback)
 const FALLBACK_PROJECTS = [
   {
+    _id: 'instagram-creator-studio',
+    slug: 'instagram-creator-studio',
+    title: 'Instagram Creator Studio',
+    tagline: 'Meta Graph API Instagram Feed, Reels, Scheduler & Creator Studio Hub',
+    description: 'A fully integrated Instagram management console that enables creators to browse live posts and reels via Meta Graph APIs, compose/publish single or carousel posts, write AI-assisted captions with Gemini 2.5, perform global OpenStreetMap geolocation lookup, and schedule posts using a background Node.js draft-publish automation scheduler.',
+    problem: 'Managing content publishing, tag/collaborator searching, and scheduling requires toggling across multiple tools. Third-party Instagram schedulers are expensive and lack custom portfolio feed integrations.',
+    features: [
+      'Meta Graph API live feed synchronization (photos, videos, reels, carousels)',
+      'Instagram Creator Studio publishing board with WebP canvas compression',
+      'AI Caption Copilot powered by Google Gemini 2.5 Flash',
+      'Global Location search via OpenStreetMap Nominatim API proxy',
+      'Secure passcode validation and local session cache persistence',
+      'Background draft publishing scheduler using cron automation tasks',
+    ],
+    tech: ['React.js', 'Node.js', 'Express.js', 'Meta Graph API', 'Gemini 2.5', 'MongoDB', 'Framer Motion'],
+    github: 'https://github.com/Sicky9304/main-portfolio.git',
+    demo: '/instagram',
+    color: 'from-pink-500 via-purple-600 to-indigo-700',
+    emoji: '📸',
+    status: 'Completed',
+    thumbnail: '/images/blogs/instagram_studio.png',
+  },
+  {
     _id: 'ai-food-app',
     slug: 'ai-food-app',
     title: 'AI-Powered Food App',
