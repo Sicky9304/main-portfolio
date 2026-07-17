@@ -59,7 +59,7 @@ const PROJECTS = [
     ],
     tech: ['React.js', 'Redux Toolkit', 'Node.js', 'Express.js', 'MongoDB', 'Stripe', 'Groq AI'],
     github: 'https://github.com/Sicky9304/ai-powered-food-app.git',
-    demo: 'https://github.com/Sicky9304/ai-powered-food-app',
+    demo: 'https://ai-powered-food-app.vercel.app/',
     color: 'from-orange-500 to-amber-500',
     emoji: '🍔',
     status: 'Completed',
