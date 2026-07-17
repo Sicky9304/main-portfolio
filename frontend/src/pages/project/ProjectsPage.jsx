@@ -32,7 +32,7 @@ const FALLBACK_PROJECTS = [
     color: 'from-pink-500 via-purple-600 to-indigo-700',
     emoji: '📸',
     status: 'Completed',
-    thumbnail: '/images/blogs/instagram_studio.png',
+    thumbnail: '/images/blogs/instagram_studio.webp',
   },
   {
     _id: 'ai-food-app',
@@ -55,7 +55,7 @@ const FALLBACK_PROJECTS = [
     color: 'from-orange-500 to-amber-500',
     emoji: '🍔',
     status: 'Completed',
-    thumbnail: '/images/blogs/food_app.png',
+    thumbnail: '/images/blogs/food_app.webp',
   },
   {
     _id: 'portfolio-admin',

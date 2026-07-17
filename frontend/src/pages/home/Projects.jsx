@@ -34,7 +34,7 @@ const FALLBACK_PROJECTS = [
     color: 'from-pink-500 via-purple-600 to-indigo-700',
     emoji: '📸',
     status: 'Completed',
-    thumbnail: '/images/blogs/instagram_studio.png',
+    thumbnail: '/images/blogs/instagram_studio.webp',
   },
   {
     _id: 'portfolio-admin',
